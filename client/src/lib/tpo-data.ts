@@ -457,46 +457,123 @@ export const TPO_PRODUCTS: Record<string, TPOProduct> = {
     description: "TPO primer for non-porous substrates, ~100 sq ft/gal",
   },
 
-  // Fasteners & Plates
-  "fastener-screws-short": {
-    id: "fastener-screws-short",
-    name: '#12 x 2" Roofing Screws',
-    category: "Fasteners",
+  // Fasteners - Screws (various lengths for different assembly thicknesses)
+  // Screw length = total insulation + cover board + deck penetration (~1.5")
+  "fastener-screws-2in": {
+    id: "fastener-screws-2in",
+    name: '#12 x 2" HD Roofing Screws',
+    category: "Fasteners & Plates",
     unit: "Box (1,000)",
     coveragePerUnit: 1000,
     coverageUnit: "pieces",
     defaultPrice: 67,
-    description: "SFS Dekfast #12 Phillips head roofing screws for thin assemblies",
+    description: "SFS Dekfast #12 roofing screws — for assemblies up to 1\" insulation",
   },
-  "fastener-screws-long": {
-    id: "fastener-screws-long",
-    name: '#14 x 4" Roofing Screws',
-    category: "Fasteners",
+  "fastener-screws-3in": {
+    id: "fastener-screws-3in",
+    name: '#14 x 3" HD Roofing Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 78,
+    description: "SFS Dekfast #14 roofing screws — for assemblies 1\"–2\" insulation",
+  },
+  "fastener-screws-4in": {
+    id: "fastener-screws-4in",
+    name: '#14 x 4" HD Roofing Screws',
+    category: "Fasteners & Plates",
     unit: "Box (1,000)",
     coveragePerUnit: 1000,
     coverageUnit: "pieces",
     defaultPrice: 95,
-    description: "Heavy-duty roofing screws for thicker insulation assemblies",
+    description: "SFS Dekfast #14 roofing screws — for assemblies 2\"–3\" insulation",
   },
+  "fastener-screws-5in": {
+    id: "fastener-screws-5in",
+    name: '#14 x 5" HD Roofing Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 110,
+    description: "SFS Dekfast #14 roofing screws — for assemblies 3\"–4\" insulation",
+  },
+  "fastener-screws-6in": {
+    id: "fastener-screws-6in",
+    name: '#14 x 6" HD Roofing Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 125,
+    description: "SFS Dekfast #14 roofing screws — for assemblies 4\"–5\" insulation",
+  },
+  "fastener-screws-7in": {
+    id: "fastener-screws-7in",
+    name: '#14 x 7" HD Roofing Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 140,
+    description: "SFS Dekfast #14 roofing screws — for assemblies 5\"–6\" insulation",
+  },
+  "fastener-screws-8in": {
+    id: "fastener-screws-8in",
+    name: '#14 x 8" HD Roofing Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 158,
+    description: "SFS Dekfast #14 roofing screws — for assemblies 6\"+ insulation",
+  },
+  "fastener-screws-membrane-2in": {
+    id: "fastener-screws-membrane-2in",
+    name: '#15 x 2" Membrane Attachment Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 72,
+    description: "Coarse-thread screws for mechanically attaching TPO membrane in seam rows",
+  },
+
+  // Plates - Insulation
   "fastener-plates-3in": {
     id: "fastener-plates-3in",
-    name: '3" Round Insulation Plates',
-    category: "Fasteners",
+    name: '3" Round Insulation Stress Plates',
+    category: "Fasteners & Plates",
     unit: "Box (1,000)",
     coveragePerUnit: 1000,
     coverageUnit: "pieces",
     defaultPrice: 232,
-    description: "Galvalume coated steel insulation attachment plates",
+    description: "Galvalume coated steel stress plates for insulation attachment",
   },
+
+  // Plates - Membrane (barbed)
   "fastener-plates-barbed": {
     id: "fastener-plates-barbed",
-    name: '2" Barbed Membrane Plates',
-    category: "Fasteners",
+    name: '2" Barbed Seam Plates',
+    category: "Fasteners & Plates",
     unit: "Box (1,000)",
     coveragePerUnit: 1000,
     coverageUnit: "pieces",
     defaultPrice: 198,
-    description: "Barbed stress plates for membrane attachment",
+    description: "Barbed stress plates for mechanically attached membrane seam rows",
+  },
+
+  // Plates - Perimeter (heavy-duty)
+  "fastener-plates-perimeter": {
+    id: "fastener-plates-perimeter",
+    name: '3" Heavy-Duty Perimeter Plates',
+    category: "Fasteners & Plates",
+    unit: "Box (500)",
+    coveragePerUnit: 500,
+    coverageUnit: "pieces",
+    defaultPrice: 165,
+    description: "Heavy-duty galvalume stress plates for high wind perimeter/corner zones",
   },
 
   // Accessories
@@ -554,11 +631,27 @@ export const TPO_PRODUCTS: Record<string, TPOProduct> = {
 
 // ---- CALCULATION ENGINE ----
 
-// Fastener density: field = 1 per 4 sq ft, perimeter = 1 per 2 sq ft
-// Assume ~15% of area is perimeter zone for fastener calculation
-const FIELD_FASTENER_RATE = 1 / 4;    // 1 fastener per 4 sq ft
-const PERIMETER_FASTENER_RATE = 1 / 2; // 1 fastener per 2 sq ft
-const PERIMETER_ZONE_RATIO = 0.15;     // 15% of roof is perimeter zone
+// ---- FASTENER ZONE CONSTANTS (FM / UL wind uplift zones) ----
+// Field zone: interior of roof, lowest uplift
+// Perimeter zone: edges of roof, moderate uplift
+// Corner zone: corners of roof, highest uplift
+// Zone ratios approximate a typical rectangular commercial roof
+export const FIELD_ZONE_RATIO = 0.70;      // 70% of roof area
+export const PERIMETER_ZONE_RATIO = 0.22;  // 22% of roof area
+export const CORNER_ZONE_RATIO = 0.08;     // 8% of roof area
+
+// Insulation fastener density (fasteners per 4'x8' board = 32 sq ft)
+// These are per-board counts that translate to per-sq-ft rates
+const INSULATION_FASTENERS_PER_BOARD_FIELD = 4;      // 4 per board in field (1 per 8 sq ft)
+const INSULATION_FASTENERS_PER_BOARD_PERIMETER = 8;  // 8 per board in perimeter (1 per 4 sq ft)
+const INSULATION_FASTENERS_PER_BOARD_CORNER = 12;    // 12 per board in corners (1 per 2.67 sq ft)
+const BOARD_AREA = 32; // sq ft per 4'x8' board
+
+// Membrane fastener density (mechanically attached only)
+// Fasteners per linear foot of membrane seam row
+const MEMBRANE_FASTENERS_PER_LF_FIELD = 1;       // 12" o.c. in field
+const MEMBRANE_FASTENERS_PER_LF_PERIMETER = 1.5;  // 8" o.c. in perimeter
+const MEMBRANE_FASTENERS_PER_LF_CORNER = 2;       // 6" o.c. in corners
 
 // Membrane overlap: ~6" side lap = ~5% waste
 const MEMBRANE_WASTE_FACTOR = 1.05;
@@ -568,6 +661,30 @@ const BOARD_WASTE_FACTOR = 1.03;
 
 // Base flashing standard height
 const BASE_FLASHING_HEIGHT_INCHES = 18;
+
+// Cover board thickness (inches) for screw length calculation
+const COVER_BOARD_THICKNESS: Record<string, number> = {
+  "densdeck-prime-half": 0.5,
+  "densdeck-prime-quarter": 0.25,
+  "securshield-hd": 0.5,
+  "perlite": 0.5,
+  "none": 0,
+};
+
+// Deck penetration depth (inches) required for screw engagement
+const DECK_PENETRATION = 1.0;
+
+/** Select the correct screw product ID based on total assembly thickness */
+function selectScrewForAssembly(totalInsulationInches: number, coverBoardInches: number): string {
+  const totalThickness = totalInsulationInches + coverBoardInches + DECK_PENETRATION;
+  if (totalThickness <= 2) return "fastener-screws-2in";
+  if (totalThickness <= 3) return "fastener-screws-3in";
+  if (totalThickness <= 4) return "fastener-screws-4in";
+  if (totalThickness <= 5) return "fastener-screws-5in";
+  if (totalThickness <= 6) return "fastener-screws-6in";
+  if (totalThickness <= 7) return "fastener-screws-7in";
+  return "fastener-screws-8in";
+}
 
 export function calculateTPOEstimate(
   assembly: AssemblyConfig,
@@ -634,23 +751,53 @@ export function calculateTPOEstimate(
     }
   }
 
-  // ---- 3. INSULATION ATTACHMENT ----
+  // ---- 3. INSULATION ATTACHMENT (Fasteners & Plates) ----
+  const coverBoardThickness = COVER_BOARD_THICKNESS[assembly.coverBoard] ?? 0;
+
   if (totalInsThickness > 0) {
     if (assembly.attachmentMethod === "mechanically-attached") {
-      // Mechanically attached: fasteners + plates for insulation
-      const fieldArea = roofArea * (1 - PERIMETER_ZONE_RATIO);
+      // Zone-based fastener calculation for insulation
+      const fieldArea = roofArea * FIELD_ZONE_RATIO;
       const perimeterArea = roofArea * PERIMETER_ZONE_RATIO;
-      const totalFasteners = Math.ceil(
-        fieldArea * FIELD_FASTENER_RATE + perimeterArea * PERIMETER_FASTENER_RATE
+      const cornerArea = roofArea * CORNER_ZONE_RATIO;
+
+      const fieldBoards = fieldArea / BOARD_AREA;
+      const perimeterBoards = perimeterArea / BOARD_AREA;
+      const cornerBoards = cornerArea / BOARD_AREA;
+
+      const fieldFasteners = Math.ceil(fieldBoards * INSULATION_FASTENERS_PER_BOARD_FIELD);
+      const perimeterFasteners = Math.ceil(perimeterBoards * INSULATION_FASTENERS_PER_BOARD_PERIMETER);
+      const cornerFasteners = Math.ceil(cornerBoards * INSULATION_FASTENERS_PER_BOARD_CORNER);
+      const totalInsFasteners = fieldFasteners + perimeterFasteners + cornerFasteners;
+
+      // Select screw length based on total assembly thickness
+      const screwId = selectScrewForAssembly(totalInsThickness, coverBoardThickness);
+      const screwProduct = TPO_PRODUCTS[screwId];
+      const screwBoxes = totalInsFasteners / screwProduct.coveragePerUnit;
+      addItem(
+        screwId,
+        screwBoxes,
+        `${totalInsFasteners.toLocaleString()} screws for ${totalInsThickness.toFixed(1)}" insulation + ${coverBoardThickness}" cover board (Field: ${fieldFasteners.toLocaleString()} / Perim: ${perimeterFasteners.toLocaleString()} / Corner: ${cornerFasteners.toLocaleString()})`
       );
 
-      // Select screw length based on total insulation thickness
-      const screwId = totalInsThickness > 2.0 ? "fastener-screws-long" : "fastener-screws-short";
-      const screwBoxes = totalFasteners / 1000;
-      addItem(screwId, screwBoxes, `${totalFasteners.toLocaleString()} fasteners for ${totalInsThickness.toFixed(1)}" total insulation`);
+      // Insulation stress plates (1:1 with screws)
+      const plateBoxes = totalInsFasteners / TPO_PRODUCTS["fastener-plates-3in"].coveragePerUnit;
+      addItem(
+        "fastener-plates-3in",
+        plateBoxes,
+        `${totalInsFasteners.toLocaleString()} insulation stress plates (1:1 with screws)`
+      );
 
-      const plateBoxes = totalFasteners / 1000;
-      addItem("fastener-plates-3in", plateBoxes, `${totalFasteners.toLocaleString()} plates for insulation`);
+      // Heavy-duty perimeter plates for perimeter + corner zones
+      const perimCornerFasteners = perimeterFasteners + cornerFasteners;
+      if (perimCornerFasteners > 0) {
+        const hdPlateBoxes = perimCornerFasteners / TPO_PRODUCTS["fastener-plates-perimeter"].coveragePerUnit;
+        addItem(
+          "fastener-plates-perimeter",
+          hdPlateBoxes,
+          `${perimCornerFasteners.toLocaleString()} heavy-duty plates for perimeter & corner zones`
+        );
+      }
     } else {
       // Fully adhered: insulation adhesive (one application per layer)
       const numLayers = activeLayers.length;
@@ -689,15 +836,35 @@ export function calculateTPOEstimate(
     const rawQty = (roofArea * MEMBRANE_WASTE_FACTOR) / TPO_PRODUCTS["adhesive-bonding"].coveragePerUnit;
     addItem("adhesive-bonding", rawQty, `Adhering membrane over ${roofArea.toLocaleString()} sq ft`);
   } else {
-    // Mechanically attached: barbed plates in seam rows
-    // Approx 1 fastener per linear foot of seam, seams every 10' (membrane width)
-    const seamRows = Math.ceil(Math.sqrt(roofArea) / 10);
-    const seamLength = Math.sqrt(roofArea);
-    const memFasteners = Math.ceil(seamRows * seamLength);
-    const memScrewBoxes = memFasteners / 1000;
+    // Mechanically attached: membrane screws + barbed plates in seam rows
+    // Membrane width = 10', so seam rows run every 10' across the roof
+    const roofWidth = Math.sqrt(roofArea);
+    const roofLength = roofArea / roofWidth;
+    const seamRows = Math.ceil(roofWidth / 10);
 
-    addItem("fastener-screws-short", memScrewBoxes, `${memFasteners.toLocaleString()} fasteners for membrane seam rows`);
-    addItem("fastener-plates-barbed", memScrewBoxes, `${memFasteners.toLocaleString()} barbed plates for membrane`);
+    // Zone-based seam fastener density
+    const fieldSeamLF = roofLength * seamRows * FIELD_ZONE_RATIO;
+    const perimeterSeamLF = roofLength * seamRows * PERIMETER_ZONE_RATIO;
+    const cornerSeamLF = roofLength * seamRows * CORNER_ZONE_RATIO;
+
+    const fieldMemFasteners = Math.ceil(fieldSeamLF * MEMBRANE_FASTENERS_PER_LF_FIELD);
+    const perimMemFasteners = Math.ceil(perimeterSeamLF * MEMBRANE_FASTENERS_PER_LF_PERIMETER);
+    const cornerMemFasteners = Math.ceil(cornerSeamLF * MEMBRANE_FASTENERS_PER_LF_CORNER);
+    const totalMemFasteners = fieldMemFasteners + perimMemFasteners + cornerMemFasteners;
+
+    const memScrewBoxes = totalMemFasteners / TPO_PRODUCTS["fastener-screws-membrane-2in"].coveragePerUnit;
+    addItem(
+      "fastener-screws-membrane-2in",
+      memScrewBoxes,
+      `${totalMemFasteners.toLocaleString()} membrane screws in ${seamRows} seam rows (Field: ${fieldMemFasteners.toLocaleString()} / Perim: ${perimMemFasteners.toLocaleString()} / Corner: ${cornerMemFasteners.toLocaleString()})`
+    );
+
+    const barbedBoxes = totalMemFasteners / TPO_PRODUCTS["fastener-plates-barbed"].coveragePerUnit;
+    addItem(
+      "fastener-plates-barbed",
+      barbedBoxes,
+      `${totalMemFasteners.toLocaleString()} barbed seam plates (1:1 with membrane screws)`
+    );
   }
 
   // ---- 7. BASE FLASHING ----

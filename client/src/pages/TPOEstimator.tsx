@@ -55,6 +55,9 @@ import {
   calculateTPOEstimate,
   exportTPOEstimateCSV,
   getInsulationSummary,
+  FIELD_ZONE_RATIO,
+  PERIMETER_ZONE_RATIO,
+  CORNER_ZONE_RATIO,
 } from "@/lib/tpo-data";
 
 const fmt = (n: number) =>
@@ -192,7 +195,7 @@ export default function TPOEstimator() {
     "Cover Board",
     "Membrane",
     "Adhesive",
-    "Fasteners",
+    "Fasteners & Plates",
     "Flashing",
     "Accessories",
   ];
@@ -792,15 +795,48 @@ export default function TPOEstimator() {
                 {categoryOrder.map((category) => {
                   const items = groupedItems[category];
                   if (!items || items.length === 0) return null;
+
+                  const isFastenersCategory = category === "Fasteners & Plates";
+
                   return (
                     <Card
                       key={category}
-                      className="border-slate-200 shadow-sm overflow-hidden"
+                      className={`shadow-sm overflow-hidden ${
+                        isFastenersCategory
+                          ? "border-amber-200 ring-1 ring-amber-100"
+                          : "border-slate-200"
+                      }`}
                     >
-                      <CardHeader className="py-3 bg-slate-50">
-                        <CardTitle className="text-sm font-semibold text-slate-700 uppercase tracking-wider">
-                          {category}
-                        </CardTitle>
+                      <CardHeader
+                        className={`py-3 ${
+                          isFastenersCategory ? "bg-amber-50" : "bg-slate-50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <CardTitle
+                            className={`text-sm font-semibold uppercase tracking-wider ${
+                              isFastenersCategory
+                                ? "text-amber-800"
+                                : "text-slate-700"
+                            }`}
+                          >
+                            {category}
+                          </CardTitle>
+                          {isFastenersCategory && (
+                            <span className="text-[10px] font-medium text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">
+                              {assembly.attachmentMethod === "mechanically-attached"
+                                ? "Mechanically Attached"
+                                : "Fully Adhered"}
+                              {" · "}
+                              {items.reduce((s, it) => s + it.totalCost, 0).toLocaleString("en-US", { style: "currency", currency: "USD" })}
+                            </span>
+                          )}
+                        </div>
+                        {isFastenersCategory && (
+                          <p className="text-[10px] text-amber-600/80 mt-1">
+                            Zone layout: Field {(FIELD_ZONE_RATIO * 100).toFixed(0)}% · Perimeter {(PERIMETER_ZONE_RATIO * 100).toFixed(0)}% · Corner {(CORNER_ZONE_RATIO * 100).toFixed(0)}% — Screw length auto-selected for {getInsulationSummary(assembly.insulationLayers).totalThickness.toFixed(1)}" insulation assembly
+                          </p>
+                        )}
                       </CardHeader>
                       <CardContent className="p-0">
                         <div className="overflow-x-auto">
