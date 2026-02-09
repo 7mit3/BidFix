@@ -28,3 +28,6 @@
 - [x] Add labor & equipment totals to GAF TPO cost summary and order list
 - [x] TypeScript compilation verified — no errors
 - [x] Write vitest tests for TPO labor/equipment (13 tests passing, 29 total)
+
+## Bug Fixes
+- [x] Fix nested button error on /estimator/carlisle-tpo — button cannot contain a nested button (was in RoofAdditions.tsx: reset button nested inside header button)

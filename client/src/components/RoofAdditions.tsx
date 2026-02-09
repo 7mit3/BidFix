@@ -147,16 +147,25 @@ export default function RoofAdditions({
         </div>
         <div className="flex items-center gap-2">
           {totalPenetrations > 0 && (
-            <button
+            <span
+              role="button"
+              tabIndex={0}
               onClick={(e) => {
                 e.stopPropagation();
                 resetAll();
               }}
-              className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  resetAll();
+                }
+              }}
+              className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" />
               Reset
-            </button>
+            </span>
           )}
           {isExpanded ? (
             <ChevronUp className="w-5 h-5 text-gray-400" />
