@@ -2,7 +2,7 @@
  * Saved Estimates Page
  *
  * Lists all saved project estimates with search, filter by system,
- * and actions to load, rename, or delete.
+ * and actions to load, rename, delete, or open breakdown directly.
  */
 import { useState } from "react";
 import { useLocation } from "wouter";
@@ -45,8 +45,16 @@ import {
   Calendar,
   DollarSign,
   Ruler,
+  ClipboardList,
 } from "lucide-react";
 import { toast } from "sonner";
+import { reconstructBreakdownFromSaved } from "@/lib/reconstruct-breakdown";
+import {
+  storeBreakdownData,
+  storeEstimateContext,
+  storeBreakdownSaveState,
+  deserializeBreakdownState,
+} from "@/lib/estimate-breakdown";
 
 const SYSTEM_OPTIONS = [
   { value: "all", label: "All Systems" },
@@ -95,6 +103,7 @@ export default function SavedEstimates() {
   const [renameId, setRenameId] = useState<number | null>(null);
   const [renameName, setRenameName] = useState("");
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [loadingBreakdownId, setLoadingBreakdownId] = useState<number | null>(null);
 
   const { data: estimates, isLoading } = trpc.estimates.list.useQuery(
     {
@@ -117,6 +126,65 @@ export default function SavedEstimates() {
           ? "/estimator/carlisle-tpo"
           : "/estimator/gaf-tpo";
     navigate(`${estimatorPath}?loadEstimate=${id}`);
+  };
+
+  const handleOpenBreakdown = async (id: number) => {
+    setLoadingBreakdownId(id);
+    try {
+      // Fetch the full estimate data (includes stateJson and breakdownState)
+      const fullEstimate = await utils.estimates.get.fetch({ id });
+      if (!fullEstimate) {
+        toast.error("Estimate not found");
+        return;
+      }
+
+      // Reconstruct the breakdown data from the saved estimator state
+      const breakdownData = reconstructBreakdownFromSaved({
+        id: fullEstimate.id,
+        name: fullEstimate.name,
+        system: fullEstimate.system,
+        systemLabel: fullEstimate.systemLabel,
+        stateJson: fullEstimate.data,
+        breakdownState: fullEstimate.breakdownState,
+        grandTotal: parseFloat(String(fullEstimate.grandTotal)) || 0,
+        roofArea: parseFloat(String(fullEstimate.roofArea)) || 0,
+      });
+
+      if (!breakdownData) {
+        toast.error("Could not reconstruct breakdown from saved data");
+        return;
+      }
+
+      // Store breakdown data in sessionStorage
+      storeBreakdownData(breakdownData);
+
+      // Store estimate context for save/back navigation
+      storeEstimateContext({
+        estimateId: fullEstimate.id,
+        estimateName: fullEstimate.name,
+        system: fullEstimate.system,
+        systemLabel: fullEstimate.systemLabel,
+        estimatorStateJson: fullEstimate.data,
+        grandTotal: parseFloat(String(fullEstimate.grandTotal)) || 0,
+        roofArea: parseFloat(String(fullEstimate.roofArea)) || 0,
+      });
+
+      // If there's saved breakdown state, restore it
+      if (fullEstimate.breakdownState) {
+        const savedState = deserializeBreakdownState(fullEstimate.breakdownState);
+        if (savedState) {
+          storeBreakdownSaveState(savedState);
+        }
+      }
+
+      // Navigate to the breakdown page
+      navigate("/breakdown");
+    } catch (err) {
+      console.error("Failed to open breakdown:", err);
+      toast.error("Failed to open breakdown");
+    } finally {
+      setLoadingBreakdownId(null);
+    }
   };
 
   const handleRename = async () => {
@@ -255,6 +323,21 @@ export default function SavedEstimates() {
                           className="flex items-center gap-1 shrink-0"
                           onClick={(e) => e.stopPropagation()}
                         >
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-2 gap-1 text-xs text-primary hover:text-primary"
+                            onClick={() => handleOpenBreakdown(est.id)}
+                            disabled={loadingBreakdownId === est.id}
+                            title="Open Breakdown"
+                          >
+                            {loadingBreakdownId === est.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <ClipboardList className="h-4 w-4" />
+                            )}
+                            <span className="hidden sm:inline">Breakdown</span>
+                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"

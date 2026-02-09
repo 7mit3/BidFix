@@ -177,3 +177,9 @@
 - [x] Restore breakdown state (toggles, edits, tax/profit, custom items) when opening breakdown
 - [x] All 115 tests passing, 0 TypeScript errors
 - [x] Test full save/load cycle in browser — Equipment Profit toggle persists correctly after reload
+
+## Open Breakdown Shortcut on Saved Estimates Page
+- [x] Add "Breakdown" button to each saved estimate card (with ClipboardList icon)
+- [x] Created reconstruct-breakdown.ts utility to reconstruct breakdown from saved state
+- [x] Load estimate data, generate breakdown data, store in sessionStorage, navigate to /breakdown
+- [x] Tested in browser — direct breakdown navigation works correctly with all data restored
