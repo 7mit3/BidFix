@@ -22,6 +22,7 @@ import {
   ChevronDown,
   ChevronRight,
   Search,
+  Database,
 } from "lucide-react";
 import {
   SYSTEM_CATEGORIES,
@@ -277,9 +278,10 @@ export default function Catalog() {
         </div>
       </div>
 
-      {/* Search bar */}
+      {/* Search bar + Pricing DB link */}
       <div className="container -mt-6 relative z-10">
-        <div className="bg-card border border-border rounded-xl shadow-lg p-2 max-w-xl">
+        <div className="flex items-center gap-3">
+        <div className="bg-card border border-border rounded-xl shadow-lg p-2 max-w-xl flex-1">
           <div className="flex items-center gap-3 px-3">
             <Search className="w-5 h-5 text-muted-foreground shrink-0" />
             <input
@@ -298,6 +300,13 @@ export default function Catalog() {
               </button>
             )}
           </div>
+        </div>
+        <Link href="/pricing">
+          <button className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors shadow-lg whitespace-nowrap">
+            <Database className="w-4 h-4" />
+            Pricing Database
+          </button>
+        </Link>
         </div>
       </div>
 

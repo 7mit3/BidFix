@@ -1,0 +1,25 @@
+{
+  "query": "SELECT COUNT(*) as cnt FROM product_pricing; SELECT system, COUNT(*) as cnt FROM product_pricing GROUP BY system;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2M93N6eA4z8JVUn.02c0fb067b9a --database Q9FjtgmyfZcDZpNJvvZPkD --execute SELECT COUNT(*) as cnt FROM product_pricing; SELECT system, COUNT(*) as cnt FROM product_pricing GROUP BY system;",
+  "rows": [
+    {
+      "cnt": "159"
+    },
+    {
+      "cnt": "system\tcnt"
+    },
+    {
+      "cnt": "carlisle-tpo\t75"
+    },
+    {
+      "cnt": "gaf-tpo\t77"
+    },
+    {
+      "cnt": "karnak-metal-kynar\t7"
+    }
+  ],
+  "messages": [],
+  "stdout": "cnt\n159\nsystem\tcnt\ncarlisle-tpo\t75\ngaf-tpo\t77\nkarnak-metal-kynar\t7\n",
+  "stderr": "",
+  "execution_time_ms": 102
+}

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import {
   KARNAK_PRODUCTS,
   calculateEstimate,
@@ -12,13 +12,18 @@ import {
   type LaborEquipmentState,
   type LaborEquipmentTotals,
 } from "@/lib/labor-equipment-data";
+import { usePricingDB } from "@/hooks/usePricingDB";
 
 export function useEstimator() {
   const [squareFootage, setSquareFootage] = useState<string>("");
   const [verticalSeamsLF, setVerticalSeamsLF] = useState<string>("");
   const [horizontalSeamsLF, setHorizontalSeamsLF] = useState<string>("");
 
-  // Custom prices: keyed by product id
+  // Pricing DB integration
+  const { getPriceMap, isFromDB } = usePricingDB();
+  const dbPriceMap = useMemo(() => getPriceMap("karnak"), [getPriceMap, isFromDB]);
+
+  // Custom prices: keyed by product id, initialized from local defaults
   const [customPrices, setCustomPrices] = useState<Record<string, number>>(() => {
     const defaults: Record<string, number> = {};
     KARNAK_PRODUCTS.forEach((p) => {
@@ -26,6 +31,26 @@ export function useEstimator() {
     });
     return defaults;
   });
+
+  // Track whether user has manually edited any price
+  const userEditedPrices = useRef<Set<string>>(new Set());
+
+  // Sync DB prices into local state when they arrive (only for non-user-edited prices)
+  useEffect(() => {
+    if (dbPriceMap.size > 0) {
+      setCustomPrices((prev) => {
+        const next = { ...prev };
+        let changed = false;
+        Array.from(dbPriceMap.entries()).forEach(([id, price]) => {
+          if (!userEditedPrices.current.has(id) && next[id] !== price) {
+            next[id] = price;
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+    }
+  }, [dbPriceMap]);
 
   // Labor & Equipment state
   const [laborEquipment, setLaborEquipment] = useState<LaborEquipmentState>(() => ({
@@ -81,16 +106,19 @@ export function useEstimator() {
   }, []);
 
   const updatePrice = useCallback((productId: string, price: number) => {
+    userEditedPrices.current.add(productId);
     setCustomPrices((prev) => ({ ...prev, [productId]: price }));
   }, []);
 
   const resetPrices = useCallback(() => {
+    userEditedPrices.current.clear();
     const defaults: Record<string, number> = {};
     KARNAK_PRODUCTS.forEach((p) => {
-      defaults[p.id] = p.defaultPrice;
+      // Reset to DB price if available, otherwise local default
+      defaults[p.id] = dbPriceMap.get(p.id) ?? p.defaultPrice;
     });
     setCustomPrices(defaults);
-  }, []);
+  }, [dbPriceMap]);
 
   const inputs: EstimateInput = useMemo(
     () => ({

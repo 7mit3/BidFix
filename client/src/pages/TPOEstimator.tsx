@@ -2,7 +2,7 @@
 // Design: Clean construction dashboard with warm neutrals, Carlisle blue accent
 // Layout: Two-column — left: assembly config + measurements, right: results
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -44,6 +44,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import RoofAdditions from "@/components/RoofAdditions";
 import { type PenetrationEstimate } from "@/lib/penetrations-data";
+import { usePricingDB } from "@/hooks/usePricingDB";
 import {
   type AssemblyConfig,
   type TPOMeasurements,
@@ -103,9 +104,29 @@ export default function TPOEstimator() {
     baseFlashingLF: 0,
   });
 
-  // Custom prices
+  // Pricing DB integration — sync DB prices reactively
+  const { getPriceMap, isFromDB } = usePricingDB();
+  const dbPrices = useMemo(() => getPriceMap("carlisle-tpo"), [getPriceMap, isFromDB]);
   const [customPrices, setCustomPrices] = useState<Record<string, number>>({});
+  const userEditedPrices = useRef<Set<string>>(new Set());
   const [priceEditorOpen, setPriceEditorOpen] = useState(false);
+
+  // Sync DB prices into local state when they arrive
+  useEffect(() => {
+    if (dbPrices.size > 0) {
+      setCustomPrices((prev) => {
+        const next = { ...prev };
+        let changed = false;
+        Array.from(dbPrices.entries()).forEach(([id, price]) => {
+          if (!userEditedPrices.current.has(id) && next[id] !== price) {
+            next[id] = price;
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+    }
+  }, [dbPrices]);
 
   // Calculate estimate
   const estimate = useMemo(
@@ -187,11 +208,20 @@ export default function TPOEstimator() {
   const updatePrice = useCallback((productId: string, value: string) => {
     const num = parseFloat(value);
     if (!isNaN(num) && num >= 0) {
+      userEditedPrices.current.add(productId);
       setCustomPrices((prev) => ({ ...prev, [productId]: num }));
     }
   }, []);
 
-  const resetPrices = useCallback(() => setCustomPrices({}), []);
+  const resetPrices = useCallback(() => {
+    userEditedPrices.current.clear();
+    // Reset to DB prices if available, otherwise empty (falls back to defaults)
+    const reset: Record<string, number> = {};
+    Array.from(dbPrices.entries()).forEach(([id, price]) => {
+      reset[id] = price;
+    });
+    setCustomPrices(reset);
+  }, [dbPrices]);
 
   const handleExportCSV = useCallback(() => {
     const csv = exportTPOEstimateCSV(estimate);

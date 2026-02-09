@@ -1,0 +1,20 @@
+# Project TODO
+
+## Reminders
+- DB pricing sync: useState initializer only runs once, so we use useEffect to sync DB prices when they arrive
+- The system prefix for pricing DB is: karnak, carlisle-tpo, gaf-tpo (stripped when passed to estimators)
+- userEditedPrices ref tracks which prices the user has manually changed so DB sync doesn't overwrite them
+
+## Completed
+- [x] Pricing database schema (products table with manufacturer, category, unit price, last updated)
+- [x] Backend API for pricing CRUD operations
+- [x] Pricing management page UI with search, filter, edit capabilities
+- [x] Integrate pricing database with Karnak, Carlisle TPO, and GAF TPO estimators
+- [x] Price history tracking
+- [x] Fix pricing sync across all three estimators (useEffect pattern for async DB data)
+
+## In Progress
+- [x] Quote request feature: Generate a quote request document (CSV/PDF) with all materials for a distributor
+- [x] Import distributor pricing: Upload CSV with updated prices to bulk-update the pricing database
+- [x] Enhance Pricing Database page with quote request and import workflows (Products tab + Quote Requests tab)
+- [x] Write vitest tests for pricing integration (16 tests passing)

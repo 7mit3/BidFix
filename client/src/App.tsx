@@ -8,15 +8,17 @@ import Catalog from "./pages/Catalog";
 import Home from "./pages/Home";
 import TPOEstimator from "./pages/TPOEstimator";
 import GAFTPOEstimator from "./pages/GAFTPOEstimator";
-
+import PricingDatabase from "./pages/PricingDatabase";
 
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Catalog} />
       <Route path={"/estimator/karnak-metal-kynar"} component={Home} />
       <Route path={"/estimator/carlisle-tpo"} component={TPOEstimator} />
       <Route path={"/estimator/gaf-tpo"} component={GAFTPOEstimator} />
+      <Route path={"/pricing"} component={PricingDatabase} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
