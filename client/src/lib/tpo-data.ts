@@ -5,10 +5,15 @@
 
 // ---- TYPES ----
 
+export interface InsulationLayer {
+  thickness: string; // e.g. "1.0", "2.5", "none"
+  enabled: boolean;
+}
+
 export interface AssemblyConfig {
   deckType: string;
   vaporBarrier: string;
-  insulationThickness: string;
+  insulationLayers: InsulationLayer[]; // up to 4 layers
   coverBoard: string;
   membraneThickness: string;
   attachmentMethod: string;
@@ -69,14 +74,44 @@ export const VAPOR_BARRIERS = [
 ];
 
 export const INSULATION_THICKNESSES = [
-  { value: "1.0", label: '1.0" Polyiso (R-5.7)', rValue: 5.7 },
-  { value: "1.5", label: '1.5" Polyiso (R-8.6)', rValue: 8.6 },
-  { value: "2.0", label: '2.0" Polyiso (R-11.4)', rValue: 11.4 },
-  { value: "2.5", label: '2.5" Polyiso (R-14.3)', rValue: 14.3 },
-  { value: "3.0", label: '3.0" Polyiso (R-17.1)', rValue: 17.1 },
-  { value: "3.5", label: '3.5" Polyiso (R-20.0)', rValue: 20.0 },
-  { value: "4.0", label: '4.0" Polyiso (R-22.8)', rValue: 22.8 },
+  { value: "1.0", label: '1.0" Polyiso (R-5.7)', rValue: 5.7, price: 32 },
+  { value: "1.5", label: '1.5" Polyiso (R-8.6)', rValue: 8.6, price: 42 },
+  { value: "1.6", label: '1.6" Polyiso (R-9.1)', rValue: 9.1, price: 44 },
+  { value: "2.0", label: '2.0" Polyiso (R-11.4)', rValue: 11.4, price: 52 },
+  { value: "2.2", label: '2.2" Polyiso (R-12.5)', rValue: 12.5, price: 56 },
+  { value: "2.5", label: '2.5" Polyiso (R-14.3)', rValue: 14.3, price: 62 },
+  { value: "3.0", label: '3.0" Polyiso (R-17.1)', rValue: 17.1, price: 72 },
+  { value: "3.1", label: '3.1" Polyiso (R-17.7)', rValue: 17.7, price: 74 },
+  { value: "3.3", label: '3.3" Polyiso (R-18.8)', rValue: 18.8, price: 78 },
+  { value: "3.5", label: '3.5" Polyiso (R-20.0)', rValue: 20.0, price: 82 },
+  { value: "4.0", label: '4.0" Polyiso (R-22.8)', rValue: 22.8, price: 92 },
+  { value: "4.3", label: '4.3" Polyiso (R-24.5)', rValue: 24.5, price: 98 },
+  { value: "4.5", label: '4.5" Polyiso (R-25.7)', rValue: 25.7, price: 102 },
+  { value: "5.0", label: '5.0" Polyiso (R-28.5)', rValue: 28.5, price: 112 },
+  { value: "5.5", label: '5.5" Polyiso (R-31.4)', rValue: 31.4, price: 122 },
+  { value: "6.0", label: '6.0" Polyiso (R-34.2)', rValue: 34.2, price: 132 },
 ];
+
+/** Helper: get total insulation thickness and R-value from layers */
+export function getInsulationSummary(layers: InsulationLayer[]): {
+  totalThickness: number;
+  totalRValue: number;
+  activeLayers: { thickness: string; rValue: number; label: string }[];
+} {
+  const activeLayers: { thickness: string; rValue: number; label: string }[] = [];
+  let totalThickness = 0;
+  let totalRValue = 0;
+  for (const layer of layers) {
+    if (!layer.enabled || layer.thickness === "none") continue;
+    const found = INSULATION_THICKNESSES.find((t) => t.value === layer.thickness);
+    if (found) {
+      activeLayers.push({ thickness: found.value, rValue: found.rValue, label: found.label });
+      totalThickness += parseFloat(found.value);
+      totalRValue += found.rValue;
+    }
+  }
+  return { totalThickness, totalRValue, activeLayers };
+}
 
 export const COVER_BOARDS = [
   { value: "densdeck-prime-half", label: 'DensDeck Prime 1/2"' },
@@ -223,6 +258,96 @@ export const TPO_PRODUCTS: Record<string, TPOProduct> = {
     coveragePerUnit: 32,
     coverageUnit: "sq ft",
     defaultPrice: 92,
+    description: "Carlisle InsulBase polyiso rigid roof insulation, 20 PSI",
+  },
+  "insulation-1.6": {
+    id: "insulation-1.6",
+    name: '1.6" Polyiso Insulation (R-9.1)',
+    category: "Insulation",
+    unit: "Board (4' x 8')",
+    coveragePerUnit: 32,
+    coverageUnit: "sq ft",
+    defaultPrice: 44,
+    description: "Carlisle InsulBase polyiso rigid roof insulation, 20 PSI",
+  },
+  "insulation-2.2": {
+    id: "insulation-2.2",
+    name: '2.2" Polyiso Insulation (R-12.5)',
+    category: "Insulation",
+    unit: "Board (4' x 8')",
+    coveragePerUnit: 32,
+    coverageUnit: "sq ft",
+    defaultPrice: 56,
+    description: "Carlisle InsulBase polyiso rigid roof insulation, 20 PSI",
+  },
+  "insulation-3.1": {
+    id: "insulation-3.1",
+    name: '3.1" Polyiso Insulation (R-17.7)',
+    category: "Insulation",
+    unit: "Board (4' x 8')",
+    coveragePerUnit: 32,
+    coverageUnit: "sq ft",
+    defaultPrice: 74,
+    description: "Carlisle InsulBase polyiso rigid roof insulation, 20 PSI",
+  },
+  "insulation-3.3": {
+    id: "insulation-3.3",
+    name: '3.3" Polyiso Insulation (R-18.8)',
+    category: "Insulation",
+    unit: "Board (4' x 8')",
+    coveragePerUnit: 32,
+    coverageUnit: "sq ft",
+    defaultPrice: 78,
+    description: "Carlisle InsulBase polyiso rigid roof insulation, 20 PSI",
+  },
+  "insulation-4.3": {
+    id: "insulation-4.3",
+    name: '4.3" Polyiso Insulation (R-24.5)',
+    category: "Insulation",
+    unit: "Board (4' x 8')",
+    coveragePerUnit: 32,
+    coverageUnit: "sq ft",
+    defaultPrice: 98,
+    description: "Carlisle InsulBase polyiso rigid roof insulation, 20 PSI",
+  },
+  "insulation-4.5": {
+    id: "insulation-4.5",
+    name: '4.5" Polyiso Insulation (R-25.7)',
+    category: "Insulation",
+    unit: "Board (4' x 8')",
+    coveragePerUnit: 32,
+    coverageUnit: "sq ft",
+    defaultPrice: 102,
+    description: "Carlisle InsulBase polyiso rigid roof insulation, 20 PSI",
+  },
+  "insulation-5.0": {
+    id: "insulation-5.0",
+    name: '5.0" Polyiso Insulation (R-28.5)',
+    category: "Insulation",
+    unit: "Board (4' x 8')",
+    coveragePerUnit: 32,
+    coverageUnit: "sq ft",
+    defaultPrice: 112,
+    description: "Carlisle InsulBase polyiso rigid roof insulation, 20 PSI",
+  },
+  "insulation-5.5": {
+    id: "insulation-5.5",
+    name: '5.5" Polyiso Insulation (R-31.4)',
+    category: "Insulation",
+    unit: "Board (4' x 8')",
+    coveragePerUnit: 32,
+    coverageUnit: "sq ft",
+    defaultPrice: 122,
+    description: "Carlisle InsulBase polyiso rigid roof insulation, 20 PSI",
+  },
+  "insulation-6.0": {
+    id: "insulation-6.0",
+    name: '6.0" Polyiso Insulation (R-34.2)',
+    category: "Insulation",
+    unit: "Board (4' x 8')",
+    coveragePerUnit: 32,
+    coverageUnit: "sq ft",
+    defaultPrice: 132,
     description: "Carlisle InsulBase polyiso rigid roof insulation, 20 PSI",
   },
 
@@ -496,35 +621,42 @@ export function calculateTPOEstimate(
     }
   }
 
-  // ---- 2. INSULATION ----
-  const insId = `insulation-${assembly.insulationThickness}`;
-  if (TPO_PRODUCTS[insId]) {
-    const insProduct = TPO_PRODUCTS[insId];
-    const rawQty = (roofArea * BOARD_WASTE_FACTOR) / insProduct.coveragePerUnit;
-    addItem(insId, rawQty, `${rawQty.toFixed(0)} boards for ${roofArea.toLocaleString()} sq ft`);
+  // ---- 2. INSULATION (multi-layer) ----
+  const { totalThickness: totalInsThickness, activeLayers } = getInsulationSummary(assembly.insulationLayers);
+  for (let i = 0; i < activeLayers.length; i++) {
+    const layer = activeLayers[i];
+    const insId = `insulation-${layer.thickness}`;
+    if (TPO_PRODUCTS[insId]) {
+      const insProduct = TPO_PRODUCTS[insId];
+      const rawQty = (roofArea * BOARD_WASTE_FACTOR) / insProduct.coveragePerUnit;
+      const layerLabel = activeLayers.length > 1 ? `Layer ${i + 1}: ` : "";
+      addItem(insId, rawQty, `${layerLabel}${rawQty.toFixed(0)} boards for ${roofArea.toLocaleString()} sq ft`);
+    }
   }
 
   // ---- 3. INSULATION ATTACHMENT ----
-  if (assembly.attachmentMethod === "mechanically-attached") {
-    // Mechanically attached: fasteners + plates for insulation
-    const fieldArea = roofArea * (1 - PERIMETER_ZONE_RATIO);
-    const perimeterArea = roofArea * PERIMETER_ZONE_RATIO;
-    const totalFasteners = Math.ceil(
-      fieldArea * FIELD_FASTENER_RATE + perimeterArea * PERIMETER_FASTENER_RATE
-    );
+  if (totalInsThickness > 0) {
+    if (assembly.attachmentMethod === "mechanically-attached") {
+      // Mechanically attached: fasteners + plates for insulation
+      const fieldArea = roofArea * (1 - PERIMETER_ZONE_RATIO);
+      const perimeterArea = roofArea * PERIMETER_ZONE_RATIO;
+      const totalFasteners = Math.ceil(
+        fieldArea * FIELD_FASTENER_RATE + perimeterArea * PERIMETER_FASTENER_RATE
+      );
 
-    // Select screw length based on insulation thickness
-    const insThickness = parseFloat(assembly.insulationThickness);
-    const screwId = insThickness > 2.0 ? "fastener-screws-long" : "fastener-screws-short";
-    const screwBoxes = totalFasteners / 1000;
-    addItem(screwId, screwBoxes, `${totalFasteners.toLocaleString()} fasteners for insulation`);
+      // Select screw length based on total insulation thickness
+      const screwId = totalInsThickness > 2.0 ? "fastener-screws-long" : "fastener-screws-short";
+      const screwBoxes = totalFasteners / 1000;
+      addItem(screwId, screwBoxes, `${totalFasteners.toLocaleString()} fasteners for ${totalInsThickness.toFixed(1)}" total insulation`);
 
-    const plateBoxes = totalFasteners / 1000;
-    addItem("fastener-plates-3in", plateBoxes, `${totalFasteners.toLocaleString()} plates for insulation`);
-  } else {
-    // Fully adhered: insulation adhesive
-    const rawQty = (roofArea * BOARD_WASTE_FACTOR) / TPO_PRODUCTS["adhesive-insulation"].coveragePerUnit;
-    addItem("adhesive-insulation", rawQty, `Adhering insulation over ${roofArea.toLocaleString()} sq ft`);
+      const plateBoxes = totalFasteners / 1000;
+      addItem("fastener-plates-3in", plateBoxes, `${totalFasteners.toLocaleString()} plates for insulation`);
+    } else {
+      // Fully adhered: insulation adhesive (one application per layer)
+      const numLayers = activeLayers.length;
+      const rawQty = (roofArea * BOARD_WASTE_FACTOR * numLayers) / TPO_PRODUCTS["adhesive-insulation"].coveragePerUnit;
+      addItem("adhesive-insulation", rawQty, `Adhering ${numLayers} insulation layer${numLayers > 1 ? "s" : ""} over ${roofArea.toLocaleString()} sq ft`);
+    }
   }
 
   // ---- 4. COVER BOARD ----
@@ -661,9 +793,15 @@ export function exportTPOEstimateCSV(estimate: TPOEstimate): string {
     "",
   ]);
 
+  const insSummary = getInsulationSummary(estimate.assembly.insulationLayers);
+  const insDesc = insSummary.activeLayers.length > 0
+    ? insSummary.activeLayers.map((l, i) => `Layer ${i + 1}: ${l.label}`).join(" + ")
+    : "None";
+
   const csvContent = [
     `Carlisle TPO Estimate - ${new Date().toLocaleDateString()}`,
     `Roof Area: ${estimate.measurements.roofArea.toLocaleString()} sq ft`,
+    `Insulation: ${insDesc} (Total: ${insSummary.totalThickness.toFixed(1)}" / R-${insSummary.totalRValue.toFixed(1)})`,
     `Wall: ${estimate.measurements.wallLinearFt} LF x ${estimate.measurements.wallHeight} ft = ${estimate.wallSqFt.toLocaleString()} sq ft`,
     `Base Flashing: ${estimate.measurements.baseFlashingLF} LF at 18" height = ${estimate.baseFlashingSqFt.toFixed(0)} sq ft`,
     "",

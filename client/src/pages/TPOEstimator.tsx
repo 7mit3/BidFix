@@ -21,6 +21,9 @@ import {
   Wrench,
   PencilLine,
   RotateCcw,
+  Plus,
+  Minus,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,6 +44,7 @@ import {
 import {
   type AssemblyConfig,
   type TPOMeasurements,
+  type InsulationLayer,
   DECK_TYPES,
   VAPOR_BARRIERS,
   INSULATION_THICKNESSES,
@@ -50,6 +54,7 @@ import {
   TPO_PRODUCTS,
   calculateTPOEstimate,
   exportTPOEstimateCSV,
+  getInsulationSummary,
 } from "@/lib/tpo-data";
 
 const fmt = (n: number) =>
@@ -60,7 +65,12 @@ export default function TPOEstimator() {
   const [assembly, setAssembly] = useState<AssemblyConfig>({
     deckType: "steel-22ga",
     vaporBarrier: "none",
-    insulationThickness: "2.0",
+    insulationLayers: [
+      { thickness: "2.0", enabled: true },
+      { thickness: "none", enabled: false },
+      { thickness: "none", enabled: false },
+      { thickness: "none", enabled: false },
+    ],
     coverBoard: "densdeck-prime-half",
     membraneThickness: "60mil",
     attachmentMethod: "fully-adhered",
@@ -87,6 +97,15 @@ export default function TPOEstimator() {
   // Derived wall sq ft
   const wallSqFt = measurements.wallLinearFt * measurements.wallHeight;
 
+  // Insulation summary
+  const insulationSummary = useMemo(
+    () => getInsulationSummary(assembly.insulationLayers),
+    [assembly.insulationLayers]
+  );
+
+  // Count how many layers are enabled
+  const enabledLayerCount = assembly.insulationLayers.filter((l) => l.enabled).length;
+
   // Handlers
   const updateAssembly = useCallback(
     (key: keyof AssemblyConfig, value: string) => {
@@ -94,6 +113,37 @@ export default function TPOEstimator() {
     },
     []
   );
+
+  const updateInsulationLayer = useCallback(
+    (index: number, thickness: string) => {
+      setAssembly((prev) => {
+        const layers = [...prev.insulationLayers];
+        layers[index] = { ...layers[index], thickness };
+        return { ...prev, insulationLayers: layers };
+      });
+    },
+    []
+  );
+
+  const addInsulationLayer = useCallback(() => {
+    setAssembly((prev) => {
+      const layers = [...prev.insulationLayers];
+      // Find the first disabled layer and enable it
+      const idx = layers.findIndex((l) => !l.enabled);
+      if (idx !== -1) {
+        layers[idx] = { thickness: "1.5", enabled: true };
+      }
+      return { ...prev, insulationLayers: layers };
+    });
+  }, []);
+
+  const removeInsulationLayer = useCallback((index: number) => {
+    setAssembly((prev) => {
+      const layers = [...prev.insulationLayers];
+      layers[index] = { thickness: "none", enabled: false };
+      return { ...prev, insulationLayers: layers };
+    });
+  }, []);
 
   const updateMeasurement = useCallback(
     (key: keyof TPOMeasurements, value: string) => {
@@ -264,29 +314,94 @@ export default function TPOEstimator() {
                   </Select>
                 </div>
 
-                {/* Insulation Thickness */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2 text-sm font-medium">
-                    <Thermometer className="w-4 h-4 text-slate-500" />
-                    Insulation Thickness (Polyiso)
-                  </Label>
-                  <Select
-                    value={assembly.insulationThickness}
-                    onValueChange={(v) =>
-                      updateAssembly("insulationThickness", v)
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {INSULATION_THICKNESSES.map((ins) => (
-                        <SelectItem key={ins.value} value={ins.value}>
-                          {ins.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                {/* Insulation Layers */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="flex items-center gap-2 text-sm font-medium">
+                      <Thermometer className="w-4 h-4 text-slate-500" />
+                      Insulation (Polyiso)
+                    </Label>
+                    {insulationSummary.totalThickness > 0 && (
+                      <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                        {insulationSummary.totalThickness.toFixed(1)}" total · R-{insulationSummary.totalRValue.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Layer 1 - always visible */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground w-14 shrink-0">Layer 1</span>
+                      <Select
+                        value={assembly.insulationLayers[0].thickness}
+                        onValueChange={(v) => updateInsulationLayer(0, v)}
+                      >
+                        <SelectTrigger className="flex-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {INSULATION_THICKNESSES.map((ins) => (
+                            <SelectItem key={ins.value} value={ins.value}>
+                              {ins.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Additional layers */}
+                    {assembly.insulationLayers.slice(1).map((layer, idx) => {
+                      const realIdx = idx + 1;
+                      if (!layer.enabled) return null;
+                      return (
+                        <motion.div
+                          key={realIdx}
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="flex items-center gap-2"
+                        >
+                          <span className="text-xs text-muted-foreground w-14 shrink-0">Layer {realIdx + 1}</span>
+                          <Select
+                            value={layer.thickness}
+                            onValueChange={(v) => updateInsulationLayer(realIdx, v)}
+                          >
+                            <SelectTrigger className="flex-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {INSULATION_THICKNESSES.map((ins) => (
+                                <SelectItem key={ins.value} value={ins.value}>
+                                  {ins.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                            onClick={() => removeInsulationLayer(realIdx)}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Add layer button */}
+                  {enabledLayerCount < 4 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={addInsulationLayer}
+                      className="w-full gap-2 text-xs border-dashed"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Add Insulation Layer ({enabledLayerCount}/4)
+                    </Button>
+                  )}
                 </div>
 
                 {/* Cover Board */}
@@ -610,7 +725,7 @@ export default function TPOEstimator() {
                             ?.label || "—"}
                         </span>
                         <span>
-                          Insulation: {assembly.insulationThickness}" Polyiso
+                          Insulation: {insulationSummary.totalThickness.toFixed(1)}" Polyiso ({insulationSummary.activeLayers.length} layer{insulationSummary.activeLayers.length !== 1 ? "s" : ""}) · R-{insulationSummary.totalRValue.toFixed(1)}
                         </span>
                         <span>
                           Membrane:{" "}
