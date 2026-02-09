@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Catalog from "./pages/Catalog";
 import Home from "./pages/Home";
 import TPOEstimator from "./pages/TPOEstimator";
+import GAFTPOEstimator from "./pages/GAFTPOEstimator";
 
 
 function Router() {
@@ -15,6 +16,7 @@ function Router() {
       <Route path={"/"} component={Catalog} />
       <Route path={"/estimator/karnak-metal-kynar"} component={Home} />
       <Route path={"/estimator/carlisle-tpo"} component={TPOEstimator} />
+      <Route path={"/estimator/gaf-tpo"} component={GAFTPOEstimator} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

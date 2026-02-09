@@ -261,6 +261,25 @@ export const ROOFING_SYSTEMS: RoofingSystem[] = [
     imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80",
   },
   {
+    id: "gaf-everguard-tpo",
+    name: "EverGuard TPO Membrane System",
+    manufacturer: "GAF",
+    category: "Single-Ply Membrane",
+    categorySlug: "single-ply-membrane",
+    substrate: "Commercial Flat Roof",
+    description:
+      "Complete GAF EverGuard TPO single-ply roofing system estimator. Configure roof assembly (deck, vapor barrier, polyiso insulation, cover board, membrane) and get a full material order list with pricing.",
+    features: [
+      "Full assembly configuration",
+      "45/60/80 mil membrane options",
+      "Adhered or mechanically attached",
+      "Wall & base flashing included",
+    ],
+    status: "available",
+    route: "/estimator/gaf-tpo",
+    imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80",
+  },
+  {
     id: "firestone-epdm",
     name: "RubberGard EPDM Membrane",
     manufacturer: "Firestone",
