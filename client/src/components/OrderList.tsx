@@ -1,6 +1,7 @@
 /**
- * OrderList — Detailed material order list with quantities
- * Design: Clean table with product details, quantities, and costs
+ * OrderList — Detailed material order list with labor/equipment summary
+ * Design: Clean table with product details, quantities, costs,
+ *         plus labor/equipment subtotals and grand total in footer
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,18 +21,28 @@ import {
   formatCurrency,
   formatNumber,
 } from "@/lib/karnak-data";
+import type { LaborEquipmentTotals } from "@/lib/labor-equipment-data";
 import { motion } from "framer-motion";
 
 interface OrderListProps {
   estimate: EstimateResult | null;
+  laborEquipmentTotals: LaborEquipmentTotals | null;
+  projectTotal: number;
 }
 
-export function OrderList({ estimate }: OrderListProps) {
+export function OrderList({
+  estimate,
+  laborEquipmentTotals,
+  projectTotal,
+}: OrderListProps) {
   if (!estimate) return null;
 
   const activeItems = estimate.lineItems.filter(
     (item) => item.quantityToOrder > 0
   );
+
+  const laborCost = laborEquipmentTotals?.laborTotal ?? 0;
+  const equipmentCost = laborEquipmentTotals?.equipmentTotal ?? 0;
 
   const handlePrint = () => {
     window.print();
@@ -59,16 +70,41 @@ export function OrderList({ estimate }: OrderListProps) {
       item.totalCost.toFixed(2),
     ]);
 
+    const laborRows = (laborEquipmentTotals?.laborBreakdown ?? []).map((l) => [
+      l.label,
+      "Labor",
+      l.detail,
+      "",
+      "",
+      "",
+      "",
+      l.cost.toFixed(2),
+    ]);
+
+    const equipRows = (laborEquipmentTotals?.equipmentBreakdown ?? []).map(
+      (e) => [e.label, "Equipment", e.detail, "", "", "", "", e.cost.toFixed(2)]
+    );
+
     const csvContent = [
-      `Karnak Material Estimate`,
+      `Karnak Project Estimate`,
       `Square Footage: ${estimate.inputs.squareFootage} sq.ft.`,
       `Vertical Seams: ${estimate.inputs.verticalSeamsLF} lin.ft.`,
       `Horizontal Seams: ${estimate.inputs.horizontalSeamsLF} lin.ft.`,
       ``,
+      `--- MATERIALS ---`,
       headers.join(","),
       ...rows.map((r) => r.join(",")),
+      `Material Subtotal,,,,,,,$${estimate.totalMaterialCost.toFixed(2)}`,
       ``,
-      `Total Material Cost,,,,,,,${formatCurrency(estimate.totalMaterialCost)}`,
+      `--- LABOR ---`,
+      ...laborRows.map((r) => r.join(",")),
+      `Labor Subtotal,,,,,,,$${laborCost.toFixed(2)}`,
+      ``,
+      `--- EQUIPMENT ---`,
+      ...equipRows.map((r) => r.join(",")),
+      `Equipment Subtotal,,,,,,,$${equipmentCost.toFixed(2)}`,
+      ``,
+      `TOTAL PROJECT ESTIMATE,,,,,,,$${projectTotal.toFixed(2)}`,
     ].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -205,15 +241,59 @@ export function OrderList({ estimate }: OrderListProps) {
                 ))}
               </TableBody>
               <TableFooter>
+                {/* Material subtotal */}
+                <TableRow className="bg-warm-200 hover:bg-warm-200 border-t-2 border-border">
+                  <TableCell
+                    colSpan={6}
+                    className="font-heading font-semibold text-sm text-foreground"
+                  >
+                    Material Subtotal
+                  </TableCell>
+                  <TableCell className="text-right font-mono-nums font-bold text-sm text-foreground">
+                    {formatCurrency(estimate.totalMaterialCost)}
+                  </TableCell>
+                </TableRow>
+
+                {/* Labor subtotal */}
+                {laborCost > 0 && (
+                  <TableRow className="bg-warm-100 hover:bg-warm-100">
+                    <TableCell
+                      colSpan={6}
+                      className="font-heading font-semibold text-sm text-foreground"
+                    >
+                      Labor Subtotal
+                    </TableCell>
+                    <TableCell className="text-right font-mono-nums font-bold text-sm text-foreground">
+                      {formatCurrency(laborCost)}
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {/* Equipment subtotal */}
+                {equipmentCost > 0 && (
+                  <TableRow className="bg-warm-100 hover:bg-warm-100">
+                    <TableCell
+                      colSpan={6}
+                      className="font-heading font-semibold text-sm text-foreground"
+                    >
+                      Equipment Subtotal
+                    </TableCell>
+                    <TableCell className="text-right font-mono-nums font-bold text-sm text-foreground">
+                      {formatCurrency(equipmentCost)}
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {/* Grand total */}
                 <TableRow className="bg-karnak-dark text-white hover:bg-karnak-dark">
                   <TableCell
                     colSpan={6}
                     className="font-heading font-bold text-base text-white"
                   >
-                    Total Material Cost
+                    Total Project Estimate
                   </TableCell>
                   <TableCell className="text-right font-mono-nums font-bold text-lg text-white">
-                    {formatCurrency(estimate.totalMaterialCost)}
+                    {formatCurrency(projectTotal)}
                   </TableCell>
                 </TableRow>
               </TableFooter>

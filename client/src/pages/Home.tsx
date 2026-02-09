@@ -14,6 +14,7 @@ import { InputSection } from "@/components/InputSection";
 import { CostSummary } from "@/components/CostSummary";
 import { OrderList } from "@/components/OrderList";
 import { PricingEditor } from "@/components/PricingEditor";
+import { LaborEquipmentSection } from "@/components/LaborEquipmentSection";
 import { SystemInfo } from "@/components/SystemInfo";
 import { Footer } from "@/components/Footer";
 
@@ -26,7 +27,7 @@ export default function Home() {
 
       <main className="flex-1 container py-8 lg:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Inputs + Pricing */}
+          {/* Left Column: Inputs + Labor/Equipment + Pricing */}
           <div className="lg:col-span-5 space-y-6" data-print-hide>
             <InputSection
               squareFootage={estimator.squareFootage}
@@ -38,6 +39,12 @@ export default function Home() {
               onClear={estimator.clearAll}
               hasInputs={estimator.hasInputs}
             />
+            <LaborEquipmentSection
+              laborEquipment={estimator.laborEquipment}
+              updateLaborItem={estimator.updateLaborItem}
+              updateEquipmentItem={estimator.updateEquipmentItem}
+              resetLaborEquipment={estimator.resetLaborEquipment}
+            />
             <PricingEditor
               customPrices={estimator.customPrices}
               updatePrice={estimator.updatePrice}
@@ -47,8 +54,16 @@ export default function Home() {
 
           {/* Right Column: Results */}
           <div className="lg:col-span-7 space-y-6">
-            <CostSummary estimate={estimator.estimate} />
-            <OrderList estimate={estimator.estimate} />
+            <CostSummary
+              estimate={estimator.estimate}
+              laborEquipmentTotals={estimator.laborEquipmentTotals}
+              projectTotal={estimator.projectTotal}
+            />
+            <OrderList
+              estimate={estimator.estimate}
+              laborEquipmentTotals={estimator.laborEquipmentTotals}
+              projectTotal={estimator.projectTotal}
+            />
           </div>
         </div>
 
