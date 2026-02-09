@@ -22,6 +22,13 @@
       "when": 1770644027403,
       "tag": "0002_thick_blink",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1770676844011,
+      "tag": "0003_colorful_inertia",
+      "breakpoints": true
     }
   ]
 }

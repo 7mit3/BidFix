@@ -167,3 +167,13 @@
 - [x] Updated all 3 estimators (Karnak, Carlisle TPO, GAF TPO) to store context on breakdown navigation
 - [x] All 115 tests passing, 0 TypeScript errors
 - [x] Test in browser — full workflow verified (save from breakdown, back to loaded estimate)
+
+## Persist Breakdown State (Save/Load Breakdown Edits)
+- [x] Add breakdownState column to saved_estimates table (JSON blob for breakdown edits)
+- [x] Create breakdown state serializer (capture toggled items, edited quantities/prices, tax/profit, custom items)
+- [x] Update save mutation to include breakdownState when saving from breakdown page
+- [x] Update SaveEstimateDialog to accept and pass breakdownState
+- [x] Store saved breakdownState in estimator state and pass to breakdown via sessionStorage
+- [x] Restore breakdown state (toggles, edits, tax/profit, custom items) when opening breakdown
+- [x] All 115 tests passing, 0 TypeScript errors
+- [x] Test full save/load cycle in browser — Equipment Profit toggle persists correctly after reload

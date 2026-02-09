@@ -25,7 +25,7 @@ import { type PenetrationEstimate } from "@/lib/penetrations-data";
 import { SaveEstimateDialog } from "@/components/SaveEstimateDialog";
 import { Button } from "@/components/ui/button";
 import { FileSpreadsheet, Save, FolderOpen } from "lucide-react";
-import { storeBreakdownData, storeEstimateContext } from "@/lib/estimate-breakdown";
+import { storeBreakdownData, storeEstimateContext, storeBreakdownSaveState, deserializeBreakdownState } from "@/lib/estimate-breakdown";
 import { serializeKarnakBreakdown } from "@/lib/breakdown-serializers";
 import {
   serializeKarnakState,
@@ -48,6 +48,7 @@ export default function Home() {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [loadedEstimateId, setLoadedEstimateId] = useState<number | null>(null);
   const [loadedEstimateName, setLoadedEstimateName] = useState<string>("");
+  const [savedBreakdownStateJson, setSavedBreakdownStateJson] = useState<string | null>(null);
 
   // Load estimate from URL param
   const loadEstimateId = new URLSearchParams(searchString).get("loadEstimate");
@@ -101,6 +102,10 @@ export default function Home() {
 
     setLoadedEstimateId(savedEstimate.id);
     setLoadedEstimateName(savedEstimate.name);
+    // Store breakdown state from DB if available
+    if (savedEstimate.breakdownState) {
+      setSavedBreakdownStateJson(savedEstimate.breakdownState);
+    }
     toast.success(`Loaded estimate: "${savedEstimate.name}"`);
 
     // Clean URL
@@ -144,8 +149,13 @@ export default function Home() {
       grandTotal: estimator.projectTotal,
       roofArea: Number(estimator.squareFootage) || 0,
     });
+    // If there's a saved breakdown state from DB, store it so the breakdown page can restore edits
+    if (savedBreakdownStateJson) {
+      const parsed = deserializeBreakdownState(savedBreakdownStateJson);
+      if (parsed) storeBreakdownSaveState(parsed);
+    }
     navigate("/breakdown");
-  }, [estimator.estimate, estimator.laborEquipment, penetrationEstimate, navigate, loadedEstimateId, loadedEstimateName, getEstimateData, estimator.projectTotal, estimator.squareFootage]);
+  }, [estimator.estimate, estimator.laborEquipment, penetrationEstimate, navigate, loadedEstimateId, loadedEstimateName, getEstimateData, estimator.projectTotal, estimator.squareFootage, savedBreakdownStateJson]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">

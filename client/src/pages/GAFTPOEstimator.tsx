@@ -83,7 +83,7 @@ import {
   calculateGAFTPOEstimate,
   exportGAFTPOEstimateCSV,
 } from "@/lib/gaf-tpo-data";
-import { storeBreakdownData, storeEstimateContext } from "@/lib/estimate-breakdown";
+import { storeBreakdownData, storeEstimateContext, storeBreakdownSaveState, deserializeBreakdownState } from "@/lib/estimate-breakdown";
 import { serializeTPOBreakdown } from "@/lib/breakdown-serializers";
 import { SaveEstimateDialog } from "@/components/SaveEstimateDialog";
 import { serializeTPOState, deserializeTPOState } from "@/lib/estimate-state-serializers";
@@ -100,6 +100,7 @@ export default function GAFTPOEstimator() {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [loadedEstimateId, setLoadedEstimateId] = useState<number | null>(null);
   const [loadedEstimateName, setLoadedEstimateName] = useState<string>("");
+  const [savedBreakdownStateJson, setSavedBreakdownStateJson] = useState<string | null>(null);
 
   // Assembly config state
   const [assembly, setAssembly] = useState<AssemblyConfig>({
@@ -382,6 +383,10 @@ export default function GAFTPOEstimator() {
     }
     setLoadedEstimateId(savedEstimate.id);
     setLoadedEstimateName(savedEstimate.name);
+    // Store breakdown state from DB if available
+    if (savedEstimate.breakdownState) {
+      setSavedBreakdownStateJson(savedEstimate.breakdownState);
+    }
     toast.success(`Loaded estimate: "${savedEstimate.name}"`);
     window.history.replaceState({}, "", "/estimator/gaf-tpo");
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -422,8 +427,13 @@ export default function GAFTPOEstimator() {
       grandTotal,
       roofArea: measurements.roofArea,
     });
+    // If there's a saved breakdown state from DB, store it so the breakdown page can restore edits
+    if (savedBreakdownStateJson) {
+      const parsed = deserializeBreakdownState(savedBreakdownStateJson);
+      if (parsed) storeBreakdownSaveState(parsed);
+    }
     navigate("/breakdown");
-  }, [estimate, laborEquipment, penetrationEstimate, navigate, loadedEstimateId, loadedEstimateName, getEstimateData, grandTotal, measurements.roofArea]);
+  }, [estimate, laborEquipment, penetrationEstimate, navigate, loadedEstimateId, loadedEstimateName, getEstimateData, grandTotal, measurements.roofArea, savedBreakdownStateJson]);
 
   // Group line items by category
   const groupedItems = useMemo(() => {

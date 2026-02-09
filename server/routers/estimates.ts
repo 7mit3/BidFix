@@ -45,6 +45,7 @@ export const estimatesRouter = router({
         data: z.string(), // JSON string of full estimator state
         grandTotal: z.string().optional(),
         roofArea: z.string().optional(),
+        breakdownState: z.string().optional(), // JSON string of breakdown edits
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -56,6 +57,7 @@ export const estimatesRouter = router({
         data: input.data,
         grandTotal: input.grandTotal ?? null,
         roofArea: input.roofArea ?? null,
+        breakdownState: input.breakdownState ?? null,
         createdBy: ctx.user?.openId || "anonymous",
       });
       return result;
@@ -71,6 +73,7 @@ export const estimatesRouter = router({
         data: z.string().optional(),
         grandTotal: z.string().optional(),
         roofArea: z.string().optional(),
+        breakdownState: z.string().optional(), // JSON string of breakdown edits
       }),
     )
     .mutation(async ({ input }) => {

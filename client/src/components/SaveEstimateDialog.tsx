@@ -40,6 +40,8 @@ interface SaveEstimateDialogProps {
   existingNotes?: string;
   /** Called after a successful save with the new/updated estimate ID */
   onSaved?: (id: number, name: string) => void;
+  /** Optional breakdown state JSON to persist alongside the estimator state */
+  breakdownState?: string;
 }
 
 export function SaveEstimateDialog({
@@ -54,6 +56,7 @@ export function SaveEstimateDialog({
   existingName,
   existingNotes,
   onSaved,
+  breakdownState,
 }: SaveEstimateDialogProps) {
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
@@ -86,6 +89,7 @@ export function SaveEstimateDialog({
         data,
         grandTotal: grandTotal?.toFixed(2),
         roofArea: roofArea?.toFixed(2),
+        breakdownState: breakdownState || undefined,
       });
       utils.estimates.list.invalidate();
       setSaved(true);
@@ -111,6 +115,7 @@ export function SaveEstimateDialog({
         data,
         grandTotal: grandTotal?.toFixed(2),
         roofArea: roofArea?.toFixed(2),
+        breakdownState: breakdownState || undefined,
       });
       utils.estimates.list.invalidate();
       setSaved(true);

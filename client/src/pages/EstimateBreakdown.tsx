@@ -38,6 +38,9 @@ import {
   loadBreakdownData,
   loadEstimateContext,
   storeEstimateContext,
+  serializeBreakdownState,
+  loadBreakdownSaveState,
+  clearBreakdownSaveState,
   fmt,
   getRateLabel,
   type EstimateBreakdownData,
@@ -46,17 +49,9 @@ import {
   type BreakdownPenetrationItem,
   type BreakdownLaborItem,
   type BreakdownEquipmentItem,
+  type TaxProfitState,
 } from "@/lib/estimate-breakdown";
 import { SaveEstimateDialog } from "@/components/SaveEstimateDialog";
-
-// ── Tax & Profit state ─────────────────────────────────────────
-
-interface TaxProfitState {
-  taxEnabled: boolean;
-  taxPercent: number;
-  profitEnabled: boolean;
-  profitPercent: number;
-}
 
 const DEFAULT_TAX_PROFIT: TaxProfitState = {
   taxEnabled: false,
@@ -119,10 +114,29 @@ export default function EstimateBreakdown() {
       return;
     }
     setData(loaded);
-    setMaterials(loaded.materials);
-    setPenetrations(loaded.penetrations);
-    setLabor(loaded.labor);
-    setEquipment(loaded.equipment);
+
+    // Check for saved breakdown state (from DB) — restores all edits
+    const savedState = loadBreakdownSaveState();
+    if (savedState) {
+      // Restore the saved breakdown state (items, toggles, tax/profit, custom items)
+      setMaterials(savedState.materials);
+      setPenetrations(savedState.penetrations);
+      setLabor(savedState.labor);
+      setEquipment(savedState.equipment);
+      if (savedState.materialsTaxProfit) setMaterialsTaxProfit(savedState.materialsTaxProfit);
+      if (savedState.penetrationsTaxProfit) setPenetrationsTaxProfit(savedState.penetrationsTaxProfit);
+      if (savedState.laborTaxProfit) setLaborTaxProfit(savedState.laborTaxProfit);
+      if (savedState.equipmentTaxProfit) setEquipmentTaxProfit(savedState.equipmentTaxProfit);
+      // Clear the saved state so it doesn't interfere with future navigations
+      clearBreakdownSaveState();
+    } else {
+      // No saved state — use the fresh breakdown data from the estimator
+      setMaterials(loaded.materials);
+      setPenetrations(loaded.penetrations);
+      setLabor(loaded.labor);
+      setEquipment(loaded.equipment);
+    }
+
     // Load estimate context for save/back navigation
     const ctx = loadEstimateContext();
     if (ctx) setEstimateCtx(ctx);
@@ -329,6 +343,20 @@ export default function EstimateBreakdown() {
     // Return the original estimator state JSON (from the estimator page)
     return estimateCtx?.estimatorStateJson ?? "{}";
   }, [estimateCtx]);
+
+  /** Serialize the current breakdown editing state for DB persistence */
+  const breakdownStateJson = useMemo(() => {
+    return serializeBreakdownState({
+      materials,
+      penetrations,
+      labor,
+      equipment,
+      materialsTaxProfit,
+      penetrationsTaxProfit,
+      laborTaxProfit,
+      equipmentTaxProfit,
+    });
+  }, [materials, penetrations, labor, equipment, materialsTaxProfit, penetrationsTaxProfit, laborTaxProfit, equipmentTaxProfit]);
 
   const handleBackToEstimator = useCallback(() => {
     if (!data) return;
@@ -890,6 +918,7 @@ export default function EstimateBreakdown() {
           existingId={estimateCtx.estimateId}
           existingName={estimateCtx.estimateName}
           onSaved={handleSaved}
+          breakdownState={breakdownStateJson}
         />
       )}
     </div>

@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, name, LENGTH(breakdownState) as breakdown_state_length, SUBSTRING(breakdownState, 1, 300) as breakdown_preview FROM saved_estimates WHERE id = 60001;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2M93N6eA4z8JVUn.02c0fb067b9a --database Q9FjtgmyfZcDZpNJvvZPkD --execute SELECT id, name, LENGTH(breakdownState) as breakdown_state_length, SUBSTRING(breakdownState, 1, 300) as breakdown_preview FROM saved_estimates WHERE id = 60001;",
+  "rows": [
+    {
+      "id": "60001",
+      "name": "115610 Preston Forest Village - Bldg 2 Area E",
+      "breakdown_state_length": "10476",
+      "breakdown_preview": "{\"materials\":[{\"id\":\"insulation-1.5\",\"name\":\"1.5\\\" Polyiso Insulation (R-8.6)\",\"description\":\"Polyiso rigid roof insulation, 20 PSI\",\"category\":\"Insulation\",\"unit\":\"Board (4' x 8')\",\"quantityNeeded\":653.40625,\"quantity\":654,\"unitPrice\":42,\"totalCost\":27468,\"enabled\":true},{\"id\":\"fastener-screws-8in\""
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tbreakdown_state_length\tbreakdown_preview\n60001\t115610 Preston Forest Village - Bldg 2 Area E\t10476\t{\"materials\":[{\"id\":\"insulation-1.5\",\"name\":\"1.5\\\" Polyiso Insulation (R-8.6)\",\"description\":\"Polyiso rigid roof insulation, 20 PSI\",\"category\":\"Insulation\",\"unit\":\"Board (4' x 8')\",\"quantityNeeded\":653.40625,\"quantity\":654,\"unitPrice\":42,\"totalCost\":27468,\"enabled\":true},{\"id\":\"fastener-screws-8in\"\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

@@ -1,0 +1,1 @@
+ALTER TABLE `saved_estimates` ADD `breakdownState` text;

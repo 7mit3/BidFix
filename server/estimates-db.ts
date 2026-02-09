@@ -61,10 +61,10 @@ export async function createEstimate(input: InsertSavedEstimate) {
   return { id: Number(result[0].insertId) };
 }
 
-/** Update an existing saved estimate (name, notes, data, grandTotal, roofArea). */
+/** Update an existing saved estimate (name, notes, data, grandTotal, roofArea, breakdownState). */
 export async function updateEstimate(
   id: number,
-  updates: Partial<Pick<InsertSavedEstimate, "name" | "notes" | "data" | "grandTotal" | "roofArea">>,
+  updates: Partial<Pick<InsertSavedEstimate, "name" | "notes" | "data" | "grandTotal" | "roofArea" | "breakdownState">>,
 ) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

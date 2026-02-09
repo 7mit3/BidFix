@@ -124,6 +124,8 @@ export const savedEstimates = mysqlTable("saved_estimates", {
   grandTotal: decimal("grandTotal", { precision: 12, scale: 2 }),
   /** Snapshot of roof area / square footage */
   roofArea: decimal("roofArea", { precision: 12, scale: 2 }),
+  /** Full breakdown state serialized as JSON (items, toggles, tax/profit, custom items) */
+  breakdownState: text("breakdownState"),
   /** User who saved this estimate */
   createdBy: varchar("createdBy", { length: 64 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

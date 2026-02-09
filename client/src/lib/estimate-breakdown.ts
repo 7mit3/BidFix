@@ -95,6 +95,7 @@ export interface EstimateContext {
  */
 const STORAGE_KEY = "estimate-breakdown-data";
 const CONTEXT_KEY = "estimate-breakdown-context";
+const BREAKDOWN_STATE_KEY = "estimate-breakdown-saved-state";
 
 export function storeBreakdownData(data: EstimateBreakdownData): void {
   try {
@@ -130,6 +131,74 @@ export function loadEstimateContext(): EstimateContext | null {
     const raw = sessionStorage.getItem(CONTEXT_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as EstimateContext;
+  } catch {
+    return null;
+  }
+}
+
+/** Store a saved breakdown state in sessionStorage (for restoring on the breakdown page). */
+export function storeBreakdownSaveState(state: BreakdownSaveState): void {
+  try {
+    sessionStorage.setItem(BREAKDOWN_STATE_KEY, JSON.stringify(state));
+  } catch {
+    sessionStorage.removeItem(BREAKDOWN_STATE_KEY);
+    sessionStorage.setItem(BREAKDOWN_STATE_KEY, JSON.stringify(state));
+  }
+}
+
+/** Load a saved breakdown state from sessionStorage. */
+export function loadBreakdownSaveState(): BreakdownSaveState | null {
+  try {
+    const raw = sessionStorage.getItem(BREAKDOWN_STATE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as BreakdownSaveState;
+  } catch {
+    return null;
+  }
+}
+
+/** Clear the saved breakdown state from sessionStorage. */
+export function clearBreakdownSaveState(): void {
+  sessionStorage.removeItem(BREAKDOWN_STATE_KEY);
+}
+
+// ── Breakdown save state (persisted to DB) ─────────────────
+
+export interface TaxProfitState {
+  taxEnabled: boolean;
+  taxPercent: number;
+  profitEnabled: boolean;
+  profitPercent: number;
+}
+
+/**
+ * The full breakdown editing state that gets persisted to the database.
+ * Captures all user edits: toggled items, edited quantities/prices,
+ * tax/profit settings per section, and custom items.
+ */
+export interface BreakdownSaveState {
+  materials: BreakdownMaterialItem[];
+  penetrations: BreakdownPenetrationItem[];
+  labor: BreakdownLaborItem[];
+  equipment: BreakdownEquipmentItem[];
+  materialsTaxProfit: TaxProfitState;
+  penetrationsTaxProfit: TaxProfitState;
+  laborTaxProfit: TaxProfitState;
+  equipmentTaxProfit: TaxProfitState;
+}
+
+/** Serialize breakdown state to a JSON string for DB storage. */
+export function serializeBreakdownState(state: BreakdownSaveState): string {
+  return JSON.stringify(state);
+}
+
+/** Deserialize breakdown state from a JSON string (from DB). */
+export function deserializeBreakdownState(json: string): BreakdownSaveState | null {
+  try {
+    const parsed = JSON.parse(json);
+    // Basic validation: check required arrays exist
+    if (!parsed.materials || !parsed.labor) return null;
+    return parsed as BreakdownSaveState;
   } catch {
     return null;
   }
