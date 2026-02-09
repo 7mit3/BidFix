@@ -123,3 +123,7 @@
 
 ## Powered by RooFix AI Badge
 - [x] Add "Powered by RooFix AI" badge to Footer component with link to roofix.ai
+
+## BidFix AI Logo (from RooFix reference)
+- [x] Generate BidFix AI logo: replace "Roo" with "Bid" in same blue/angular font, keep "Fix" and "AI" identical
+- [x] Upload and integrate into the app (Catalog hero, Catalog footer, main Footer)

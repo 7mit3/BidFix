@@ -1,13 +1,22 @@
 /**
- * Footer — BidFix AI branded footer with "Powered by RooFix AI" badge
+ * Footer — BidFix AI branded footer with logo and "Powered by RooFix AI" badge
  * Design: Minimal dark footer with brand badge linking to roofix.ai
  */
+
+const BIDFIX_LOGO = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663079448619/ycsDUxLnvcoeWeQr.png";
 
 export function Footer() {
   return (
     <footer className="mt-auto border-t border-border bg-muted/30">
       <div className="container py-6">
         <div className="flex flex-col items-center gap-4">
+          {/* BidFix AI Logo */}
+          <img
+            src={BIDFIX_LOGO}
+            alt="BidFix AI"
+            className="h-8 w-auto opacity-80"
+          />
+
           {/* Disclaimer */}
           <p className="text-sm text-muted-foreground text-center max-w-2xl">
             Material estimator based on manufacturer spec sheets — coverage rates are for estimating purposes only.

@@ -251,11 +251,16 @@ export default function Catalog() {
                 Roofing Estimator
               </span>
             </div>
-            <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-              BidFix AI
-              <br />
-              <span className="text-cyan">Roofing Estimator</span>
-            </h1>
+            <div className="mb-4">
+              <img
+                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663079448619/ycsDUxLnvcoeWeQr.png"
+                alt="BidFix AI"
+                className="h-14 sm:h-18 lg:h-22 w-auto object-contain"
+              />
+              <h2 className="text-cyan font-heading text-2xl sm:text-3xl lg:text-4xl font-bold mt-2">
+                Roofing Estimator
+              </h2>
+            </div>
             <p className="text-slate-text/90 text-base sm:text-lg leading-relaxed max-w-xl">
               Select a roofing system below to calculate material quantities,
               labor costs, and generate a complete project estimate. Browse by
@@ -343,9 +348,14 @@ export default function Catalog() {
               Coverage rates are for estimating purposes only. Actual amounts may
               vary depending on roof conditions.
             </p>
-            <p className="text-xs">
-              BidFix AI — A RooFix AI Module
-            </p>
+            <div className="flex items-center gap-2">
+              <img
+                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663079448619/ycsDUxLnvcoeWeQr.png"
+                alt="BidFix AI"
+                className="h-6 w-auto"
+              />
+              <span className="text-xs text-muted-foreground">— A RooFix AI Module</span>
+            </div>
           </div>
         </div>
       </footer>
