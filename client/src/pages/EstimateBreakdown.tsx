@@ -3,6 +3,7 @@
  *
  * Shows all materials, penetrations, labor, and equipment in a single view.
  * Every line item can be toggled on/off and has editable quantities and prices.
+ * Each section has adjustable Tax % and Profit % with toggles.
  * Grand total updates reactively.
  */
 
@@ -25,6 +26,7 @@ import {
   EyeOff,
   ChevronDown,
   ChevronUp,
+  Percent,
 } from "lucide-react";
 import {
   loadBreakdownData,
@@ -39,7 +41,23 @@ import {
   type BreakdownEquipmentItem,
 } from "@/lib/estimate-breakdown";
 
-// ── Section collapse state ───────────────────────────────────
+// ── Tax & Profit state per section ──────────────────────────
+
+interface TaxProfitState {
+  taxEnabled: boolean;
+  taxPercent: number;
+  profitEnabled: boolean;
+  profitPercent: number;
+}
+
+const DEFAULT_TAX_PROFIT: TaxProfitState = {
+  taxEnabled: false,
+  taxPercent: 8.25,
+  profitEnabled: false,
+  profitPercent: 20,
+};
+
+// ── Section collapse state ──────────────────────────────────
 
 interface SectionState {
   materials: boolean;
@@ -48,7 +66,7 @@ interface SectionState {
   equipment: boolean;
 }
 
-// ── Main component ───────────────────────────────────────────
+// ── Main component ──────────────────────────────────────────
 
 export default function EstimateBreakdown() {
   const [, navigate] = useLocation();
@@ -69,6 +87,12 @@ export default function EstimateBreakdown() {
 
   const [showDisabled, setShowDisabled] = useState(true);
 
+  // Tax & Profit per section
+  const [materialsTaxProfit, setMaterialsTaxProfit] = useState<TaxProfitState>({ ...DEFAULT_TAX_PROFIT });
+  const [penetrationsTaxProfit, setPenetrationsTaxProfit] = useState<TaxProfitState>({ ...DEFAULT_TAX_PROFIT });
+  const [laborTaxProfit, setLaborTaxProfit] = useState<TaxProfitState>({ ...DEFAULT_TAX_PROFIT });
+  const [equipmentTaxProfit, setEquipmentTaxProfit] = useState<TaxProfitState>({ ...DEFAULT_TAX_PROFIT });
+
   // Load data from sessionStorage on mount
   useEffect(() => {
     const loaded = loadBreakdownData();
@@ -83,7 +107,7 @@ export default function EstimateBreakdown() {
     setEquipment(loaded.equipment);
   }, [navigate]);
 
-  // ── Material handlers ────────────────────────────────────
+  // ── Material handlers ───────────────────────────────────
 
   const updateMaterial = useCallback(
     (id: string, field: "quantity" | "unitPrice" | "enabled", value: number | boolean) => {
@@ -103,7 +127,7 @@ export default function EstimateBreakdown() {
     []
   );
 
-  // ── Penetration handlers ─────────────────────────────────
+  // ── Penetration handlers ────────────────────────────────
 
   const updatePenetration = useCallback(
     (id: string, field: "quantity" | "unitPrice" | "enabled", value: number | boolean) => {
@@ -123,7 +147,7 @@ export default function EstimateBreakdown() {
     []
   );
 
-  // ── Labor handlers ───────────────────────────────────────
+  // ── Labor handlers ──────────────────────────────────────
 
   const updateLabor = useCallback(
     (id: string, field: "rate" | "quantity" | "enabled", value: number | boolean) => {
@@ -134,11 +158,7 @@ export default function EstimateBreakdown() {
           if (field === "rate" || field === "quantity") {
             const rate = field === "rate" ? (value as number) : item.rate;
             const qty = field === "quantity" ? (value as number) : item.quantity;
-            // For per_sqft and per_lf, computedCost was pre-calculated with area/LF
-            // We need to recalculate proportionally
             if (item.rateType === "per_sqft" || item.rateType === "per_lf") {
-              // The original computedCost = originalRate * area
-              // New cost = newRate * area = (newRate / originalRate) * originalComputedCost
               if (item.rate > 0) {
                 updated.computedCost = (rate / item.rate) * item.computedCost;
               } else {
@@ -156,7 +176,7 @@ export default function EstimateBreakdown() {
     []
   );
 
-  // ── Equipment handlers ───────────────────────────────────
+  // ── Equipment handlers ──────────────────────────────────
 
   const updateEquipment = useCallback(
     (id: string, field: "rate" | "quantity" | "enabled", value: number | boolean) => {
@@ -176,44 +196,77 @@ export default function EstimateBreakdown() {
     []
   );
 
-  // ── Totals ───────────────────────────────────────────────
+  // ── Compute base totals (before tax/profit) ─────────────
 
-  const materialTotal = useMemo(
+  const materialBase = useMemo(
     () => materials.filter((m) => m.enabled).reduce((sum, m) => sum + m.totalCost, 0),
     [materials]
   );
 
-  const penetrationTotal = useMemo(
+  const penetrationBase = useMemo(
     () => penetrations.filter((p) => p.enabled).reduce((sum, p) => sum + p.totalCost, 0),
     [penetrations]
   );
 
-  const laborTotal = useMemo(
+  const laborBase = useMemo(
     () => labor.filter((l) => l.enabled).reduce((sum, l) => sum + l.computedCost, 0),
     [labor]
   );
 
-  const equipmentTotal = useMemo(
+  const equipmentBase = useMemo(
     () => equipment.filter((e) => e.enabled).reduce((sum, e) => sum + e.computedCost, 0),
     [equipment]
   );
 
-  const grandTotal = materialTotal + penetrationTotal + laborTotal + equipmentTotal;
+  // ── Compute tax & profit amounts per section ────────────
 
-  // ── Section toggle ───────────────────────────────────────
+  const computeTaxProfit = (base: number, tp: TaxProfitState) => {
+    const taxAmount = tp.taxEnabled ? base * (tp.taxPercent / 100) : 0;
+    const profitAmount = tp.profitEnabled ? base * (tp.profitPercent / 100) : 0;
+    return { taxAmount, profitAmount, sectionTotal: base + taxAmount + profitAmount };
+  };
+
+  const matTP = useMemo(() => computeTaxProfit(materialBase, materialsTaxProfit), [materialBase, materialsTaxProfit]);
+  const penTP = useMemo(() => computeTaxProfit(penetrationBase, penetrationsTaxProfit), [penetrationBase, penetrationsTaxProfit]);
+  const labTP = useMemo(() => computeTaxProfit(laborBase, laborTaxProfit), [laborBase, laborTaxProfit]);
+  const eqTP = useMemo(() => computeTaxProfit(equipmentBase, equipmentTaxProfit), [equipmentBase, equipmentTaxProfit]);
+
+  const grandTotal = matTP.sectionTotal + penTP.sectionTotal + labTP.sectionTotal + eqTP.sectionTotal;
+
+  // Total tax and profit across all sections
+  const totalTax = matTP.taxAmount + penTP.taxAmount + labTP.taxAmount + eqTP.taxAmount;
+  const totalProfit = matTP.profitAmount + penTP.profitAmount + labTP.profitAmount + eqTP.profitAmount;
+
+  // ── Section toggle ──────────────────────────────────────
 
   const toggleSection = useCallback((section: keyof SectionState) => {
     setSections((prev) => ({ ...prev, [section]: !prev[section] }));
   }, []);
 
-  // ── Excel Export ─────────────────────────────────────────
+  // ── Excel Export ────────────────────────────────────────
 
   const exportExcel = useCallback(() => {
     if (!data) return;
     import("xlsx").then((XLSX) => {
       const wb = XLSX.utils.book_new();
 
-      // ── Materials sheet ───────────────────────────────────
+      // Helper to add tax/profit rows to a sheet data array
+      const addTaxProfitRows = (rows: any[], base: number, tp: TaxProfitState, totalLabel: string) => {
+        const { taxAmount, profitAmount, sectionTotal } = computeTaxProfit(base, tp);
+        rows.push({} as any);
+        rows.push({ Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": totalLabel + " (Base)", Total: base, Included: "" } as any);
+        if (tp.taxEnabled) {
+          rows.push({ Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": `Tax (${tp.taxPercent}%)`, Total: taxAmount, Included: "Yes" } as any);
+        }
+        if (tp.profitEnabled) {
+          rows.push({ Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": `Profit (${tp.profitPercent}%)`, Total: profitAmount, Included: "Yes" } as any);
+        }
+        if (tp.taxEnabled || tp.profitEnabled) {
+          rows.push({ Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": totalLabel + " (w/ Tax & Profit)", Total: sectionTotal, Included: "" } as any);
+        }
+      };
+
+      // ── Materials sheet ──────────────────────────────────
       const matRows = materials.map((m) => ({
         Category: m.category,
         Item: m.name,
@@ -224,118 +277,157 @@ export default function EstimateBreakdown() {
         Total: m.totalCost,
         Included: m.enabled ? "Yes" : "No",
       }));
-      matRows.push(
-        {} as any,
-        { Category: "", Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": "Materials Total", Total: materialTotal, Included: "" } as any
-      );
-      const matWs = XLSX.utils.json_to_sheet(matRows);
-      // Set column widths
+      // Remap for addTaxProfitRows compatibility
+      const matSummary: any[] = [];
+      matSummary.push({} as any);
+      matSummary.push({ Category: "", Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": "Materials (Base)", Total: materialBase, Included: "" } as any);
+      if (materialsTaxProfit.taxEnabled) {
+        matSummary.push({ Category: "", Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": `Tax (${materialsTaxProfit.taxPercent}%)`, Total: matTP.taxAmount, Included: "Yes" } as any);
+      }
+      if (materialsTaxProfit.profitEnabled) {
+        matSummary.push({ Category: "", Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": `Profit (${materialsTaxProfit.profitPercent}%)`, Total: matTP.profitAmount, Included: "Yes" } as any);
+      }
+      if (materialsTaxProfit.taxEnabled || materialsTaxProfit.profitEnabled) {
+        matSummary.push({ Category: "", Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": "Materials Total", Total: matTP.sectionTotal, Included: "" } as any);
+      } else {
+        matSummary.push({ Category: "", Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": "Materials Total", Total: materialBase, Included: "" } as any);
+      }
+      const matWs = XLSX.utils.json_to_sheet([...matRows, ...matSummary]);
       matWs["!cols"] = [
         { wch: 16 }, { wch: 40 }, { wch: 30 }, { wch: 18 },
-        { wch: 10 }, { wch: 12 }, { wch: 14 }, { wch: 10 },
+        { wch: 10 }, { wch: 28 }, { wch: 14 }, { wch: 10 },
       ];
       XLSX.utils.book_append_sheet(wb, matWs, "Materials");
 
-      // ── Penetrations sheet (if any) ───────────────────────
+      // ── Penetrations sheet ──────────────────────────────
       if (penetrations.length > 0) {
-        const penRows = penetrations.map((p) => ({
-          Item: p.name,
-          Description: p.description,
-          Unit: p.unit,
-          Quantity: p.quantity,
-          "Unit Price": p.unitPrice,
-          Total: p.totalCost,
+        const penRows: any[] = penetrations.map((p) => ({
+          Item: p.name, Description: p.description, Unit: p.unit,
+          Quantity: p.quantity, "Unit Price": p.unitPrice, Total: p.totalCost,
           Included: p.enabled ? "Yes" : "No",
         }));
-        penRows.push(
-          {} as any,
-          { Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": "Penetrations Total", Total: penetrationTotal, Included: "" } as any
-        );
+        penRows.push({} as any);
+        penRows.push({ Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": "Penetrations (Base)", Total: penetrationBase, Included: "" } as any);
+        if (penetrationsTaxProfit.taxEnabled) {
+          penRows.push({ Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": `Tax (${penetrationsTaxProfit.taxPercent}%)`, Total: penTP.taxAmount, Included: "Yes" } as any);
+        }
+        if (penetrationsTaxProfit.profitEnabled) {
+          penRows.push({ Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": `Profit (${penetrationsTaxProfit.profitPercent}%)`, Total: penTP.profitAmount, Included: "Yes" } as any);
+        }
+        if (penetrationsTaxProfit.taxEnabled || penetrationsTaxProfit.profitEnabled) {
+          penRows.push({ Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": "Penetrations Total", Total: penTP.sectionTotal, Included: "" } as any);
+        } else {
+          penRows.push({ Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": "Penetrations Total", Total: penetrationBase, Included: "" } as any);
+        }
         const penWs = XLSX.utils.json_to_sheet(penRows);
-        penWs["!cols"] = [
-          { wch: 30 }, { wch: 30 }, { wch: 12 },
-          { wch: 10 }, { wch: 12 }, { wch: 14 }, { wch: 10 },
-        ];
+        penWs["!cols"] = [{ wch: 30 }, { wch: 30 }, { wch: 12 }, { wch: 10 }, { wch: 28 }, { wch: 14 }, { wch: 10 }];
         XLSX.utils.book_append_sheet(wb, penWs, "Penetrations");
       }
 
-      // ── Labor sheet ───────────────────────────────────────
+      // ── Labor sheet ─────────────────────────────────────
       if (labor.length > 0) {
-        const labRows = labor.map((l) => ({
-          Item: l.label,
-          Description: l.description,
-          "Rate Type": getRateLabel(l.rateType),
-          Rate: l.rate,
-          Quantity: l.rateType === "per_sqft" || l.rateType === "per_lf" ? "—" : l.quantity,
-          Total: l.computedCost,
-          Included: l.enabled ? "Yes" : "No",
+        const labRows: any[] = labor.map((l) => ({
+          Item: l.label, Description: l.description, "Rate Type": getRateLabel(l.rateType),
+          Rate: l.rate, Quantity: l.rateType === "per_sqft" || l.rateType === "per_lf" ? "—" : l.quantity,
+          Total: l.computedCost, Included: l.enabled ? "Yes" : "No",
         }));
-        labRows.push(
-          {} as any,
-          { Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: "Labor Total", Total: laborTotal, Included: "" } as any
-        );
+        labRows.push({} as any);
+        labRows.push({ Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: "Labor (Base)", Total: laborBase, Included: "" } as any);
+        if (laborTaxProfit.taxEnabled) {
+          labRows.push({ Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: `Tax (${laborTaxProfit.taxPercent}%)`, Total: labTP.taxAmount, Included: "Yes" } as any);
+        }
+        if (laborTaxProfit.profitEnabled) {
+          labRows.push({ Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: `Profit (${laborTaxProfit.profitPercent}%)`, Total: labTP.profitAmount, Included: "Yes" } as any);
+        }
+        if (laborTaxProfit.taxEnabled || laborTaxProfit.profitEnabled) {
+          labRows.push({ Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: "Labor Total", Total: labTP.sectionTotal, Included: "" } as any);
+        } else {
+          labRows.push({ Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: "Labor Total", Total: laborBase, Included: "" } as any);
+        }
         const labWs = XLSX.utils.json_to_sheet(labRows);
-        labWs["!cols"] = [
-          { wch: 30 }, { wch: 30 }, { wch: 14 },
-          { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 10 },
-        ];
+        labWs["!cols"] = [{ wch: 30 }, { wch: 30 }, { wch: 14 }, { wch: 12 }, { wch: 28 }, { wch: 14 }, { wch: 10 }];
         XLSX.utils.book_append_sheet(wb, labWs, "Labor");
       }
 
-      // ── Equipment sheet ───────────────────────────────────
+      // ── Equipment sheet ─────────────────────────────────
       if (equipment.length > 0) {
-        const eqRows = equipment.map((e) => ({
-          Item: e.label,
-          Description: e.description,
-          "Rate Type": getRateLabel(e.rateType),
-          Rate: e.rate,
-          Quantity: e.rateType === "flat" ? "—" : e.quantity,
-          Total: e.computedCost,
-          Included: e.enabled ? "Yes" : "No",
+        const eqRows: any[] = equipment.map((e) => ({
+          Item: e.label, Description: e.description, "Rate Type": getRateLabel(e.rateType),
+          Rate: e.rate, Quantity: e.rateType === "flat" ? "—" : e.quantity,
+          Total: e.computedCost, Included: e.enabled ? "Yes" : "No",
         }));
-        eqRows.push(
-          {} as any,
-          { Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: "Equipment Total", Total: equipmentTotal, Included: "" } as any
-        );
+        eqRows.push({} as any);
+        eqRows.push({ Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: "Equipment (Base)", Total: equipmentBase, Included: "" } as any);
+        if (equipmentTaxProfit.taxEnabled) {
+          eqRows.push({ Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: `Tax (${equipmentTaxProfit.taxPercent}%)`, Total: eqTP.taxAmount, Included: "Yes" } as any);
+        }
+        if (equipmentTaxProfit.profitEnabled) {
+          eqRows.push({ Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: `Profit (${equipmentTaxProfit.profitPercent}%)`, Total: eqTP.profitAmount, Included: "Yes" } as any);
+        }
+        if (equipmentTaxProfit.taxEnabled || equipmentTaxProfit.profitEnabled) {
+          eqRows.push({ Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: "Equipment Total", Total: eqTP.sectionTotal, Included: "" } as any);
+        } else {
+          eqRows.push({ Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: "Equipment Total", Total: equipmentBase, Included: "" } as any);
+        }
         const eqWs = XLSX.utils.json_to_sheet(eqRows);
-        eqWs["!cols"] = [
-          { wch: 30 }, { wch: 30 }, { wch: 14 },
-          { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 10 },
-        ];
+        eqWs["!cols"] = [{ wch: 30 }, { wch: 30 }, { wch: 14 }, { wch: 12 }, { wch: 28 }, { wch: 14 }, { wch: 10 }];
         XLSX.utils.book_append_sheet(wb, eqWs, "Equipment");
       }
 
-      // ── Summary sheet ─────────────────────────────────────
-      const summaryRows = [
-        { Section: "Materials", Items: materials.filter((m) => m.enabled).length, Total: materialTotal },
-        ...(penetrations.length > 0 ? [{ Section: "Penetrations", Items: penetrations.filter((p) => p.enabled).length, Total: penetrationTotal }] : []),
-        ...(labor.length > 0 ? [{ Section: "Labor", Items: labor.filter((l) => l.enabled).length, Total: laborTotal }] : []),
-        ...(equipment.length > 0 ? [{ Section: "Equipment", Items: equipment.filter((e) => e.enabled).length, Total: equipmentTotal }] : []),
-        {} as any,
-        { Section: "GRAND TOTAL", Items: "", Total: grandTotal } as any,
+      // ── Summary sheet ───────────────────────────────────
+      const summaryRows: any[] = [
+        { Section: "Materials (Base)", Items: materials.filter((m) => m.enabled).length, Total: materialBase },
       ];
+      if (materialsTaxProfit.taxEnabled) summaryRows.push({ Section: `  Tax (${materialsTaxProfit.taxPercent}%)`, Items: "", Total: matTP.taxAmount });
+      if (materialsTaxProfit.profitEnabled) summaryRows.push({ Section: `  Profit (${materialsTaxProfit.profitPercent}%)`, Items: "", Total: matTP.profitAmount });
+      if (materialsTaxProfit.taxEnabled || materialsTaxProfit.profitEnabled) summaryRows.push({ Section: "Materials Total", Items: "", Total: matTP.sectionTotal });
+
+      if (penetrations.length > 0) {
+        summaryRows.push({ Section: "Penetrations (Base)", Items: penetrations.filter((p) => p.enabled).length, Total: penetrationBase });
+        if (penetrationsTaxProfit.taxEnabled) summaryRows.push({ Section: `  Tax (${penetrationsTaxProfit.taxPercent}%)`, Items: "", Total: penTP.taxAmount });
+        if (penetrationsTaxProfit.profitEnabled) summaryRows.push({ Section: `  Profit (${penetrationsTaxProfit.profitPercent}%)`, Items: "", Total: penTP.profitAmount });
+        if (penetrationsTaxProfit.taxEnabled || penetrationsTaxProfit.profitEnabled) summaryRows.push({ Section: "Penetrations Total", Items: "", Total: penTP.sectionTotal });
+      }
+
+      if (labor.length > 0) {
+        summaryRows.push({ Section: "Labor (Base)", Items: labor.filter((l) => l.enabled).length, Total: laborBase });
+        if (laborTaxProfit.taxEnabled) summaryRows.push({ Section: `  Tax (${laborTaxProfit.taxPercent}%)`, Items: "", Total: labTP.taxAmount });
+        if (laborTaxProfit.profitEnabled) summaryRows.push({ Section: `  Profit (${laborTaxProfit.profitPercent}%)`, Items: "", Total: labTP.profitAmount });
+        if (laborTaxProfit.taxEnabled || laborTaxProfit.profitEnabled) summaryRows.push({ Section: "Labor Total", Items: "", Total: labTP.sectionTotal });
+      }
+
+      if (equipment.length > 0) {
+        summaryRows.push({ Section: "Equipment (Base)", Items: equipment.filter((e) => e.enabled).length, Total: equipmentBase });
+        if (equipmentTaxProfit.taxEnabled) summaryRows.push({ Section: `  Tax (${equipmentTaxProfit.taxPercent}%)`, Items: "", Total: eqTP.taxAmount });
+        if (equipmentTaxProfit.profitEnabled) summaryRows.push({ Section: `  Profit (${equipmentTaxProfit.profitPercent}%)`, Items: "", Total: eqTP.profitAmount });
+        if (equipmentTaxProfit.taxEnabled || equipmentTaxProfit.profitEnabled) summaryRows.push({ Section: "Equipment Total", Items: "", Total: eqTP.sectionTotal });
+      }
+
+      summaryRows.push({} as any);
+      if (totalTax > 0) summaryRows.push({ Section: "Total Tax", Items: "", Total: totalTax });
+      if (totalProfit > 0) summaryRows.push({ Section: "Total Profit", Items: "", Total: totalProfit });
+      summaryRows.push({ Section: "GRAND TOTAL", Items: "", Total: grandTotal });
+
       const summaryWs = XLSX.utils.json_to_sheet(summaryRows);
-      summaryWs["!cols"] = [{ wch: 20 }, { wch: 10 }, { wch: 16 }];
+      summaryWs["!cols"] = [{ wch: 28 }, { wch: 10 }, { wch: 16 }];
       XLSX.utils.book_append_sheet(wb, summaryWs, "Summary");
-      // Move Summary to the first position
       const idx = wb.SheetNames.indexOf("Summary");
       if (idx > 0) {
         wb.SheetNames.splice(idx, 1);
         wb.SheetNames.unshift("Summary");
       }
 
-      // ── Download ──────────────────────────────────────────
       XLSX.writeFile(wb, `${data.systemSlug}-estimate-${Date.now()}.xlsx`);
     });
-  }, [data, materials, penetrations, labor, equipment, materialTotal, penetrationTotal, laborTotal, equipmentTotal, grandTotal]);
+  }, [data, materials, penetrations, labor, equipment, materialBase, penetrationBase, laborBase, equipmentBase, materialsTaxProfit, penetrationsTaxProfit, laborTaxProfit, equipmentTaxProfit, matTP, penTP, labTP, eqTP, grandTotal, totalTax, totalProfit]);
 
-  // ── Print ────────────────────────────────────────────────
+  // ── Print ───────────────────────────────────────────────
 
   const handlePrint = useCallback(() => {
     window.print();
   }, []);
 
-  // ── Accent color classes ─────────────────────────────────
+  // ── Accent color classes ────────────────────────────────
 
   const accentMap: Record<string, { bg: string; text: string; border: string; light: string }> = {
     red: { bg: "bg-red-600", text: "text-red-600", border: "border-red-200", light: "bg-red-50" },
@@ -345,7 +437,7 @@ export default function EstimateBreakdown() {
 
   const accent = accentMap[data?.accentColor ?? "red"] ?? accentMap.red;
 
-  // ── Loading / no data ────────────────────────────────────
+  // ── Loading / no data ───────────────────────────────────
 
   if (!data) {
     return (
@@ -355,7 +447,7 @@ export default function EstimateBreakdown() {
     );
   }
 
-  // ── Group materials by category ──────────────────────────
+  // ── Group materials by category ─────────────────────────
 
   const materialsByCategory: Record<string, BreakdownMaterialItem[]> = {};
   materials.forEach((m) => {
@@ -375,7 +467,7 @@ export default function EstimateBreakdown() {
 
   return (
     <div className="min-h-screen bg-slate-50 print:bg-white">
-      {/* ── Header ──────────────────────────────────────────── */}
+      {/* ── Header ─────────────────────────────────────────── */}
       <div className={`${accent.bg} text-white`}>
         <div className="container py-6">
           <div className="flex items-center justify-between">
@@ -439,28 +531,28 @@ export default function EstimateBreakdown() {
         </div>
       </div>
 
-      {/* ── Grand Total Sticky Bar ──────────────────────────── */}
+      {/* ── Grand Total Sticky Bar ─────────────────────────── */}
       <div className="sticky top-0 z-20 bg-white border-b border-slate-200 shadow-sm print:static print:shadow-none">
         <div className="container py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6 text-sm">
+            <div className="flex items-center gap-6 text-sm flex-wrap">
               <div>
                 <span className="text-muted-foreground">Materials</span>
-                <span className="ml-2 font-semibold tabular-nums">{fmt(materialTotal)}</span>
+                <span className="ml-2 font-semibold tabular-nums">{fmt(matTP.sectionTotal)}</span>
               </div>
               {penetrations.length > 0 && (
                 <div>
                   <span className="text-muted-foreground">Penetrations</span>
-                  <span className="ml-2 font-semibold tabular-nums">{fmt(penetrationTotal)}</span>
+                  <span className="ml-2 font-semibold tabular-nums">{fmt(penTP.sectionTotal)}</span>
                 </div>
               )}
               <div>
                 <span className="text-muted-foreground">Labor</span>
-                <span className="ml-2 font-semibold tabular-nums">{fmt(laborTotal)}</span>
+                <span className="ml-2 font-semibold tabular-nums">{fmt(labTP.sectionTotal)}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Equipment</span>
-                <span className="ml-2 font-semibold tabular-nums">{fmt(equipmentTotal)}</span>
+                <span className="ml-2 font-semibold tabular-nums">{fmt(eqTP.sectionTotal)}</span>
               </div>
             </div>
             <div className="text-right">
@@ -473,15 +565,18 @@ export default function EstimateBreakdown() {
         </div>
       </div>
 
-      {/* ── Content ─────────────────────────────────────────── */}
+      {/* ── Content ────────────────────────────────────────── */}
       <div className="container py-6 space-y-6">
-        {/* ── Materials Section ──────────────────────────────── */}
+        {/* ── Materials Section ─────────────────────────────── */}
         <SectionCard
           title="Materials"
           icon={<Package className={`w-5 h-5 ${accent.text}`} />}
           count={enabledMaterialCount}
           total={materials.length}
-          subtotal={materialTotal}
+          baseSubtotal={materialBase}
+          sectionTotal={matTP.sectionTotal}
+          taxProfit={materialsTaxProfit}
+          onTaxProfitChange={setMaterialsTaxProfit}
           isOpen={sections.materials}
           onToggle={() => toggleSection("materials")}
           accent={accent}
@@ -509,14 +604,17 @@ export default function EstimateBreakdown() {
           )}
         </SectionCard>
 
-        {/* ── Penetrations Section ──────────────────────────── */}
+        {/* ── Penetrations Section ─────────────────────────── */}
         {penetrations.length > 0 && (
           <SectionCard
             title="Roof Penetrations"
             icon={<Wrench className={`w-5 h-5 ${accent.text}`} />}
             count={enabledPenetrationCount}
             total={penetrations.length}
-            subtotal={penetrationTotal}
+            baseSubtotal={penetrationBase}
+            sectionTotal={penTP.sectionTotal}
+            taxProfit={penetrationsTaxProfit}
+            onTaxProfitChange={setPenetrationsTaxProfit}
             isOpen={sections.penetrations}
             onToggle={() => toggleSection("penetrations")}
             accent={accent}
@@ -538,13 +636,16 @@ export default function EstimateBreakdown() {
           </SectionCard>
         )}
 
-        {/* ── Labor Section ─────────────────────────────────── */}
+        {/* ── Labor Section ────────────────────────────────── */}
         <SectionCard
           title="Labor"
           icon={<HardHat className={`w-5 h-5 ${accent.text}`} />}
           count={enabledLaborCount}
           total={labor.length}
-          subtotal={laborTotal}
+          baseSubtotal={laborBase}
+          sectionTotal={labTP.sectionTotal}
+          taxProfit={laborTaxProfit}
+          onTaxProfitChange={setLaborTaxProfit}
           isOpen={sections.labor}
           onToggle={() => toggleSection("labor")}
           accent={accent}
@@ -565,13 +666,16 @@ export default function EstimateBreakdown() {
           )}
         </SectionCard>
 
-        {/* ── Equipment Section ──────────────────────────────── */}
+        {/* ── Equipment Section ─────────────────────────────── */}
         <SectionCard
           title="Equipment"
           icon={<Settings className={`w-5 h-5 ${accent.text}`} />}
           count={enabledEquipmentCount}
           total={equipment.length}
-          subtotal={equipmentTotal}
+          baseSubtotal={equipmentBase}
+          sectionTotal={eqTP.sectionTotal}
+          taxProfit={equipmentTaxProfit}
+          onTaxProfitChange={setEquipmentTaxProfit}
           isOpen={sections.equipment}
           onToggle={() => toggleSection("equipment")}
           accent={accent}
@@ -592,28 +696,56 @@ export default function EstimateBreakdown() {
           )}
         </SectionCard>
 
-        {/* ── Grand Total Summary ───────────────────────────── */}
+        {/* ── Grand Total Summary ──────────────────────────── */}
         <Card className="border-slate-300 shadow-md">
           <CardContent className="py-6">
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Materials ({enabledMaterialCount} items)</span>
-                <span className="font-medium tabular-nums">{fmt(materialTotal)}</span>
+                <span className="font-medium tabular-nums">{fmt(materialBase)}</span>
               </div>
               {penetrations.length > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Penetrations ({enabledPenetrationCount} items)</span>
-                  <span className="font-medium tabular-nums">{fmt(penetrationTotal)}</span>
+                  <span className="font-medium tabular-nums">{fmt(penetrationBase)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Labor ({enabledLaborCount} items)</span>
-                <span className="font-medium tabular-nums">{fmt(laborTotal)}</span>
+                <span className="font-medium tabular-nums">{fmt(laborBase)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Equipment ({enabledEquipmentCount} items)</span>
-                <span className="font-medium tabular-nums">{fmt(equipmentTotal)}</span>
+                <span className="font-medium tabular-nums">{fmt(equipmentBase)}</span>
               </div>
+
+              {/* Tax & Profit summary */}
+              {(totalTax > 0 || totalProfit > 0) && (
+                <>
+                  <Separator className="my-2" />
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground font-medium">Subtotal (before Tax & Profit)</span>
+                    <span className="font-medium tabular-nums">{fmt(materialBase + penetrationBase + laborBase + equipmentBase)}</span>
+                  </div>
+                  {totalTax > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-1">
+                        <Percent className="w-3 h-3" /> Total Tax
+                      </span>
+                      <span className="font-medium tabular-nums text-amber-600">{fmt(totalTax)}</span>
+                    </div>
+                  )}
+                  {totalProfit > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-1">
+                        <Percent className="w-3 h-3" /> Total Profit
+                      </span>
+                      <span className="font-medium tabular-nums text-emerald-600">{fmt(totalProfit)}</span>
+                    </div>
+                  )}
+                </>
+              )}
+
               <Separator />
               <div className="flex justify-between items-center">
                 <span className="text-lg font-bold">Grand Total</span>
@@ -625,7 +757,7 @@ export default function EstimateBreakdown() {
           </CardContent>
         </Card>
 
-        {/* ── Footer ────────────────────────────────────────── */}
+        {/* ── Footer ───────────────────────────────────────── */}
         <div className="text-center py-4 print:hidden">
           <Button
             variant="outline"
@@ -645,21 +777,30 @@ export default function EstimateBreakdown() {
   );
 }
 
-// ── Section Card wrapper ─────────────────────────────────────
+// ── Section Card wrapper ────────────────────────────────────
 
 interface SectionCardProps {
   title: string;
   icon: React.ReactNode;
   count: number;
   total: number;
-  subtotal: number;
+  baseSubtotal: number;
+  sectionTotal: number;
+  taxProfit: TaxProfitState;
+  onTaxProfitChange: (tp: TaxProfitState) => void;
   isOpen: boolean;
   onToggle: () => void;
   accent: { bg: string; text: string; border: string; light: string };
   children: React.ReactNode;
 }
 
-function SectionCard({ title, icon, count, total, subtotal, isOpen, onToggle, accent, children }: SectionCardProps) {
+function SectionCard({
+  title, icon, count, total, baseSubtotal, sectionTotal,
+  taxProfit, onTaxProfitChange, isOpen, onToggle, accent, children,
+}: SectionCardProps) {
+  const taxAmount = taxProfit.taxEnabled ? baseSubtotal * (taxProfit.taxPercent / 100) : 0;
+  const profitAmount = taxProfit.profitEnabled ? baseSubtotal * (taxProfit.profitPercent / 100) : 0;
+
   return (
     <Card className="border-slate-200 shadow-sm overflow-hidden">
       <CardHeader
@@ -676,7 +817,7 @@ function SectionCard({ title, icon, count, total, subtotal, isOpen, onToggle, ac
           </CardTitle>
           <div className="flex items-center gap-3">
             <span className={`text-lg font-bold tabular-nums ${accent.text}`}>
-              {fmt(subtotal)}
+              {fmt(sectionTotal)}
             </span>
             {isOpen ? (
               <ChevronUp className="w-4 h-4 text-muted-foreground" />
@@ -698,13 +839,94 @@ function SectionCard({ title, icon, count, total, subtotal, isOpen, onToggle, ac
             <div className="w-10"></div>
           </div>
           {children}
+
+          {/* ── Tax & Profit Footer ──────────────────────────── */}
+          <div className="mt-4 pt-3 border-t border-slate-200 space-y-2">
+            {/* Base subtotal */}
+            <div className="flex justify-between items-center px-2 text-sm">
+              <span className="text-muted-foreground font-medium">{title} Subtotal</span>
+              <span className="font-semibold tabular-nums">{fmt(baseSubtotal)}</span>
+            </div>
+
+            {/* Tax row */}
+            <div className="flex items-center justify-between px-2 py-1.5 rounded-md bg-amber-50/60 border border-amber-100">
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={taxProfit.taxEnabled}
+                  onCheckedChange={(checked) =>
+                    onTaxProfitChange({ ...taxProfit, taxEnabled: checked })
+                  }
+                  className="scale-75"
+                />
+                <span className="text-sm font-medium text-amber-800">Tax</span>
+                <div className="relative w-20">
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={taxProfit.taxPercent}
+                    onChange={(e) =>
+                      onTaxProfitChange({ ...taxProfit, taxPercent: parseFloat(e.target.value) || 0 })
+                    }
+                    className="h-7 text-xs text-right tabular-nums pr-6 w-full"
+                    disabled={!taxProfit.taxEnabled}
+                  />
+                  <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+                </div>
+              </div>
+              <span className={`text-sm font-semibold tabular-nums ${taxProfit.taxEnabled ? "text-amber-700" : "text-muted-foreground"}`}>
+                {taxProfit.taxEnabled ? fmt(taxAmount) : "—"}
+              </span>
+            </div>
+
+            {/* Profit row */}
+            <div className="flex items-center justify-between px-2 py-1.5 rounded-md bg-emerald-50/60 border border-emerald-100">
+              <div className="flex items-center gap-3">
+                <Switch
+                  checked={taxProfit.profitEnabled}
+                  onCheckedChange={(checked) =>
+                    onTaxProfitChange({ ...taxProfit, profitEnabled: checked })
+                  }
+                  className="scale-75"
+                />
+                <span className="text-sm font-medium text-emerald-800">Profit</span>
+                <div className="relative w-20">
+                  <Input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    value={taxProfit.profitPercent}
+                    onChange={(e) =>
+                      onTaxProfitChange({ ...taxProfit, profitPercent: parseFloat(e.target.value) || 0 })
+                    }
+                    className="h-7 text-xs text-right tabular-nums pr-6 w-full"
+                    disabled={!taxProfit.profitEnabled}
+                  />
+                  <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">%</span>
+                </div>
+              </div>
+              <span className={`text-sm font-semibold tabular-nums ${taxProfit.profitEnabled ? "text-emerald-700" : "text-muted-foreground"}`}>
+                {taxProfit.profitEnabled ? fmt(profitAmount) : "—"}
+              </span>
+            </div>
+
+            {/* Section total with tax & profit */}
+            {(taxProfit.taxEnabled || taxProfit.profitEnabled) && (
+              <div className="flex justify-between items-center px-2 pt-1 text-sm">
+                <span className="font-bold">{title} Total (incl. Tax & Profit)</span>
+                <span className={`font-bold tabular-nums ${accent.text}`}>{fmt(sectionTotal)}</span>
+              </div>
+            )}
+          </div>
         </CardContent>
       )}
     </Card>
   );
 }
 
-// ── Material Row ─────────────────────────────────────────────
+// ── Material Row ────────────────────────────────────────────
 
 interface MaterialRowProps {
   item: BreakdownMaterialItem;
@@ -764,7 +986,7 @@ function MaterialRow({ item, onUpdate }: MaterialRowProps) {
   );
 }
 
-// ── Penetration Row ──────────────────────────────────────────
+// ── Penetration Row ─────────────────────────────────────────
 
 interface PenetrationRowProps {
   item: BreakdownPenetrationItem;
@@ -824,7 +1046,7 @@ function PenetrationRow({ item, onUpdate }: PenetrationRowProps) {
   );
 }
 
-// ── Labor Row ────────────────────────────────────────────────
+// ── Labor Row ───────────────────────────────────────────────
 
 interface LaborRowProps {
   item: BreakdownLaborItem;
@@ -889,7 +1111,7 @@ function LaborRow({ item, onUpdate }: LaborRowProps) {
   );
 }
 
-// ── Equipment Row ────────────────────────────────────────────
+// ── Equipment Row ───────────────────────────────────────────
 
 interface EquipmentRowProps {
   item: BreakdownEquipmentItem;

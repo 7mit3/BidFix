@@ -49,3 +49,11 @@
 - [x] Update EstimateBreakdown page Export CSV button to Export Excel (.xlsx)
 - [x] Update both header and footer export buttons
 - [x] Multi-sheet workbook: Summary, Materials, Penetrations, Labor, Equipment
+
+## Tax & Profit on Breakdown Page
+- [x] Add tax % and profit % state with toggles for each section (Materials, Penetrations, Labor, Equipment)
+- [x] Show tax and profit line items in each section's footer with editable percentages (amber for tax, green for profit)
+- [x] Include section-level tax and profit in section subtotals with "Section Total (incl. Tax & Profit)" row
+- [x] Add tax and profit to the grand total summary card (shows Subtotal before Tax & Profit, Total Tax, Total Profit)
+- [x] Include tax and profit in Excel export
+- [x] All 57 tests passing
