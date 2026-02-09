@@ -243,19 +243,21 @@ export const ROOFING_SYSTEMS: RoofingSystem[] = [
   // ── Single-Ply Membrane ──────────────────────────────────────
   {
     id: "carlisle-tpo-sure-weld",
-    name: "Sure-Weld TPO Membrane",
+    name: "Sure-Weld TPO Membrane System",
     manufacturer: "Carlisle SynTec",
     category: "Single-Ply Membrane",
     categorySlug: "single-ply-membrane",
     substrate: "Commercial Flat Roof",
     description:
-      "Thermoplastic polyolefin single-ply roofing membrane with heat-welded seams for superior watertight performance.",
+      "Complete TPO single-ply roofing system estimator. Configure roof assembly (deck, vapor barrier, polyiso insulation, cover board, membrane) and get a full material order list with pricing.",
     features: [
-      "Heat-welded seams",
-      "ENERGY STAR rated",
-      "Chemical resistant",
+      "Full assembly configuration",
+      "45/60/80 mil membrane options",
+      "Adhered or mechanically attached",
+      "Wall & base flashing included",
     ],
-    status: "coming_soon",
+    status: "available",
+    route: "/estimator/carlisle-tpo",
     imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&q=80",
   },
   {

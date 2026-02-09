@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Catalog from "./pages/Catalog";
 import Home from "./pages/Home";
+import TPOEstimator from "./pages/TPOEstimator";
 
 
 function Router() {
@@ -13,6 +14,7 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Catalog} />
       <Route path={"/estimator/karnak-metal-kynar"} component={Home} />
+      <Route path={"/estimator/carlisle-tpo"} component={TPOEstimator} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
