@@ -68,6 +68,25 @@ export interface EstimateBreakdownData {
   equipment: BreakdownEquipmentItem[];
 }
 
+// ── Estimate context (for save/back navigation from breakdown) ──
+
+export interface EstimateContext {
+  /** Saved estimate ID (null if not yet saved) */
+  estimateId: number | null;
+  /** Saved estimate name */
+  estimateName: string;
+  /** System slug, e.g. "gaf-tpo" */
+  system: string;
+  /** Human-readable system label */
+  systemLabel: string;
+  /** Serialized estimator state JSON (for saving back to DB) */
+  estimatorStateJson: string;
+  /** Grand total at time of navigation */
+  grandTotal: number;
+  /** Roof area at time of navigation */
+  roofArea: number;
+}
+
 // ── Serialization helpers ────────────────────────────────────
 
 /**
@@ -75,6 +94,7 @@ export interface EstimateBreakdownData {
  * We use sessionStorage as the transport to avoid URL length limits.
  */
 const STORAGE_KEY = "estimate-breakdown-data";
+const CONTEXT_KEY = "estimate-breakdown-context";
 
 export function storeBreakdownData(data: EstimateBreakdownData): void {
   try {
@@ -91,6 +111,25 @@ export function loadBreakdownData(): EstimateBreakdownData | null {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as EstimateBreakdownData;
+  } catch {
+    return null;
+  }
+}
+
+export function storeEstimateContext(ctx: EstimateContext): void {
+  try {
+    sessionStorage.setItem(CONTEXT_KEY, JSON.stringify(ctx));
+  } catch {
+    sessionStorage.removeItem(CONTEXT_KEY);
+    sessionStorage.setItem(CONTEXT_KEY, JSON.stringify(ctx));
+  }
+}
+
+export function loadEstimateContext(): EstimateContext | null {
+  try {
+    const raw = sessionStorage.getItem(CONTEXT_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as EstimateContext;
   } catch {
     return null;
   }

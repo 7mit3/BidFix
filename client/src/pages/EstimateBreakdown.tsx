@@ -32,17 +32,22 @@ import {
   Percent,
   Plus,
   Trash2,
+  Save,
 } from "lucide-react";
 import {
   loadBreakdownData,
+  loadEstimateContext,
+  storeEstimateContext,
   fmt,
   getRateLabel,
   type EstimateBreakdownData,
+  type EstimateContext,
   type BreakdownMaterialItem,
   type BreakdownPenetrationItem,
   type BreakdownLaborItem,
   type BreakdownEquipmentItem,
 } from "@/lib/estimate-breakdown";
+import { SaveEstimateDialog } from "@/components/SaveEstimateDialog";
 
 // ── Tax & Profit state ─────────────────────────────────────────
 
@@ -82,6 +87,8 @@ function nextCustomId(prefix: string) {
 export default function EstimateBreakdown() {
   const [, navigate] = useLocation();
   const [data, setData] = useState<EstimateBreakdownData | null>(null);
+  const [estimateCtx, setEstimateCtx] = useState<EstimateContext | null>(null);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
 
   // Editable copies of each section
   const [materials, setMaterials] = useState<BreakdownMaterialItem[]>([]);
@@ -116,6 +123,9 @@ export default function EstimateBreakdown() {
     setPenetrations(loaded.penetrations);
     setLabor(loaded.labor);
     setEquipment(loaded.equipment);
+    // Load estimate context for save/back navigation
+    const ctx = loadEstimateContext();
+    if (ctx) setEstimateCtx(ctx);
   }, [navigate]);
 
   // ── Material handlers ──────────────────────────────────────
@@ -313,6 +323,32 @@ export default function EstimateBreakdown() {
   const totalTax = matTP.taxAmount + penTP.taxAmount + labTP.taxAmount + eqTP.taxAmount;
   const totalProfit = matTP.profitAmount + penTP.profitAmount + labTP.profitAmount + eqTP.profitAmount;
 
+  // ── Save from breakdown ────────────────────────────────────
+
+  const getEstimateData = useCallback(() => {
+    // Return the original estimator state JSON (from the estimator page)
+    return estimateCtx?.estimatorStateJson ?? "{}";
+  }, [estimateCtx]);
+
+  const handleBackToEstimator = useCallback(() => {
+    if (!data) return;
+    if (estimateCtx?.estimateId) {
+      // Navigate back to the estimator with the loaded estimate
+      navigate(`/estimator/${data.systemSlug}?loadEstimate=${estimateCtx.estimateId}`);
+    } else {
+      navigate(`/estimator/${data.systemSlug}`);
+    }
+  }, [data, estimateCtx, navigate]);
+
+  const handleSaved = useCallback((id: number, name: string) => {
+    // Update the context so subsequent saves use the new ID
+    setEstimateCtx((prev) => prev ? { ...prev, estimateId: id, estimateName: name } : prev);
+    // Also update sessionStorage so Back to Estimator works
+    if (estimateCtx) {
+      storeEstimateContext({ ...estimateCtx, estimateId: id, estimateName: name });
+    }
+  }, [estimateCtx]);
+
   // ── Section toggle ─────────────────────────────────────────
 
   const toggleSection = useCallback((section: keyof SectionState) => {
@@ -504,7 +540,7 @@ export default function EstimateBreakdown() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate(`/estimator/${data.systemSlug}`)}
+                onClick={handleBackToEstimator}
                 className="text-white/80 hover:text-foreground hover:bg-card/10 print:hidden"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -544,6 +580,17 @@ export default function EstimateBreakdown() {
                 <Printer className="w-4 h-4 mr-1" />
                 Print
               </Button>
+              {estimateCtx && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSaveDialogOpen(true)}
+                  className="text-white/80 hover:text-foreground hover:bg-card/10 text-xs"
+                >
+                  <Save className="w-4 h-4 mr-1" />
+                  Save
+                </Button>
+              )}
             </div>
           </div>
           {/* Measurements */}
@@ -805,14 +852,11 @@ export default function EstimateBreakdown() {
               )}
             </div>
           </CardContent>
-        </Card>
-
-        {/* ── Footer ──────────────────────────────────────────── */}
-        <div className="text-center py-4 print:hidden">
+        </Card>        {/* ── Footer ──────────────────────────────────────────────── */}
+        <div className="flex justify-center items-center gap-3 py-4 print:hidden">
           <Button
             variant="outline"
-            onClick={() => navigate(`/estimator/${data.systemSlug}`)}
-            className="mr-3"
+            onClick={handleBackToEstimator}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Estimator
@@ -821,8 +865,33 @@ export default function EstimateBreakdown() {
             <FileSpreadsheet className="w-4 h-4 mr-2" />
             Export Excel
           </Button>
+          {estimateCtx && (
+            <Button
+              onClick={() => setSaveDialogOpen(true)}
+              variant="default"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save Estimate
+            </Button>
+          )}
         </div>
       </div>
+
+      {/* Save Estimate Dialog */}
+      {estimateCtx && (
+        <SaveEstimateDialog
+          open={saveDialogOpen}
+          onOpenChange={setSaveDialogOpen}
+          system={estimateCtx.system}
+          systemLabel={estimateCtx.systemLabel}
+          getEstimateData={getEstimateData}
+          grandTotal={grandTotal}
+          roofArea={data.roofArea}
+          existingId={estimateCtx.estimateId}
+          existingName={estimateCtx.estimateName}
+          onSaved={handleSaved}
+        />
+      )}
     </div>
   );
 }

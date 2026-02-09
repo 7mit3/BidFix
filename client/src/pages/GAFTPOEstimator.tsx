@@ -83,7 +83,7 @@ import {
   calculateGAFTPOEstimate,
   exportGAFTPOEstimateCSV,
 } from "@/lib/gaf-tpo-data";
-import { storeBreakdownData } from "@/lib/estimate-breakdown";
+import { storeBreakdownData, storeEstimateContext } from "@/lib/estimate-breakdown";
 import { serializeTPOBreakdown } from "@/lib/breakdown-serializers";
 import { SaveEstimateDialog } from "@/components/SaveEstimateDialog";
 import { serializeTPOState, deserializeTPOState } from "@/lib/estimate-state-serializers";
@@ -412,8 +412,18 @@ export default function GAFTPOEstimator() {
       "emerald",
     );
     storeBreakdownData(breakdownData);
+    // Store estimate context so breakdown page can save and navigate back
+    storeEstimateContext({
+      estimateId: loadedEstimateId,
+      estimateName: loadedEstimateName,
+      system: "gaf-tpo",
+      systemLabel: "GAF EverGuard TPO",
+      estimatorStateJson: getEstimateData(),
+      grandTotal,
+      roofArea: measurements.roofArea,
+    });
     navigate("/breakdown");
-  }, [estimate, laborEquipment, penetrationEstimate, navigate]);
+  }, [estimate, laborEquipment, penetrationEstimate, navigate, loadedEstimateId, loadedEstimateName, getEstimateData, grandTotal, measurements.roofArea]);
 
   // Group line items by category
   const groupedItems = useMemo(() => {

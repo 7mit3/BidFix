@@ -158,3 +158,12 @@
 - [x] Remove debug console.log statements from getEstimateData
 - [x] Update vitest tests for assembly config roundtrip (4 new tests, 115 total passing)
 - [x] Test in browser — full save/load cycle with assembly changes verified
+
+## Breakdown Page: Save Button & Back Navigation
+- [x] Add "Save Estimate" button to Breakdown page (footer + header toolbar)
+- [x] Save button opens SaveEstimateDialog with pre-filled name and Overwrite option
+- [x] Fix "Back to Estimator" to return to the loaded estimate via ?loadEstimate= URL param
+- [x] Pass loaded estimate context through sessionStorage (estimateId, name, system, stateJson, grandTotal)
+- [x] Updated all 3 estimators (Karnak, Carlisle TPO, GAF TPO) to store context on breakdown navigation
+- [x] All 115 tests passing, 0 TypeScript errors
+- [x] Test in browser — full workflow verified (save from breakdown, back to loaded estimate)

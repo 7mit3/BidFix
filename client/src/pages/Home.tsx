@@ -25,7 +25,7 @@ import { type PenetrationEstimate } from "@/lib/penetrations-data";
 import { SaveEstimateDialog } from "@/components/SaveEstimateDialog";
 import { Button } from "@/components/ui/button";
 import { FileSpreadsheet, Save, FolderOpen } from "lucide-react";
-import { storeBreakdownData } from "@/lib/estimate-breakdown";
+import { storeBreakdownData, storeEstimateContext } from "@/lib/estimate-breakdown";
 import { serializeKarnakBreakdown } from "@/lib/breakdown-serializers";
 import {
   serializeKarnakState,
@@ -108,17 +108,6 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [savedEstimate]);
 
-  const handleViewBreakdown = useCallback(() => {
-    if (!estimator.estimate) return;
-    const breakdownData = serializeKarnakBreakdown(
-      estimator.estimate,
-      estimator.laborEquipment,
-      penetrationEstimate,
-    );
-    storeBreakdownData(breakdownData);
-    navigate("/breakdown");
-  }, [estimator.estimate, estimator.laborEquipment, penetrationEstimate, navigate]);
-
   const getEstimateData = useCallback(() => {
     return serializeKarnakState({
       squareFootage: estimator.squareFootage,
@@ -136,6 +125,27 @@ export default function Home() {
     estimator.laborEquipment,
     penetrationEstimate,
   ]);
+
+  const handleViewBreakdown = useCallback(() => {
+    if (!estimator.estimate) return;
+    const breakdownData = serializeKarnakBreakdown(
+      estimator.estimate,
+      estimator.laborEquipment,
+      penetrationEstimate,
+    );
+    storeBreakdownData(breakdownData);
+    // Store estimate context so breakdown page can save and navigate back
+    storeEstimateContext({
+      estimateId: loadedEstimateId,
+      estimateName: loadedEstimateName,
+      system: "karnak-metal-kynar",
+      systemLabel: "Karnak Metal Kynar",
+      estimatorStateJson: getEstimateData(),
+      grandTotal: estimator.projectTotal,
+      roofArea: Number(estimator.squareFootage) || 0,
+    });
+    navigate("/breakdown");
+  }, [estimator.estimate, estimator.laborEquipment, penetrationEstimate, navigate, loadedEstimateId, loadedEstimateName, getEstimateData, estimator.projectTotal, estimator.squareFootage]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
