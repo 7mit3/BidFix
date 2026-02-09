@@ -253,7 +253,7 @@ export default function Catalog() {
             </div>
             <div className="mb-4">
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663079448619/ycsDUxLnvcoeWeQr.png"
+                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663079448619/PWRGJsnfFcLrGXhj.png"
                 alt="BidFix AI"
                 className="h-14 sm:h-18 lg:h-22 w-auto object-contain"
               />
@@ -350,7 +350,7 @@ export default function Catalog() {
             </p>
             <div className="flex items-center gap-2">
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663079448619/ycsDUxLnvcoeWeQr.png"
+                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663079448619/PWRGJsnfFcLrGXhj.png"
                 alt="BidFix AI"
                 className="h-6 w-auto"
               />

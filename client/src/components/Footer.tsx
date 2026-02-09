@@ -3,7 +3,7 @@
  * Design: Minimal dark footer with brand badge linking to roofix.ai
  */
 
-const BIDFIX_LOGO = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663079448619/ycsDUxLnvcoeWeQr.png";
+const BIDFIX_LOGO = "https://files.manuscdn.com/user_upload_by_module/session_file/310519663079448619/PWRGJsnfFcLrGXhj.png";
 
 export function Footer() {
   return (

@@ -127,3 +127,7 @@
 ## BidFix AI Logo (from RooFix reference)
 - [x] Generate BidFix AI logo: replace "Roo" with "Bid" in same blue/angular font, keep "Fix" and "AI" identical
 - [x] Upload and integrate into the app (Catalog hero, Catalog footer, main Footer)
+
+## Transparent Logo Background
+- [x] Remove black background from BidFix AI logo, make transparent
+- [x] Upload and update all references in the app (Footer, Catalog hero, Catalog footer)
