@@ -49,7 +49,7 @@ export function LaborEquipmentSection({
       >
         <div className="flex items-center justify-between">
           <CardTitle className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
-            <HardHat className="w-5 h-5 text-karnak-red" />
+            <HardHat className="w-5 h-5 text-cyan" />
             Labor & Equipment
           </CardTitle>
           <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export function LaborEquipmentSection({
           {/* Labor Section */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <HardHat className="w-4 h-4 text-warm-500" />
+              <HardHat className="w-4 h-4 text-cyan-muted" />
               <h4 className="font-heading text-sm font-semibold text-foreground uppercase tracking-wide">
                 Labor
               </h4>
@@ -97,7 +97,7 @@ export function LaborEquipmentSection({
                   key={item.id}
                   className={`rounded-lg border p-3 transition-colors ${
                     item.enabled
-                      ? "border-border bg-white"
+                      ? "border-border bg-card"
                       : "border-border/40 bg-muted/30"
                   }`}
                 >
@@ -151,7 +151,7 @@ export function LaborEquipmentSection({
                                 parseFloat(e.target.value) || 0
                               )
                             }
-                            className="pl-6 h-8 text-sm font-mono-nums bg-white text-right"
+                            className="pl-6 h-8 text-sm font-mono-nums bg-card text-right"
                           />
                         </div>
                       </div>
@@ -174,7 +174,7 @@ export function LaborEquipmentSection({
                                 parseFloat(e.target.value) || 0
                               )
                             }
-                            className="h-8 text-sm font-mono-nums bg-white text-right"
+                            className="h-8 text-sm font-mono-nums bg-card text-right"
                           />
                         </div>
                       )}
@@ -190,7 +190,7 @@ export function LaborEquipmentSection({
           {/* Equipment Section */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Wrench className="w-4 h-4 text-warm-500" />
+              <Wrench className="w-4 h-4 text-cyan-muted" />
               <h4 className="font-heading text-sm font-semibold text-foreground uppercase tracking-wide">
                 Equipment
               </h4>
@@ -201,7 +201,7 @@ export function LaborEquipmentSection({
                   key={item.id}
                   className={`rounded-lg border p-3 transition-colors ${
                     item.enabled
-                      ? "border-border bg-white"
+                      ? "border-border bg-card"
                       : "border-border/40 bg-muted/30"
                   }`}
                 >
@@ -253,7 +253,7 @@ export function LaborEquipmentSection({
                                 parseFloat(e.target.value) || 0
                               )
                             }
-                            className="pl-6 h-8 text-sm font-mono-nums bg-white text-right"
+                            className="pl-6 h-8 text-sm font-mono-nums bg-card text-right"
                           />
                         </div>
                       </div>
@@ -276,7 +276,7 @@ export function LaborEquipmentSection({
                                 parseFloat(e.target.value) || 0
                               )
                             }
-                            className="h-8 text-sm font-mono-nums bg-white text-right"
+                            className="h-8 text-sm font-mono-nums bg-card text-right"
                           />
                         </div>
                       )}

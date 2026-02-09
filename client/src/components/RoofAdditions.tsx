@@ -217,21 +217,21 @@ export default function RoofAdditions({
   const selectedGauge = selectedMetal?.gauges.find((g) => g.id === sheetMetalState.gaugeId);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between p-5 hover:bg-muted/30 transition-colors"
       >
         <div className="flex items-center gap-3">
           <div className={`p-2 bg-${accentColor}-50 rounded-lg`}>
             <Wrench className={`w-5 h-5 text-${accentColor}-600`} />
           </div>
           <div className="text-left">
-            <h3 className="font-semibold text-gray-900 text-lg">
+            <h3 className="font-semibold text-foreground text-lg">
               Roof Penetrations & Additions
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               {totalPenetrations > 0 || totalFlashingLF > 0
                 ? `${totalPenetrations > 0 ? `${totalPenetrations} penetration${totalPenetrations !== 1 ? "s" : ""}` : ""}${totalPenetrations > 0 && totalFlashingLF > 0 ? " · " : ""}${totalFlashingLF > 0 ? `${totalFlashingLF.toLocaleString()} LF flashing` : ""} · $${combinedEstimate.totalMaterialCost.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
                 : "Add pipe flashings, curbs, fans, drains, sheet metal, and more"}
@@ -254,16 +254,16 @@ export default function RoofAdditions({
                   resetAll();
                 }
               }}
-              className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs text-slate-muted hover:text-muted-foreground px-2 py-1 rounded-md hover:bg-muted transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" />
               Reset
             </span>
           )}
           {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-slate-muted" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-slate-muted" />
           )}
         </div>
       </button>
@@ -279,7 +279,7 @@ export default function RoofAdditions({
 
               return (
                 <div key={category}>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-muted mb-3">
                     {category}
                   </h4>
                   <div className="space-y-2">
@@ -294,24 +294,24 @@ export default function RoofAdditions({
                           className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
                             isActive
                               ? `border-${accentColor}-200 bg-${accentColor}-50/30`
-                              : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
+                              : "border-gray-100 bg-muted/30/50 hover:bg-muted/30"
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0 flex-1">
                             <IconComp
                               className={`w-4 h-4 shrink-0 ${
-                                isActive ? `text-${accentColor}-600` : "text-gray-400"
+                                isActive ? `text-${accentColor}-600` : "text-slate-muted"
                               }`}
                             />
                             <div className="min-w-0">
                               <p
                                 className={`text-sm font-medium truncate ${
-                                  isActive ? "text-gray-900" : "text-gray-700"
+                                  isActive ? "text-foreground" : "text-foreground"
                                 }`}
                               >
                                 {pen.name}
                               </p>
-                              <p className="text-xs text-gray-400 truncate">
+                              <p className="text-xs text-slate-muted truncate">
                                 {pen.description}
                                 {pen.sizeLabel && ` · ${pen.sizeLabel}`}
                               </p>
@@ -323,7 +323,7 @@ export default function RoofAdditions({
                             <button
                               onClick={() => updateQuantity(pen.id, -1)}
                               disabled={qty === 0}
-                              className="w-7 h-7 flex items-center justify-center rounded-md border border-gray-200 bg-white text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                              className="w-7 h-7 flex items-center justify-center rounded-md border border-border bg-card text-muted-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                             >
                               <Minus className="w-3 h-3" />
                             </button>
@@ -335,18 +335,18 @@ export default function RoofAdditions({
                               onChange={(e) =>
                                 setQuantity(pen.id, parseInt(e.target.value) || 0)
                               }
-                              className={`w-12 h-7 text-center text-sm font-medium border rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-${accentColor}-400 ${
+                              className={`w-12 h-7 text-center text-sm font-medium border rounded-md bg-card focus:outline-none focus:ring-1 focus:ring-${accentColor}-400 ${
                                 isActive
-                                  ? `border-${accentColor}-300 text-gray-900`
-                                  : "border-gray-200 text-gray-400"
+                                  ? `border-${accentColor}-300 text-foreground`
+                                  : "border-border text-slate-muted"
                               }`}
                             />
                             <button
                               onClick={() => updateQuantity(pen.id, 1)}
-                              className={`w-7 h-7 flex items-center justify-center rounded-md border bg-white hover:bg-gray-100 transition-colors ${
+                              className={`w-7 h-7 flex items-center justify-center rounded-md border bg-card hover:bg-muted transition-colors ${
                                 isActive
                                   ? `border-${accentColor}-300 text-${accentColor}-600`
-                                  : "border-gray-200 text-gray-500"
+                                  : "border-border text-muted-foreground"
                               }`}
                             >
                               <Plus className="w-3 h-3" />
@@ -367,7 +367,7 @@ export default function RoofAdditions({
                 className="w-full flex items-center justify-between mb-3"
               >
                 <div className="flex items-center gap-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-muted">
                     Sheet Metal Flashing
                   </h4>
                   {totalFlashingLF > 0 && (
@@ -377,9 +377,9 @@ export default function RoofAdditions({
                   )}
                 </div>
                 {sheetMetalExpanded ? (
-                  <ChevronUp className="w-4 h-4 text-gray-400" />
+                  <ChevronUp className="w-4 h-4 text-slate-muted" />
                 ) : (
-                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                  <ChevronDown className="w-4 h-4 text-slate-muted" />
                 )}
               </button>
 
@@ -389,18 +389,18 @@ export default function RoofAdditions({
                   <div className={`p-4 rounded-lg border border-${accentColor}-100 bg-${accentColor}-50/20`}>
                     <div className="flex items-center gap-2 mb-3">
                       <Layers className={`w-4 h-4 text-${accentColor}-600`} />
-                      <span className="text-sm font-semibold text-gray-800">Metal Selection</span>
+                      <span className="text-sm font-semibold text-foreground">Metal Selection</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       {/* Metal Type */}
                       <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                        <label className="block text-xs font-medium text-muted-foreground mb-1">
                           Metal Type
                         </label>
                         <select
                           value={sheetMetalState.metalTypeId}
                           onChange={(e) => setMetalType(e.target.value)}
-                          className="w-full h-9 text-sm border border-gray-200 rounded-md bg-white px-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                          className="w-full h-9 text-sm border border-border rounded-md bg-card px-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
                         >
                           {METAL_TYPES.map((metal) => (
                             <option key={metal.id} value={metal.id}>
@@ -411,7 +411,7 @@ export default function RoofAdditions({
                       </div>
                       {/* Gauge / Thickness */}
                       <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">
+                        <label className="block text-xs font-medium text-muted-foreground mb-1">
                           {sheetMetalState.metalTypeId === "copper"
                             ? "Weight"
                             : sheetMetalState.metalTypeId === "aluminum"
@@ -421,7 +421,7 @@ export default function RoofAdditions({
                         <select
                           value={sheetMetalState.gaugeId}
                           onChange={(e) => setGauge(e.target.value)}
-                          className="w-full h-9 text-sm border border-gray-200 rounded-md bg-white px-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                          className="w-full h-9 text-sm border border-border rounded-md bg-card px-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
                         >
                           {selectedMetal?.gauges.map((gauge) => (
                             <option key={gauge.id} value={gauge.id}>
@@ -431,7 +431,7 @@ export default function RoofAdditions({
                         </select>
                       </div>
                     </div>
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-xs text-slate-muted mt-2">
                       {selectedMetal?.name} {selectedGauge?.label} — Base: ${selectedMetal?.basePricePerLF.toFixed(2)}/LF
                       {selectedGauge && selectedGauge.priceMultiplier !== 1
                         ? ` × ${selectedGauge.priceMultiplier.toFixed(2)} gauge factor`
@@ -451,24 +451,24 @@ export default function RoofAdditions({
                           className={`flex items-center justify-between p-3 rounded-lg border transition-all ${
                             isActive
                               ? `border-${accentColor}-200 bg-${accentColor}-50/30`
-                              : "border-gray-100 bg-gray-50/50 hover:bg-gray-50"
+                              : "border-gray-100 bg-muted/30/50 hover:bg-muted/30"
                           }`}
                         >
                           <div className="flex items-center gap-3 min-w-0 flex-1">
                             <Layers
                               className={`w-4 h-4 shrink-0 ${
-                                isActive ? `text-${accentColor}-600` : "text-gray-400"
+                                isActive ? `text-${accentColor}-600` : "text-slate-muted"
                               }`}
                             />
                             <div className="min-w-0">
                               <p
                                 className={`text-sm font-medium truncate ${
-                                  isActive ? "text-gray-900" : "text-gray-700"
+                                  isActive ? "text-foreground" : "text-foreground"
                                 }`}
                               >
                                 {profile.name}
                               </p>
-                              <p className="text-xs text-gray-400 truncate">
+                              <p className="text-xs text-slate-muted truncate">
                                 {profile.description}
                               </p>
                             </div>
@@ -479,7 +479,7 @@ export default function RoofAdditions({
                             <button
                               onClick={() => updateFlashingQuantity(profile.id, -10)}
                               disabled={qty === 0}
-                              className="w-7 h-7 flex items-center justify-center rounded-md border border-gray-200 bg-white text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                              className="w-7 h-7 flex items-center justify-center rounded-md border border-border bg-card text-muted-foreground hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                             >
                               <Minus className="w-3 h-3" />
                             </button>
@@ -495,22 +495,22 @@ export default function RoofAdditions({
                                     parseInt(e.target.value) || 0
                                   )
                                 }
-                                className={`w-16 h-7 text-center text-sm font-medium border rounded-md bg-white pr-6 focus:outline-none focus:ring-1 focus:ring-${accentColor}-400 ${
+                                className={`w-16 h-7 text-center text-sm font-medium border rounded-md bg-card pr-6 focus:outline-none focus:ring-1 focus:ring-${accentColor}-400 ${
                                   isActive
-                                    ? `border-${accentColor}-300 text-gray-900`
-                                    : "border-gray-200 text-gray-400"
+                                    ? `border-${accentColor}-300 text-foreground`
+                                    : "border-border text-slate-muted"
                                 }`}
                               />
-                              <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] text-gray-400 pointer-events-none">
+                              <span className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-muted pointer-events-none">
                                 LF
                               </span>
                             </div>
                             <button
                               onClick={() => updateFlashingQuantity(profile.id, 10)}
-                              className={`w-7 h-7 flex items-center justify-center rounded-md border bg-white hover:bg-gray-100 transition-colors ${
+                              className={`w-7 h-7 flex items-center justify-center rounded-md border bg-card hover:bg-muted transition-colors ${
                                 isActive
                                   ? `border-${accentColor}-300 text-${accentColor}-600`
-                                  : "border-gray-200 text-gray-500"
+                                  : "border-border text-muted-foreground"
                               }`}
                             >
                               <Plus className="w-3 h-3" />
@@ -527,15 +527,15 @@ export default function RoofAdditions({
 
           {/* Summary & Materials */}
           {(totalPenetrations > 0 || totalFlashingLF > 0) && (
-            <div className="border-t border-gray-200 bg-gray-50">
+            <div className="border-t border-border bg-muted/30">
               {/* Quick Summary */}
               <div className="p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-semibold text-gray-900">
+                  <h4 className="font-semibold text-foreground">
                     Penetrations & Flashing Summary
                   </h4>
                   <div className="flex items-center gap-3 text-sm">
-                    <span className="flex items-center gap-1 text-gray-500">
+                    <span className="flex items-center gap-1 text-muted-foreground">
                       <Clock className="w-3.5 h-3.5" />
                       Est. {formatLaborTime(combinedEstimate.totalLaborMinutes)}
                     </span>
@@ -569,10 +569,10 @@ export default function RoofAdditions({
                           key={item.penetrationId}
                           className="flex items-center justify-between text-sm"
                         >
-                          <span className="text-gray-600">
+                          <span className="text-muted-foreground">
                             {item.quantity}x {item.name}
                           </span>
-                          <span className="text-gray-900 font-medium">
+                          <span className="text-foreground font-medium">
                             ${itemCost.toLocaleString("en-US", {
                               minimumFractionDigits: 2,
                             })}
@@ -587,14 +587,14 @@ export default function RoofAdditions({
                 {totalFlashingLF > 0 && (
                   <div className="space-y-1.5 mb-3">
                     {totalPenetrations > 0 && (
-                      <div className="border-t border-gray-200 pt-2 mt-2">
-                        <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                      <div className="border-t border-border pt-2 mt-2">
+                        <p className="text-xs font-bold uppercase tracking-wider text-slate-muted mb-1.5">
                           Sheet Metal Flashing ({selectedMetal?.name} {selectedGauge?.label})
                         </p>
                       </div>
                     )}
                     {!totalPenetrations && (
-                      <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+                      <p className="text-xs font-bold uppercase tracking-wider text-slate-muted mb-1.5">
                         Sheet Metal Flashing ({selectedMetal?.name} {selectedGauge?.label})
                       </p>
                     )}
@@ -603,10 +603,10 @@ export default function RoofAdditions({
                         key={item.flashingId}
                         className="flex items-center justify-between text-sm"
                       >
-                        <span className="text-gray-600">
+                        <span className="text-muted-foreground">
                           {item.quantity.toLocaleString()} LF {item.name}
                         </span>
-                        <span className="text-gray-900 font-medium">
+                        <span className="text-foreground font-medium">
                           ${item.totalCost.toLocaleString("en-US", {
                             minimumFractionDigits: 2,
                           })}
@@ -635,11 +635,11 @@ export default function RoofAdditions({
 
               {/* Detailed Materials Table */}
               {showMaterials && (
-                <div className="border-t border-gray-200 px-5 pb-5">
+                <div className="border-t border-border px-5 pb-5">
                   <div className="overflow-x-auto mt-4">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="text-left text-xs uppercase tracking-wider text-gray-400 border-b border-gray-200">
+                        <tr className="text-left text-xs uppercase tracking-wider text-slate-muted border-b border-border">
                           <th className="pb-2 pr-4">Material</th>
                           <th className="pb-2 pr-4 text-right">Qty</th>
                           <th className="pb-2 pr-4">Unit</th>
@@ -650,13 +650,13 @@ export default function RoofAdditions({
                       <tbody className="divide-y divide-gray-100">
                         {/* Penetration materials */}
                         {penetrationEstimate.materials.map((mat, i) => (
-                          <tr key={`pen-${i}`} className="text-gray-700">
+                          <tr key={`pen-${i}`} className="text-foreground">
                             <td className="py-2 pr-4">
                               <div>
-                                <p className="font-medium text-gray-900">
+                                <p className="font-medium text-foreground">
                                   {mat.materialName}
                                 </p>
-                                <p className="text-xs text-gray-400">
+                                <p className="text-xs text-slate-muted">
                                   For: {mat.fromPenetration}
                                 </p>
                               </div>
@@ -664,7 +664,7 @@ export default function RoofAdditions({
                             <td className="py-2 pr-4 text-right font-medium">
                               {mat.quantity}
                             </td>
-                            <td className="py-2 pr-4 text-gray-500">
+                            <td className="py-2 pr-4 text-muted-foreground">
                               {mat.unit}
                             </td>
                             <td className="py-2 pr-4 text-right">
@@ -681,20 +681,20 @@ export default function RoofAdditions({
                         {sheetMetalEstimate.lineItems.length > 0 && (
                           <tr>
                             <td colSpan={5} className="pt-3 pb-1">
-                              <p className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                              <p className="text-xs font-bold uppercase tracking-wider text-slate-muted">
                                 Sheet Metal Flashing — {selectedMetal?.name} {selectedGauge?.label}
                               </p>
                             </td>
                           </tr>
                         )}
                         {sheetMetalEstimate.lineItems.map((item, i) => (
-                          <tr key={`sm-${i}`} className="text-gray-700">
+                          <tr key={`sm-${i}`} className="text-foreground">
                             <td className="py-2 pr-4">
                               <div>
-                                <p className="font-medium text-gray-900">
+                                <p className="font-medium text-foreground">
                                   {item.name}
                                 </p>
-                                <p className="text-xs text-gray-400">
+                                <p className="text-xs text-slate-muted">
                                   {selectedMetal?.name} {selectedGauge?.label}
                                 </p>
                               </div>
@@ -702,7 +702,7 @@ export default function RoofAdditions({
                             <td className="py-2 pr-4 text-right font-medium">
                               {item.quantity.toLocaleString()}
                             </td>
-                            <td className="py-2 pr-4 text-gray-500">LF</td>
+                            <td className="py-2 pr-4 text-muted-foreground">LF</td>
                             <td className="py-2 pr-4 text-right">
                               ${item.unitPrice.toFixed(2)}
                             </td>
@@ -715,10 +715,10 @@ export default function RoofAdditions({
                         ))}
                       </tbody>
                       <tfoot>
-                        <tr className="border-t-2 border-gray-300">
+                        <tr className="border-t-2 border-border">
                           <td
                             colSpan={4}
-                            className="pt-3 font-bold text-gray-900"
+                            className="pt-3 font-bold text-foreground"
                           >
                             Penetrations & Flashing Total
                           </td>

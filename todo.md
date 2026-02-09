@@ -104,3 +104,19 @@
 - [x] Show $/sq.ft. below Grand Total in the bottom summary card
 - [x] Calculate as Grand Total ÷ Total Roof Area (from user input)
 - [x] Test in browser and verify — confirmed $7.54/sq.ft. for 80,000 sq.ft. TPO estimate
+
+## RooFix AI Rebranding → BidFix AI
+- [x] Extract exact color scheme from roofix.ai (dark navy #0a0f1e, cyan #00E5FF, orange #ff6b00)
+- [x] Propose module name options — user chose BidFix AI
+- [x] Generate BidFix AI logo matching RooFix X styling
+- [x] Overhaul index.css with dark theme (navy base, cyan accent, OKLCH colors)
+- [x] Update index.html with Inter font and BidFix AI title
+- [x] Switch App.tsx to dark theme
+- [x] Rewrite Catalog page with BidFix AI branding
+- [x] Rewrite HeroSection with BidFix AI branding
+- [x] Rewrite Footer with BidFix AI branding
+- [x] Update all component colors (CostSummary, InputSection, OrderList, LaborEquipment, PricingEditor, RoofAdditions)
+- [x] Fix remaining light backgrounds (PricingDatabase, NotFound, SavedEstimates, TPOEstimator)
+- [x] Remove all karnak-red, warm-, stone- color references
+- [x] All 97 tests passing, zero TypeScript errors
+- [x] Verified in browser across Catalog, Estimators, Pricing Database

@@ -1,5 +1,5 @@
 /**
- * SystemInfo — Reference information about the Karnak system
+ * SystemInfo — Reference information about the roofing system
  * Design: Subtle info section with system details
  */
 
@@ -45,7 +45,7 @@ export function SystemInfo() {
               href="https://www.karnakcorp.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-karnak-red hover:underline font-medium"
+              className="text-cyan hover:underline font-medium"
             >
               karnakcorp.com
             </a>{" "}

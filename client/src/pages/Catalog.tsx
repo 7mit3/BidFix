@@ -57,7 +57,7 @@ function SystemCard({ system }: { system: RoofingSystem }) {
       <Card
         className={`overflow-hidden transition-all duration-200 h-full ${
           isAvailable
-            ? "hover:shadow-lg hover:border-karnak-red/30 cursor-pointer"
+            ? "hover:shadow-lg hover:border-cyan/30 cursor-pointer"
             : "opacity-75"
         }`}
       >
@@ -75,7 +75,7 @@ function SystemCard({ system }: { system: RoofingSystem }) {
                   </h4>
                 </div>
                 {isAvailable ? (
-                  <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 shrink-0 text-xs">
+                  <Badge className="bg-cyan/20 text-cyan border-cyan/30 shrink-0 text-xs">
                     <Calculator className="w-3 h-3 mr-1" />
                     Ready
                   </Badge>
@@ -112,7 +112,7 @@ function SystemCard({ system }: { system: RoofingSystem }) {
 
               {isAvailable && system.route ? (
                 <Link href={system.route}>
-                  <Button size="sm" className="bg-karnak-red hover:bg-karnak-red/90 text-white">
+                  <Button size="sm" className="bg-cyan hover:bg-cyan-soft text-navy-deep font-semibold">
                     Open Estimator
                     <ArrowRight className="w-4 h-4 ml-1" />
                   </Button>
@@ -157,7 +157,7 @@ function CategorySection({ category }: { category: SystemCategory }) {
             <span className="text-xs text-muted-foreground">
               {systems.length} system{systems.length !== 1 ? "s" : ""}
               {availableCount > 0 && (
-                <span className="text-emerald-600 ml-1">
+                <span className="text-cyan ml-1">
                   · {availableCount} ready
                 </span>
               )}
@@ -233,8 +233,8 @@ export default function Catalog() {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${CATALOG_HERO_URL})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-karnak-dark/95 via-karnak-dark/80 to-karnak-dark/60" />
-        <div className="absolute top-0 left-0 right-0 h-1 bg-karnak-red" />
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-deep/95 via-navy-deep/80 to-navy-deep/60" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-cyan" />
 
         <div className="relative container py-16 sm:py-20">
           <motion.div
@@ -244,34 +244,34 @@ export default function Catalog() {
             className="max-w-2xl"
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-karnak-red flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-cyan flex items-center justify-center">
                 <Calculator className="w-5 h-5 text-white" />
               </div>
-              <span className="text-karnak-red font-semibold text-sm uppercase tracking-widest">
+              <span className="text-cyan font-semibold text-sm uppercase tracking-widest">
                 Roofing Estimator
               </span>
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-              Commercial Roofing
+              BidFix AI
               <br />
-              <span className="text-warm-300">Material Estimator</span>
+              <span className="text-cyan">Roofing Estimator</span>
             </h1>
-            <p className="text-warm-300/90 text-base sm:text-lg leading-relaxed max-w-xl">
+            <p className="text-slate-text/90 text-base sm:text-lg leading-relaxed max-w-xl">
               Select a roofing system below to calculate material quantities,
               labor costs, and generate a complete project estimate. Browse by
               coating type or manufacturer.
             </p>
 
             <div className="flex items-center gap-4 mt-6 text-sm">
-              <div className="flex items-center gap-2 text-warm-400">
-                <div className="w-2 h-2 rounded-full bg-emerald-400" />
+              <div className="flex items-center gap-2 text-slate-muted">
+                <div className="w-2 h-2 rounded-full bg-cyan" />
                 <span>
                   {availableSystems} estimator{availableSystems !== 1 ? "s" : ""}{" "}
                   ready
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-warm-400">
-                <div className="w-2 h-2 rounded-full bg-warm-500" />
+              <div className="flex items-center gap-2 text-slate-muted">
+                <div className="w-2 h-2 rounded-full bg-slate-muted" />
                 <span>{totalSystems} total systems</span>
               </div>
             </div>
@@ -303,13 +303,13 @@ export default function Catalog() {
           </div>
         </div>
         <Link href="/saved">
-          <button className="inline-flex items-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors shadow-lg whitespace-nowrap">
+          <button className="inline-flex items-center gap-2 px-5 py-3 bg-cyan/20 text-cyan border border-cyan/30 rounded-xl text-sm font-medium hover:bg-cyan/30 transition-colors shadow-lg whitespace-nowrap">
             <FolderOpen className="w-4 h-4" />
             Saved Estimates
           </button>
         </Link>
         <Link href="/pricing">
-          <button className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors shadow-lg whitespace-nowrap">
+          <button className="inline-flex items-center gap-2 px-5 py-3 bg-orange/20 text-orange border border-orange/30 rounded-xl text-sm font-medium hover:bg-orange/30 transition-colors shadow-lg whitespace-nowrap">
             <Database className="w-4 h-4" />
             Pricing Database
           </button>
@@ -344,7 +344,7 @@ export default function Catalog() {
               vary depending on roof conditions.
             </p>
             <p className="text-xs">
-              Built for commercial roofing contractors
+              BidFix AI — A RooFix AI Module
             </p>
           </div>
         </div>

@@ -40,60 +40,97 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --font-sans: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif;
-  --font-heading: 'DM Sans', system-ui, sans-serif;
+  /* Typography — Inter (matches RooFix AI) */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --color-karnak-red: oklch(0.5 0.2 25);
-  --color-karnak-red-light: oklch(0.6 0.18 25);
-  --color-karnak-dark: oklch(0.2 0.02 50);
+  /* BidFix AI Brand Colors — RooFix-aligned */
+  --color-cyan: oklch(0.85 0.15 195);
+  --color-cyan-soft: oklch(0.78 0.12 195);
+  --color-cyan-muted: oklch(0.65 0.1 195);
+  --color-orange: oklch(0.65 0.2 45);
+  --color-orange-soft: oklch(0.72 0.18 45);
+  --color-navy-deep: oklch(0.15 0.02 260);
+  --color-navy-surface: oklch(0.2 0.025 260);
+  --color-navy-card: oklch(0.22 0.025 260);
+  --color-slate-text: oklch(0.75 0.02 250);
+  --color-slate-muted: oklch(0.55 0.02 250);
   --color-success: oklch(0.55 0.16 145);
   --color-success-foreground: oklch(0.98 0 0);
-  --color-warm-50: oklch(0.99 0.005 80);
-  --color-warm-100: oklch(0.97 0.008 80);
-  --color-warm-200: oklch(0.93 0.01 75);
-  --color-warm-300: oklch(0.87 0.015 70);
-  --color-warm-400: oklch(0.7 0.03 60);
-  --color-warm-500: oklch(0.55 0.04 55);
-  --color-warm-600: oklch(0.45 0.04 55);
-  --color-warm-700: oklch(0.35 0.03 55);
-  --color-warm-800: oklch(0.25 0.02 55);
-  --color-warm-900: oklch(0.18 0.015 55);
 }
 
-:root {
+/* Dark theme (primary — matches RooFix AI) */
+.dark {
   --radius: 0.5rem;
-  --background: oklch(0.988 0.004 80);
-  --foreground: oklch(0.22 0.02 50);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.02 50);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.02 50);
-  --primary: oklch(0.5 0.2 25);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.96 0.006 80);
-  --secondary-foreground: oklch(0.35 0.03 55);
-  --muted: oklch(0.96 0.006 80);
-  --muted-foreground: oklch(0.55 0.02 55);
-  --accent: oklch(0.96 0.006 80);
-  --accent-foreground: oklch(0.22 0.02 50);
+  --background: oklch(0.15 0.02 260);
+  --foreground: oklch(0.93 0.01 250);
+  --card: oklch(0.2 0.025 260);
+  --card-foreground: oklch(0.93 0.01 250);
+  --popover: oklch(0.2 0.025 260);
+  --popover-foreground: oklch(0.93 0.01 250);
+  --primary: oklch(0.85 0.15 195);
+  --primary-foreground: oklch(0.15 0.02 260);
+  --secondary: oklch(0.22 0.025 260);
+  --secondary-foreground: oklch(0.75 0.02 250);
+  --muted: oklch(0.22 0.025 260);
+  --muted-foreground: oklch(0.55 0.02 250);
+  --accent: oklch(0.22 0.025 260);
+  --accent-foreground: oklch(0.93 0.01 250);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.91 0.008 75);
-  --input: oklch(0.91 0.008 75);
-  --ring: oklch(0.5 0.2 25);
-  --chart-1: oklch(0.5 0.2 25);
-  --chart-2: oklch(0.55 0.16 145);
-  --chart-3: oklch(0.6 0.12 250);
-  --chart-4: oklch(0.65 0.14 60);
-  --chart-5: oklch(0.5 0.1 300);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.22 0.02 50);
-  --sidebar-primary: oklch(0.5 0.2 25);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.96 0.006 80);
-  --sidebar-accent-foreground: oklch(0.22 0.02 50);
-  --sidebar-border: oklch(0.91 0.008 75);
-  --sidebar-ring: oklch(0.5 0.2 25);
+  --border: oklch(0.3 0.02 260);
+  --input: oklch(0.25 0.02 260);
+  --ring: oklch(0.85 0.15 195);
+  --chart-1: oklch(0.85 0.15 195);
+  --chart-2: oklch(0.65 0.2 45);
+  --chart-3: oklch(0.55 0.16 145);
+  --chart-4: oklch(0.6 0.12 300);
+  --chart-5: oklch(0.7 0.1 60);
+  --sidebar: oklch(0.17 0.02 260);
+  --sidebar-foreground: oklch(0.93 0.01 250);
+  --sidebar-primary: oklch(0.85 0.15 195);
+  --sidebar-primary-foreground: oklch(0.15 0.02 260);
+  --sidebar-accent: oklch(0.22 0.025 260);
+  --sidebar-accent-foreground: oklch(0.93 0.01 250);
+  --sidebar-border: oklch(0.3 0.02 260);
+  --sidebar-ring: oklch(0.85 0.15 195);
+}
+
+/* Fallback light :root (unused — app defaults to dark) */
+:root {
+  --radius: 0.5rem;
+  --background: oklch(0.15 0.02 260);
+  --foreground: oklch(0.93 0.01 250);
+  --card: oklch(0.2 0.025 260);
+  --card-foreground: oklch(0.93 0.01 250);
+  --popover: oklch(0.2 0.025 260);
+  --popover-foreground: oklch(0.93 0.01 250);
+  --primary: oklch(0.85 0.15 195);
+  --primary-foreground: oklch(0.15 0.02 260);
+  --secondary: oklch(0.22 0.025 260);
+  --secondary-foreground: oklch(0.75 0.02 250);
+  --muted: oklch(0.22 0.025 260);
+  --muted-foreground: oklch(0.55 0.02 250);
+  --accent: oklch(0.22 0.025 260);
+  --accent-foreground: oklch(0.93 0.01 250);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.3 0.02 260);
+  --input: oklch(0.25 0.02 260);
+  --ring: oklch(0.85 0.15 195);
+  --chart-1: oklch(0.85 0.15 195);
+  --chart-2: oklch(0.65 0.2 45);
+  --chart-3: oklch(0.55 0.16 145);
+  --chart-4: oklch(0.6 0.12 300);
+  --chart-5: oklch(0.7 0.1 60);
+  --sidebar: oklch(0.17 0.02 260);
+  --sidebar-foreground: oklch(0.93 0.01 250);
+  --sidebar-primary: oklch(0.85 0.15 195);
+  --sidebar-primary-foreground: oklch(0.15 0.02 260);
+  --sidebar-accent: oklch(0.22 0.025 260);
+  --sidebar-accent-foreground: oklch(0.93 0.01 250);
+  --sidebar-border: oklch(0.3 0.02 260);
+  --sidebar-ring: oklch(0.85 0.15 195);
 }
 
 @layer base {
@@ -153,6 +190,14 @@
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
   }
+
+  /* Glass card utility for RooFix-style panels */
+  .glass-card {
+    background: oklch(0.2 0.025 260 / 0.6);
+    border: 1px solid oklch(0.3 0.02 260 / 0.5);
+    backdrop-filter: blur(12px);
+    border-radius: 0.75rem;
+  }
 }
 
 @media print {
@@ -177,7 +222,6 @@
     display: block !important;
   }
 
-  /* Show only the results section */
   [data-print-hide] {
     display: none !important;
   }

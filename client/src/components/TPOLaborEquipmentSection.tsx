@@ -46,25 +46,25 @@ export function TPOLaborEquipmentSection({
 
   const accentClasses = {
     blue: {
-      icon: "text-blue-600",
-      subIcon: "text-blue-500",
-      enabledBorder: "border-slate-200 bg-white",
-      disabledBorder: "border-slate-100 bg-slate-50/50",
+      icon: "text-cyan",
+      subIcon: "text-cyan",
+      enabledBorder: "border-border bg-card",
+      disabledBorder: "border-border bg-muted/30/50",
     },
     emerald: {
-      icon: "text-emerald-600",
-      subIcon: "text-emerald-500",
-      enabledBorder: "border-slate-200 bg-white",
-      disabledBorder: "border-slate-100 bg-slate-50/50",
+      icon: "text-success",
+      subIcon: "text-success",
+      enabledBorder: "border-border bg-card",
+      disabledBorder: "border-border bg-muted/30/50",
     },
   };
 
   const colors = accentClasses[accentColor];
 
   return (
-    <Card className="border-slate-200 shadow-sm">
+    <Card className="border-border shadow-sm">
       <CardHeader
-        className="pb-3 cursor-pointer select-none hover:bg-slate-50 transition-colors"
+        className="pb-3 cursor-pointer select-none hover:bg-muted/30 transition-colors"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="flex items-center justify-between">

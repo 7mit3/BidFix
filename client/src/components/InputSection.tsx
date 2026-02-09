@@ -45,7 +45,7 @@ export function InputSection({
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
-            <Ruler className="w-5 h-5 text-karnak-red" />
+            <Ruler className="w-5 h-5 text-cyan" />
             Roof Measurements
           </CardTitle>
           {hasInputs && (
@@ -71,8 +71,8 @@ export function InputSection({
             htmlFor="sqft"
             className="text-sm font-semibold text-foreground flex items-center gap-2"
           >
-            <div className="w-6 h-6 rounded bg-karnak-red/10 flex items-center justify-center">
-              <Ruler className="w-3.5 h-3.5 text-karnak-red" />
+            <div className="w-6 h-6 rounded bg-cyan/10 flex items-center justify-center">
+              <Ruler className="w-3.5 h-3.5 text-cyan" />
             </div>
             Total Roof Area
           </Label>
@@ -86,7 +86,7 @@ export function InputSection({
               onChange={(e) =>
                 handleNumericInput(e.target.value, setSquareFootage)
               }
-              className="pr-14 h-12 text-lg font-mono-nums bg-white border-2 focus:border-karnak-red focus:ring-karnak-red/20"
+              className="pr-14 h-12 text-lg font-mono-nums bg-card border-2 focus:border-cyan focus:ring-cyan/20"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
               sq. ft.
@@ -100,8 +100,8 @@ export function InputSection({
             htmlFor="vseams"
             className="text-sm font-semibold text-foreground flex items-center gap-2"
           >
-            <div className="w-6 h-6 rounded bg-karnak-red/10 flex items-center justify-center">
-              <ArrowDownUp className="w-3.5 h-3.5 text-karnak-red" />
+            <div className="w-6 h-6 rounded bg-cyan/10 flex items-center justify-center">
+              <ArrowDownUp className="w-3.5 h-3.5 text-cyan" />
             </div>
             Vertical Seams
           </Label>
@@ -115,7 +115,7 @@ export function InputSection({
               onChange={(e) =>
                 handleNumericInput(e.target.value, setVerticalSeamsLF)
               }
-              className="pr-14 h-12 text-lg font-mono-nums bg-white border-2 focus:border-karnak-red focus:ring-karnak-red/20"
+              className="pr-14 h-12 text-lg font-mono-nums bg-card border-2 focus:border-cyan focus:ring-cyan/20"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
               lin. ft.
@@ -132,8 +132,8 @@ export function InputSection({
             htmlFor="hseams"
             className="text-sm font-semibold text-foreground flex items-center gap-2"
           >
-            <div className="w-6 h-6 rounded bg-karnak-red/10 flex items-center justify-center">
-              <ArrowLeftRight className="w-3.5 h-3.5 text-karnak-red" />
+            <div className="w-6 h-6 rounded bg-cyan/10 flex items-center justify-center">
+              <ArrowLeftRight className="w-3.5 h-3.5 text-cyan" />
             </div>
             Horizontal Seams
           </Label>
@@ -147,7 +147,7 @@ export function InputSection({
               onChange={(e) =>
                 handleNumericInput(e.target.value, setHorizontalSeamsLF)
               }
-              className="pr-14 h-12 text-lg font-mono-nums bg-white border-2 focus:border-karnak-red focus:ring-karnak-red/20"
+              className="pr-14 h-12 text-lg font-mono-nums bg-card border-2 focus:border-cyan focus:ring-cyan/20"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
               lin. ft.

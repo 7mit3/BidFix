@@ -56,9 +56,9 @@ const SYSTEM_OPTIONS = [
 ];
 
 const SYSTEM_COLORS: Record<string, string> = {
-  "karnak-metal-kynar": "bg-red-600",
-  "carlisle-tpo": "bg-blue-600",
-  "gaf-tpo": "bg-emerald-600",
+  "karnak-metal-kynar": "bg-destructive",
+  "carlisle-tpo": "bg-cyan",
+  "gaf-tpo": "bg-success",
 };
 
 function fmt(amount: string | number | null | undefined): string {
@@ -148,17 +148,17 @@ export default function SavedEstimates() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-gradient-to-r from-stone-800 to-stone-700 text-white">
+      <div className="bg-gradient-to-r from-navy-deep to-navy-surface text-white">
         <div className="container py-6">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-1 text-white/70 hover:text-white text-sm mb-3 transition-colors"
+            className="flex items-center gap-1 text-white/70 hover:text-foreground text-sm mb-3 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Catalog
           </button>
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-white/10 rounded-lg">
+            <div className="p-2 bg-card/10 rounded-lg">
               <FolderOpen className="h-6 w-6" />
             </div>
             <div>

@@ -1,6 +1,6 @@
 /**
- * HeroSection — Karnak-branded header with metal roof hero image
- * Design: Bold red top bar + hero image with overlay text + back navigation
+ * HeroSection — BidFix AI branded header with metal roof hero image
+ * Design: Cyan accent bar + hero image with overlay text + back navigation
  */
 
 import { Calculator, ArrowLeft } from "lucide-react";
@@ -12,7 +12,7 @@ export function HeroSection() {
   return (
     <header className="relative">
       {/* Red brand bar */}
-      <div className="bg-karnak-red h-1.5" />
+      <div className="bg-cyan h-1.5" />
 
       {/* Hero image section */}
       <div className="relative h-[220px] sm:h-[260px] lg:h-[300px] overflow-hidden">
@@ -29,7 +29,7 @@ export function HeroSection() {
           {/* Back to catalog */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-warm-400 hover:text-white text-sm mb-4 transition-colors w-fit"
+            className="inline-flex items-center gap-2 text-slate-muted hover:text-foreground text-sm mb-4 transition-colors w-fit"
           >
             <ArrowLeft className="w-4 h-4" />
             All Roofing Systems
@@ -37,19 +37,19 @@ export function HeroSection() {
 
           <div className="max-w-2xl">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-lg bg-karnak-red flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 rounded-lg bg-cyan flex items-center justify-center shadow-lg">
                 <Calculator className="w-5 h-5 text-white" />
               </div>
-              <span className="text-karnak-red-light font-heading font-semibold text-sm tracking-wide uppercase">
+              <span className="text-cyan-light font-heading font-semibold text-sm tracking-wide uppercase">
                 Material Estimator
               </span>
             </div>
             <h1 className="font-heading text-white text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight tracking-tight">
               Karnak Metal Kynar
               <br />
-              <span className="text-warm-300">Coating System</span>
+              <span className="text-cyan">Coating System</span>
             </h1>
-            <p className="mt-3 text-warm-300/90 text-sm sm:text-base max-w-lg leading-relaxed">
+            <p className="mt-3 text-slate-text/90 text-sm sm:text-base max-w-lg leading-relaxed">
               White Reflective Coating System (702-404-501) — Calculate material quantities and costs for your metal roof restoration project.
             </p>
           </div>

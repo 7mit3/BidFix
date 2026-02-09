@@ -1,6 +1,6 @@
 /**
- * Footer — Simple branded footer
- * Design: Minimal with Karnak reference
+ * Footer — BidFix AI branded footer
+ * Design: Minimal dark footer with brand reference
  */
 
 export function Footer() {
@@ -9,10 +9,10 @@ export function Footer() {
       <div className="container py-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-muted-foreground">
           <p>
-            Material estimator based on Karnak spec sheet METAL-KYNAR 702-404-501
+            Material estimator based on manufacturer spec sheets — coverage rates are for estimating purposes only
           </p>
           <p className="text-xs">
-            Estimates only — verify with your Karnak representative
+            BidFix AI — A <a href="https://www.roofix.ai" target="_blank" rel="noopener noreferrer" className="text-cyan hover:text-cyan-soft transition-colors">RooFix AI</a> Module
           </p>
         </div>
       </div>

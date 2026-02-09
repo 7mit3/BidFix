@@ -67,12 +67,12 @@ export function CostSummary({
   ];
 
   const stepColors: Record<string, string> = {
-    Preparation: "bg-warm-400",
-    Primer: "bg-blue-500",
-    "Horizontal Seam Sealing": "bg-amber-500",
+    Preparation: "bg-cyan-muted",
+    Primer: "bg-cyan",
+    "Horizontal Seam Sealing": "bg-orange/100",
     "Vertical Seam Sealing": "bg-orange-500",
-    "Base Coat": "bg-emerald-500",
-    "Finish Coat": "bg-karnak-red",
+    "Base Coat": "bg-success/100",
+    "Finish Coat": "bg-cyan",
   };
 
   // Category bar widths (proportional to project total)
@@ -86,10 +86,10 @@ export function CostSummary({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card className="border-2 border-karnak-red/20 shadow-md overflow-hidden">
+        <Card className="border-2 border-cyan/20 shadow-md overflow-hidden">
           {/* Grand total header */}
-          <div className="bg-gradient-to-r from-karnak-dark to-warm-800 px-6 py-6">
-            <p className="text-warm-400 text-xs font-medium uppercase tracking-wider mb-1">
+          <div className="bg-gradient-to-r from-navy-deep to-navy-surface px-6 py-6">
+            <p className="text-slate-muted text-xs font-medium uppercase tracking-wider mb-1">
               Total Project Estimate
             </p>
             <p className="text-white font-heading text-3xl sm:text-4xl font-bold font-mono-nums tracking-tight">
@@ -99,8 +99,8 @@ export function CostSummary({
             {/* Three-category summary row */}
             <div className="flex flex-wrap gap-x-6 gap-y-2 mt-4">
               <div className="flex items-center gap-2">
-                <Package className="w-4 h-4 text-warm-300" />
-                <span className="text-warm-300 text-xs uppercase tracking-wide">
+                <Package className="w-4 h-4 text-slate-text" />
+                <span className="text-slate-text text-xs uppercase tracking-wide">
                   Materials
                 </span>
                 <span className="text-white font-mono-nums text-sm font-semibold">
@@ -108,8 +108,8 @@ export function CostSummary({
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <HardHat className="w-4 h-4 text-warm-300" />
-                <span className="text-warm-300 text-xs uppercase tracking-wide">
+                <HardHat className="w-4 h-4 text-slate-text" />
+                <span className="text-slate-text text-xs uppercase tracking-wide">
                   Labor
                 </span>
                 <span className="text-white font-mono-nums text-sm font-semibold">
@@ -117,8 +117,8 @@ export function CostSummary({
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Wrench className="w-4 h-4 text-warm-300" />
-                <span className="text-warm-300 text-xs uppercase tracking-wide">
+                <Wrench className="w-4 h-4 text-slate-text" />
+                <span className="text-slate-text text-xs uppercase tracking-wide">
                   Equipment
                 </span>
                 <span className="text-white font-mono-nums text-sm font-semibold">
@@ -130,16 +130,16 @@ export function CostSummary({
             {/* Price per square foot */}
             {sqft > 0 && (
               <div className="mt-4 pt-4 border-t border-white/15 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
-                  <Ruler className="w-4 h-4 text-warm-300" />
+                <div className="w-9 h-9 rounded-lg bg-card/10 flex items-center justify-center">
+                  <Ruler className="w-4 h-4 text-slate-text" />
                 </div>
                 <div>
-                  <p className="text-warm-400 text-xs uppercase tracking-wide">
+                  <p className="text-slate-muted text-xs uppercase tracking-wide">
                     Price per Square Foot
                   </p>
                   <p className="text-white font-heading text-xl font-bold font-mono-nums">
                     {formatCurrency(pricePerSqFt)}
-                    <span className="text-warm-400 text-sm font-normal ml-1">
+                    <span className="text-slate-muted text-sm font-normal ml-1">
                       / sq. ft.
                     </span>
                   </p>
@@ -151,7 +151,7 @@ export function CostSummary({
           {/* Category proportion bar */}
           <div className="h-2 flex">
             <motion.div
-              className="bg-karnak-red h-full"
+              className="bg-cyan h-full"
               initial={{ width: 0 }}
               animate={{
                 width: `${(materialCost / catBarMax) * 100}%`,
@@ -159,7 +159,7 @@ export function CostSummary({
               transition={{ duration: 0.5 }}
             />
             <motion.div
-              className="bg-blue-500 h-full"
+              className="bg-cyan h-full"
               initial={{ width: 0 }}
               animate={{
                 width: `${(laborCost / catBarMax) * 100}%`,
@@ -167,7 +167,7 @@ export function CostSummary({
               transition={{ duration: 0.5, delay: 0.1 }}
             />
             <motion.div
-              className="bg-amber-500 h-full"
+              className="bg-orange/100 h-full"
               initial={{ width: 0 }}
               animate={{
                 width: `${(equipmentCost / catBarMax) * 100}%`,
@@ -179,7 +179,7 @@ export function CostSummary({
           {/* Material breakdown */}
           <CardHeader className="pb-3 pt-5">
             <CardTitle className="font-heading text-sm font-semibold text-foreground flex items-center gap-2">
-              <Package className="w-4 h-4 text-karnak-red" />
+              <Package className="w-4 h-4 text-cyan" />
               Material Cost by Step
             </CardTitle>
           </CardHeader>
@@ -201,7 +201,7 @@ export function CostSummary({
                     </div>
                     <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                       <motion.div
-                        className={`h-full rounded-full ${stepColors[step] || "bg-warm-500"}`}
+                        className={`h-full rounded-full ${stepColors[step] || "bg-navy-surface/200"}`}
                         initial={{ width: 0 }}
                         animate={{ width: `${percentage}%` }}
                         transition={{ duration: 0.5, ease: "easeOut" }}
@@ -220,7 +220,7 @@ export function CostSummary({
                 <Separator />
                 <CardHeader className="pb-3 pt-4">
                   <CardTitle className="font-heading text-sm font-semibold text-foreground flex items-center gap-2">
-                    <HardHat className="w-4 h-4 text-blue-500" />
+                    <HardHat className="w-4 h-4 text-cyan" />
                     Labor Breakdown
                   </CardTitle>
                 </CardHeader>

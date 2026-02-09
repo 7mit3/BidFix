@@ -86,7 +86,7 @@ export function OrderList({
     );
 
     const csvContent = [
-      `Karnak Project Estimate`,
+      `BidFix AI Project Estimate`,
       `Square Footage: ${estimate.inputs.squareFootage} sq.ft.`,
       `Vertical Seams: ${estimate.inputs.verticalSeamsLF} lin.ft.`,
       `Horizontal Seams: ${estimate.inputs.horizontalSeamsLF} lin.ft.`,
@@ -111,7 +111,7 @@ export function OrderList({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `karnak-estimate-${Date.now()}.csv`;
+    link.download = `bidfix-estimate-${Date.now()}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -126,7 +126,7 @@ export function OrderList({
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <CardTitle className="font-heading text-lg font-bold text-foreground flex items-center gap-2">
-              <ClipboardList className="w-5 h-5 text-karnak-red" />
+              <ClipboardList className="w-5 h-5 text-cyan" />
               Material Order List
             </CardTitle>
             <div className="flex items-center gap-2">
@@ -205,7 +205,7 @@ export function OrderList({
                 {activeItems.map((item, index) => (
                   <TableRow
                     key={item.product.id}
-                    className={index % 2 === 0 ? "bg-white" : "bg-muted/20"}
+                    className={index % 2 === 0 ? "bg-card" : "bg-muted/20"}
                   >
                     <TableCell>
                       <div>
@@ -227,7 +227,7 @@ export function OrderList({
                       {formatNumber(item.quantityNeeded)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <span className="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 rounded bg-karnak-red/10 text-karnak-red font-mono-nums font-bold text-sm">
+                      <span className="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 rounded bg-cyan/10 text-cyan font-mono-nums font-bold text-sm">
                         {item.quantityToOrder}
                       </span>
                     </TableCell>
@@ -242,7 +242,7 @@ export function OrderList({
               </TableBody>
               <TableFooter>
                 {/* Material subtotal */}
-                <TableRow className="bg-warm-200 hover:bg-warm-200 border-t-2 border-border">
+                <TableRow className="bg-navy-surface/40 hover:bg-navy-surface/40 border-t-2 border-border">
                   <TableCell
                     colSpan={6}
                     className="font-heading font-semibold text-sm text-foreground"
@@ -256,7 +256,7 @@ export function OrderList({
 
                 {/* Labor subtotal */}
                 {laborCost > 0 && (
-                  <TableRow className="bg-warm-100 hover:bg-warm-100">
+                  <TableRow className="bg-navy-surface/30 hover:bg-navy-surface/30">
                     <TableCell
                       colSpan={6}
                       className="font-heading font-semibold text-sm text-foreground"
@@ -271,7 +271,7 @@ export function OrderList({
 
                 {/* Equipment subtotal */}
                 {equipmentCost > 0 && (
-                  <TableRow className="bg-warm-100 hover:bg-warm-100">
+                  <TableRow className="bg-navy-surface/30 hover:bg-navy-surface/30">
                     <TableCell
                       colSpan={6}
                       className="font-heading font-semibold text-sm text-foreground"
@@ -285,7 +285,7 @@ export function OrderList({
                 )}
 
                 {/* Grand total */}
-                <TableRow className="bg-karnak-dark text-white hover:bg-karnak-dark">
+                <TableRow className="bg-navy-deep text-white hover:bg-navy-deep">
                   <TableCell
                     colSpan={6}
                     className="font-heading font-bold text-base text-white"

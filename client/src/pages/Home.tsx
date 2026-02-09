@@ -1,8 +1,8 @@
 /**
- * Karnak Material Cost Estimator — Home Page
+ * Karnak Metal Kynar Estimator — Home Page
  *
- * Design: Clean Construction Dashboard (Scandinavian Industrial)
- * - Warm neutrals grounded by Karnak red accent
+ * Design: BidFix AI Dark Theme (RooFix-aligned)
+ * - Dark navy with cyan accent
  * - Card-based sections with generous padding
  * - Reactive real-time calculations
  * - Progressive disclosure: Input → Summary → Detail
@@ -127,16 +127,16 @@ export default function Home() {
 
       {/* Loaded estimate banner */}
       {loadedEstimateName && (
-        <div className="bg-amber-50 border-b border-amber-200 py-2">
+        <div className="bg-orange/10 border-b border-orange/30 py-2">
           <div className="container flex items-center justify-between text-sm">
-            <span className="text-amber-800">
+            <span className="text-orange">
               <FolderOpen className="inline h-4 w-4 mr-1" />
               Loaded: <strong>{loadedEstimateName}</strong>
             </span>
             <Button
               variant="ghost"
               size="sm"
-              className="text-amber-700 hover:text-amber-900"
+              className="text-orange hover:text-amber-900"
               onClick={() => {
                 setLoadedEstimateId(null);
                 setLoadedEstimateName("");
@@ -205,7 +205,7 @@ export default function Home() {
                 <Button
                   size="lg"
                   onClick={handleViewBreakdown}
-                  className="bg-karnak-red hover:bg-karnak-red/90 text-white gap-2"
+                  className="bg-cyan hover:bg-cyan/90 text-white gap-2"
                 >
                   <FileSpreadsheet className="w-5 h-5" />
                   View Full Breakdown

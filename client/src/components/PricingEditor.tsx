@@ -92,7 +92,7 @@ export function PricingEditor({
                       parseFloat(e.target.value) || 0
                     )
                   }
-                  className="pl-7 h-9 text-sm font-mono-nums bg-white text-right"
+                  className="pl-7 h-9 text-sm font-mono-nums bg-card text-right"
                 />
               </div>
             </div>

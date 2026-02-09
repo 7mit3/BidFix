@@ -421,7 +421,7 @@ export default function TPOEstimator() {
     <div className="min-h-screen bg-background">
       {/* Hero Header */}
       <div
-        className="relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-700 to-blue-900"
+        className="relative overflow-hidden bg-gradient-to-br from-navy-deep via-navy-surface to-cyan/20"
         data-print-hide
       >
         <div className="absolute inset-0 opacity-10">
@@ -436,17 +436,17 @@ export default function TPOEstimator() {
         <div className="container py-8 relative z-10">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-blue-200 hover:text-white transition-colors text-sm mb-4"
+            className="inline-flex items-center gap-2 text-blue-200 hover:text-foreground transition-colors text-sm mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Catalog
           </Link>
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-              <Shield className="w-5 h-5 text-blue-300" />
+            <div className="w-10 h-10 rounded-lg bg-cyan/20 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-cyan/70" />
             </div>
             <div>
-              <p className="text-blue-300 text-xs font-medium tracking-wider uppercase">
+              <p className="text-cyan/70 text-xs font-medium tracking-wider uppercase">
                 Carlisle SynTec
               </p>
               <h1 className="text-2xl md:text-3xl font-bold text-white font-display">
@@ -454,7 +454,7 @@ export default function TPOEstimator() {
               </h1>
             </div>
           </div>
-          <p className="text-slate-300 text-sm max-w-2xl">
+          <p className="text-slate-text text-sm max-w-2xl">
             Configure your roof assembly, enter measurements, and get a complete
             material order list with pricing for Carlisle Sure-Weld TPO
             single-ply membrane systems.
@@ -464,16 +464,16 @@ export default function TPOEstimator() {
 
       {/* Loaded estimate banner */}
       {loadedEstimateName && (
-        <div className="bg-amber-50 border-b border-amber-200 py-2">
+        <div className="bg-orange/10 border-b border-orange/30 py-2">
           <div className="container flex items-center justify-between text-sm">
-            <span className="text-amber-800">
+            <span className="text-orange">
               <FolderOpen className="inline h-4 w-4 mr-1" />
               Loaded: <strong>{loadedEstimateName}</strong>
             </span>
             <Button
               variant="ghost"
               size="sm"
-              className="text-amber-700 hover:text-amber-900"
+              className="text-orange hover:text-amber-900"
               onClick={() => {
                 setLoadedEstimateId(null);
                 setLoadedEstimateName("");
@@ -491,10 +491,10 @@ export default function TPOEstimator() {
           {/* Left Column: Config + Measurements */}
           <div className="lg:col-span-5 space-y-6" data-print-hide>
             {/* Assembly Configuration */}
-            <Card className="border-slate-200 shadow-sm">
+            <Card className="border-border shadow-sm">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Layers className="w-5 h-5 text-blue-600" />
+                  <Layers className="w-5 h-5 text-cyan" />
                   Roof Assembly
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
@@ -505,7 +505,7 @@ export default function TPOEstimator() {
                 {/* Deck Type */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2 text-sm font-medium">
-                    <SquareStack className="w-4 h-4 text-slate-500" />
+                    <SquareStack className="w-4 h-4 text-muted-foreground" />
                     Substrate / Deck Type
                   </Label>
                   <Select
@@ -528,7 +528,7 @@ export default function TPOEstimator() {
                 {/* Vapor Barrier */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2 text-sm font-medium">
-                    <Shield className="w-4 h-4 text-slate-500" />
+                    <Shield className="w-4 h-4 text-muted-foreground" />
                     Vapor Barrier
                   </Label>
                   <Select
@@ -552,12 +552,12 @@ export default function TPOEstimator() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-2 text-sm font-medium">
-                      <Thermometer className="w-4 h-4 text-slate-500" />
+                      <Thermometer className="w-4 h-4 text-muted-foreground" />
                       Insulation (Polyiso)
                     </Label>
                     <div className="flex items-center gap-2">
                       {assembly.insulationEnabled && insulationSummary.totalThickness > 0 && (
-                        <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                        <span className="text-xs font-semibold text-cyan bg-cyan/10 px-2 py-0.5 rounded-full">
                           {insulationSummary.totalThickness.toFixed(1)}" total · R-{insulationSummary.totalRValue.toFixed(1)}
                         </span>
                       )}
@@ -667,7 +667,7 @@ export default function TPOEstimator() {
                 {/* Cover Board */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2 text-sm font-medium">
-                    <Layers className="w-4 h-4 text-slate-500" />
+                    <Layers className="w-4 h-4 text-muted-foreground" />
                     Cover Board
                   </Label>
                   <Select
@@ -690,7 +690,7 @@ export default function TPOEstimator() {
                 {/* Membrane Thickness */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2 text-sm font-medium">
-                    <Package className="w-4 h-4 text-slate-500" />
+                    <Package className="w-4 h-4 text-muted-foreground" />
                     Membrane Thickness
                   </Label>
                   <Select
@@ -715,7 +715,7 @@ export default function TPOEstimator() {
                 {/* Attachment Method */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2 text-sm font-medium">
-                    <Wrench className="w-4 h-4 text-slate-500" />
+                    <Wrench className="w-4 h-4 text-muted-foreground" />
                     Attachment Method
                   </Label>
                   <Select
@@ -748,7 +748,7 @@ export default function TPOEstimator() {
                       className="overflow-hidden"
                     >
                       <div className="mt-4 pt-4 border-t border-dashed border-amber-300 space-y-4">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-orange flex items-center gap-1.5">
                           <Wrench className="w-3.5 h-3.5" />
                           Membrane Securement
                         </p>
@@ -778,7 +778,7 @@ export default function TPOEstimator() {
                           <Label className="text-xs text-muted-foreground">
                             Insulation Screw Length
                             {assembly.fastenerLength === "auto" && (
-                              <span className="ml-2 text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                              <span className="ml-2 text-[10px] font-medium text-orange bg-orange/10 px-1.5 py-0.5 rounded">
                                 → {getResolvedFastenerLength(assembly).replace("in", '"')}
                               </span>
                             )}
@@ -820,8 +820,8 @@ export default function TPOEstimator() {
                           </Select>
                         </div>
 
-                        <div className="border-t border-dashed border-slate-200 pt-3 mt-3">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-blue-700 mb-3">Membrane Fasteners</p>
+                        <div className="border-t border-dashed border-border pt-3 mt-3">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-cyan mb-3">Membrane Fasteners</p>
                         </div>
 
                         {/* Membrane Screw Length */}
@@ -829,7 +829,7 @@ export default function TPOEstimator() {
                           <Label className="text-xs text-muted-foreground">
                             Membrane Screw Length
                             {assembly.membraneFastenerLength === "auto" && (
-                              <span className="ml-2 text-[10px] font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                              <span className="ml-2 text-[10px] font-medium text-cyan bg-cyan/10 px-1.5 py-0.5 rounded">
                                 → {getResolvedMembraneFastenerLength(assembly).replace("in", '"')}
                               </span>
                             )}
@@ -878,10 +878,10 @@ export default function TPOEstimator() {
             </Card>
 
             {/* Measurements */}
-            <Card className="border-slate-200 shadow-sm">
+            <Card className="border-border shadow-sm">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Ruler className="w-5 h-5 text-blue-600" />
+                  <Ruler className="w-5 h-5 text-cyan" />
                   Measurements
                 </CardTitle>
                 <p className="text-sm text-muted-foreground">
@@ -910,8 +910,8 @@ export default function TPOEstimator() {
                 </div>
 
                 {/* Wall Dimensions */}
-                <div className="p-4 bg-slate-50 rounded-lg space-y-4">
-                  <p className="text-sm font-medium text-slate-700">
+                <div className="p-4 bg-muted/30 rounded-lg space-y-4">
+                  <p className="text-sm font-medium text-foreground">
                     Wall Perimeter & Height
                   </p>
                   <div className="grid grid-cols-2 gap-3">
@@ -961,7 +961,7 @@ export default function TPOEstimator() {
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-xs text-blue-600 font-medium"
+                      className="text-xs text-cyan font-medium"
                     >
                       = {wallSqFt.toLocaleString()} sq ft wall area
                     </motion.p>
@@ -1000,12 +1000,12 @@ export default function TPOEstimator() {
 
             {/* Price Editor */}
             <Collapsible open={priceEditorOpen} onOpenChange={setPriceEditorOpen}>
-              <Card className="border-slate-200 shadow-sm">
+              <Card className="border-border shadow-sm">
                 <CollapsibleTrigger asChild>
-                  <CardHeader className="pb-4 cursor-pointer hover:bg-slate-50 transition-colors">
+                  <CardHeader className="pb-4 cursor-pointer hover:bg-muted/30 transition-colors">
                     <CardTitle className="flex items-center justify-between text-lg">
                       <span className="flex items-center gap-2">
-                        <PencilLine className="w-5 h-5 text-blue-600" />
+                        <PencilLine className="w-5 h-5 text-cyan" />
                         Edit Pricing
                       </span>
                       <div className="flex items-center gap-2">
@@ -1047,7 +1047,7 @@ export default function TPOEstimator() {
                         return (
                           <div
                             key={id}
-                            className="flex items-center justify-between gap-3 py-2 border-b border-slate-100 last:border-0"
+                            className="flex items-center justify-between gap-3 py-2 border-b border-border last:border-0"
                           >
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate">
@@ -1107,51 +1107,51 @@ export default function TPOEstimator() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Card className="bg-gradient-to-br from-slate-800 via-slate-700 to-blue-900 text-white border-0 shadow-lg">
+                  <Card className="bg-gradient-to-br from-navy-deep via-navy-surface to-cyan/20 text-white border-0 shadow-lg">
                     <CardContent className="py-6">
-                      <p className="text-blue-300 text-xs font-semibold tracking-wider uppercase mb-1">
+                      <p className="text-cyan/70 text-xs font-semibold tracking-wider uppercase mb-1">
                         Total Project Estimate
                       </p>
                       <p className="text-4xl font-bold font-display tracking-tight">
                         {fmt(grandTotal)}
                       </p>
                       <div className="flex flex-wrap gap-x-6 gap-y-2 mt-3 text-sm">
-                        <span className="text-slate-300">
+                        <span className="text-slate-text">
                           <Package className="w-3.5 h-3.5 inline mr-1" />
                           Materials: {fmt(estimate.totalMaterialCost)}
                         </span>
                         {laborCost > 0 && (
-                          <span className="text-slate-300">
+                          <span className="text-slate-text">
                             <HardHat className="w-3.5 h-3.5 inline mr-1" />
                             Labor: {fmt(laborCost)}
                           </span>
                         )}
                         {equipmentCost > 0 && (
-                          <span className="text-slate-300">
+                          <span className="text-slate-text">
                             <Wrench className="w-3.5 h-3.5 inline mr-1" />
                             Equipment: {fmt(equipmentCost)}
                           </span>
                         )}
                         {penetrationCost > 0 && (
-                          <span className="text-blue-300">
+                          <span className="text-cyan/70">
                             Penetrations: {fmt(penetrationCost)}
                           </span>
                         )}
                       </div>
                       <div className="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-sm">
-                        <span className="text-slate-300">
+                        <span className="text-slate-text">
                           <DollarSign className="w-3.5 h-3.5 inline mr-1" />
                           {measurements.roofArea > 0
                             ? `${(grandTotal / measurements.roofArea).toFixed(2)} / sq ft`
                             : "—"}
                         </span>
-                        <span className="text-slate-300">
+                        <span className="text-slate-text">
                           <Layers className="w-3.5 h-3.5 inline mr-1" />
                           {measurements.roofArea.toLocaleString()} sq ft roof
                         </span>
                       </div>
                       {/* Assembly Summary */}
-                      <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-slate-300">
+                      <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-2 md:grid-cols-3 gap-2 text-xs text-slate-text">
                         <span>
                           Deck:{" "}
                           {DECK_TYPES.find((d) => d.value === assembly.deckType)
@@ -1237,27 +1237,27 @@ export default function TPOEstimator() {
                       key={category}
                       className={`shadow-sm overflow-hidden ${
                         isFastenersCategory
-                          ? "border-amber-200 ring-1 ring-amber-100"
-                          : "border-slate-200"
+                          ? "border-orange/30 ring-1 ring-amber-100"
+                          : "border-border"
                       }`}
                     >
                       <CardHeader
                         className={`py-3 ${
-                          isFastenersCategory ? "bg-amber-50" : "bg-slate-50"
+                          isFastenersCategory ? "bg-orange/10" : "bg-muted/30"
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <CardTitle
                             className={`text-sm font-semibold uppercase tracking-wider ${
                               isFastenersCategory
-                                ? "text-amber-800"
-                                : "text-slate-700"
+                                ? "text-orange"
+                                : "text-foreground"
                             }`}
                           >
                             {category}
                           </CardTitle>
                           {isFastenersCategory && (
-                            <span className="text-[10px] font-medium text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">
+                            <span className="text-[10px] font-medium text-orange bg-orange/20 px-2 py-0.5 rounded-full">
                               {assembly.attachmentMethod === "mechanically-attached"
                                 ? "Mechanically Attached"
                                 : "Fully Adhered"}
@@ -1267,7 +1267,7 @@ export default function TPOEstimator() {
                           )}
                         </div>
                         {isFastenersCategory && (
-                          <p className="text-[10px] text-amber-600/80 mt-1">
+                          <p className="text-[10px] text-orange/80 mt-1">
                             Zone layout: Field {(FIELD_ZONE_RATIO * 100).toFixed(0)}% · Perimeter {(PERIMETER_ZONE_RATIO * 100).toFixed(0)}% · Corner {(CORNER_ZONE_RATIO * 100).toFixed(0)}% — Screw length auto-selected for {getInsulationSummary(assembly.insulationLayers).totalThickness.toFixed(1)}" insulation assembly
                           </p>
                         )}
@@ -1276,7 +1276,7 @@ export default function TPOEstimator() {
                         <div className="overflow-x-auto">
                           <table className="w-full text-sm">
                             <thead>
-                              <tr className="border-b border-slate-100">
+                              <tr className="border-b border-border">
                                 <th className="text-left py-2 px-4 font-medium text-muted-foreground text-xs">
                                   Product
                                 </th>
@@ -1298,10 +1298,10 @@ export default function TPOEstimator() {
                               {items.map((item, i) => (
                                 <tr
                                   key={i}
-                                  className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors"
+                                  className="border-b border-slate-50 hover:bg-muted/30/50 transition-colors"
                                 >
                                   <td className="py-3 px-4">
-                                    <p className="font-medium text-slate-800">
+                                    <p className="font-medium text-foreground">
                                       {item.product.name}
                                     </p>
                                     <p className="text-xs text-muted-foreground mt-0.5">
@@ -1317,7 +1317,7 @@ export default function TPOEstimator() {
                                   <td className="py-3 px-4 text-right tabular-nums">
                                     {fmt(item.unitPrice)}
                                   </td>
-                                  <td className="py-3 px-4 text-right font-semibold tabular-nums text-slate-800">
+                                  <td className="py-3 px-4 text-right font-semibold tabular-nums text-foreground">
                                     {fmt(item.totalCost)}
                                   </td>
                                 </tr>
@@ -1331,42 +1331,42 @@ export default function TPOEstimator() {
                 })}
 
                 {/* Grand Total Footer */}
-                <Card className="border-blue-200 bg-blue-50/50">
+                <Card className="border-cyan/30 bg-cyan/10/50">
                   <CardContent className="py-4">
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm text-slate-600">
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <span>Roofing Materials</span>
                         <span className="tabular-nums">{fmt(estimate.totalMaterialCost)}</span>
                       </div>
                       {penetrationCost > 0 && (
-                        <div className="flex items-center justify-between text-sm text-slate-600">
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
                           <span>Penetrations & Additions</span>
                           <span className="tabular-nums">{fmt(penetrationCost)}</span>
                         </div>
                       )}
                       {laborCost > 0 && (
-                        <div className="flex items-center justify-between text-sm text-slate-600">
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
                           <span>Labor</span>
                           <span className="tabular-nums">{fmt(laborCost)}</span>
                         </div>
                       )}
                       {equipmentCost > 0 && (
-                        <div className="flex items-center justify-between text-sm text-slate-600">
+                        <div className="flex items-center justify-between text-sm text-muted-foreground">
                           <span>Equipment</span>
                           <span className="tabular-nums">{fmt(equipmentCost)}</span>
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-blue-200">
-                      <span className="text-lg font-semibold text-slate-700">
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-cyan/30">
+                      <span className="text-lg font-semibold text-foreground">
                         Grand Total
                       </span>
-                      <span className="text-2xl font-bold text-slate-900 tabular-nums">
+                      <span className="text-2xl font-bold text-foreground tabular-nums">
                         {fmt(grandTotal)}
                       </span>
                     </div>
                     {measurements.roofArea > 0 && (
-                      <p className="text-sm text-blue-600 mt-1">
+                      <p className="text-sm text-cyan mt-1">
                         {(
                           grandTotal / measurements.roofArea
                         ).toFixed(2)}{" "}
@@ -1391,7 +1391,7 @@ export default function TPOEstimator() {
                 <Button
                   size="lg"
                   onClick={handleViewBreakdown}
-                  className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+                  className="bg-cyan hover:bg-cyan-soft text-white gap-2"
                 >
                   <FileSpreadsheet className="w-5 h-5" />
                   View Full Breakdown
@@ -1399,10 +1399,10 @@ export default function TPOEstimator() {
               </div>
               </>
             ) : (
-              <Card className="border-dashed border-2 border-slate-200">
+              <Card className="border-dashed border-2 border-border">
                 <CardContent className="py-16 text-center">
-                  <Ruler className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-500 mb-2">
+                  <Ruler className="w-12 h-12 text-slate-text mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-muted-foreground mb-2">
                     Configure & Measure
                   </h3>
                   <p className="text-sm text-muted-foreground max-w-md mx-auto">
@@ -1434,7 +1434,7 @@ export default function TPOEstimator() {
       />
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 mt-12 py-6 bg-slate-50">
+      <footer className="border-t border-border mt-12 py-6 bg-muted/30">
         <div className="container">
           <p className="text-xs text-muted-foreground text-center">
             Carlisle Sure-Weld TPO Estimator — Pricing based on industry
