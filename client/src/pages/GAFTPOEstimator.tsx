@@ -52,9 +52,6 @@ import {
   FIELD_ZONE_RATIO,
   PERIMETER_ZONE_RATIO,
   CORNER_ZONE_RATIO,
-  INSULATION_SCREW_TYPES,
-  INSULATION_SCREW_LENGTHS,
-  MEMBRANE_SCREW_LENGTHS,
   INSULATION_PLATE_TYPES,
   MEMBRANE_PLATE_TYPES,
   getResolvedFastenerLength,
@@ -63,6 +60,9 @@ import {
 import {
   GAF_VAPOR_BARRIERS,
   GAF_COVER_BOARDS,
+  GAF_INSULATION_SCREW_TYPES,
+  GAF_INSULATION_SCREW_LENGTHS,
+  GAF_MEMBRANE_SCREW_LENGTHS,
   GAF_MEMBRANE_THICKNESSES,
   GAF_ATTACHMENT_METHODS,
   GAF_TPO_PRODUCTS,
@@ -88,7 +88,7 @@ export default function GAFTPOEstimator() {
     coverBoard: "densdeck-prime-half",
     membraneThickness: "60mil",
     attachmentMethod: "fully-adhered",
-    fastenerType: "sfs-dekfast",
+    fastenerType: "gaf-drilltec-14",
     fastenerLength: "auto",
     membraneFastenerLength: "auto",
     plateType: "3in-round",
@@ -573,7 +573,7 @@ export default function GAFTPOEstimator() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {INSULATION_SCREW_TYPES.map((st) => (
+                              {GAF_INSULATION_SCREW_TYPES.map((st) => (
                                 <SelectItem key={st.value} value={st.value}>
                                   {st.label}
                                 </SelectItem>
@@ -600,7 +600,7 @@ export default function GAFTPOEstimator() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {INSULATION_SCREW_LENGTHS.map((sl) => (
+                              {GAF_INSULATION_SCREW_LENGTHS.map((sl) => (
                                 <SelectItem key={sl.value} value={sl.value}>
                                   {sl.label}
                                 </SelectItem>
@@ -651,7 +651,7 @@ export default function GAFTPOEstimator() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {MEMBRANE_SCREW_LENGTHS.map((sl) => (
+                              {GAF_MEMBRANE_SCREW_LENGTHS.map((sl) => (
                                 <SelectItem key={sl.value} value={sl.value}>
                                   {sl.label}
                                 </SelectItem>
