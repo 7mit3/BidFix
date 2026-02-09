@@ -6,7 +6,7 @@
  * Integrates into any estimator via props.
  */
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   PENETRATION_TYPES,
   PENETRATION_CATEGORIES,
@@ -90,7 +90,7 @@ export default function RoofAdditions({
   }, [activeItems]);
 
   // Notify parent when estimate changes
-  useMemo(() => {
+  useEffect(() => {
     onEstimateChange?.(estimate);
   }, [estimate, onEstimateChange]);
 
