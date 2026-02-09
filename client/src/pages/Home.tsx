@@ -8,7 +8,7 @@
  * - Progressive disclosure: Input → Summary → Detail
  */
 
-import { useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { useLocation, useSearch } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useEstimator } from "@/hooks/useEstimator";
@@ -20,7 +20,7 @@ import { PricingEditor } from "@/components/PricingEditor";
 import { LaborEquipmentSection } from "@/components/LaborEquipmentSection";
 import { SystemInfo } from "@/components/SystemInfo";
 import { Footer } from "@/components/Footer";
-import RoofAdditions from "@/components/RoofAdditions";
+import RoofAdditions, { type RoofAdditionsHandle } from "@/components/RoofAdditions";
 import { type PenetrationEstimate } from "@/lib/penetrations-data";
 import { SaveEstimateDialog } from "@/components/SaveEstimateDialog";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,10 @@ export default function Home() {
   const estimator = useEstimator();
   const [penetrationEstimate, setPenetrationEstimate] = useState<PenetrationEstimate | null>(null);
   const penetrationCost = penetrationEstimate?.totalMaterialCost ?? 0;
+  const roofAdditionsRef = useRef<RoofAdditionsHandle>(null);
+  const [roofAdditionsInitialState, setRoofAdditionsInitialState] = useState<
+    { lineItems: Record<string, number>; sheetMetal: import("@/lib/sheet-metal-flashing-data").SheetMetalFlashingState } | undefined
+  >(undefined);
 
   // Save dialog state
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
@@ -85,6 +89,16 @@ export default function Home() {
       });
     }
 
+    // Restore penetrations & sheet metal flashing
+    if (state.penetrationsState) {
+      if (roofAdditionsRef.current) {
+        roofAdditionsRef.current.setState(state.penetrationsState);
+      } else {
+        // Component not mounted yet — set initial state for first render
+        setRoofAdditionsInitialState(state.penetrationsState);
+      }
+    }
+
     setLoadedEstimateId(savedEstimate.id);
     setLoadedEstimateName(savedEstimate.name);
     toast.success(`Loaded estimate: "${savedEstimate.name}"`);
@@ -112,6 +126,7 @@ export default function Home() {
       horizontalSeamsLF: estimator.horizontalSeamsLF,
       customPrices: estimator.customPrices,
       laborEquipment: estimator.laborEquipment,
+      penetrationsState: roofAdditionsRef.current?.getState(),
     });
   }, [
     estimator.squareFootage,
@@ -119,6 +134,7 @@ export default function Home() {
     estimator.horizontalSeamsLF,
     estimator.customPrices,
     estimator.laborEquipment,
+    penetrationEstimate,
   ]);
 
   return (
@@ -174,8 +190,10 @@ export default function Home() {
               resetPrices={estimator.resetPrices}
             />
             <RoofAdditions
+              ref={roofAdditionsRef}
               onEstimateChange={setPenetrationEstimate}
               accentColor="red"
+              initialState={roofAdditionsInitialState}
             />
           </div>
 

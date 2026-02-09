@@ -8,7 +8,7 @@
  * Integrates into any estimator via props.
  */
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useImperativeHandle, forwardRef } from "react";
 import {
   PENETRATION_TYPES,
   PENETRATION_CATEGORIES,
@@ -65,24 +65,47 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   ArrowUp,
 };
 
+/** Saved state shape for penetrations + sheet metal (used by save/load) */
+export interface RoofAdditionsSavedState {
+  lineItems: Record<string, number>;
+  sheetMetal: SheetMetalFlashingState;
+}
+
+/** Imperative handle exposed via ref */
+export interface RoofAdditionsHandle {
+  getState: () => RoofAdditionsSavedState;
+  setState: (state: RoofAdditionsSavedState) => void;
+}
+
 interface RoofAdditionsProps {
   onEstimateChange?: (estimate: PenetrationEstimate) => void;
   accentColor?: string; // tailwind color class e.g. "blue" "red"
+  /** Initial state for restoring from a saved estimate */
+  initialState?: RoofAdditionsSavedState;
 }
 
-export default function RoofAdditions({
-  onEstimateChange,
-  accentColor = "blue",
-}: RoofAdditionsProps) {
+const RoofAdditions = forwardRef<RoofAdditionsHandle, RoofAdditionsProps>(
+  function RoofAdditions({ onEstimateChange, accentColor = "blue", initialState }, ref) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const [lineItems, setLineItems] = useState<Record<string, number>>({});
+  const [lineItems, setLineItems] = useState<Record<string, number>>(
+    initialState?.lineItems ?? {}
+  );
   const [showMaterials, setShowMaterials] = useState(false);
 
   // Sheet Metal Flashing state
   const [sheetMetalState, setSheetMetalState] = useState<SheetMetalFlashingState>(
-    getDefaultSheetMetalState()
+    initialState?.sheetMetal ?? getDefaultSheetMetalState()
   );
   const [sheetMetalExpanded, setSheetMetalExpanded] = useState(true);
+
+  // Expose imperative handle for save/load
+  useImperativeHandle(ref, () => ({
+    getState: () => ({ lineItems, sheetMetal: sheetMetalState }),
+    setState: (state: RoofAdditionsSavedState) => {
+      setLineItems(state.lineItems);
+      setSheetMetalState(state.sheetMetal);
+    },
+  }), [lineItems, sheetMetalState]);
 
   const grouped = useMemo(() => getPenetrationsByCategory(), []);
 
@@ -740,4 +763,6 @@ export default function RoofAdditions({
       )}
     </div>
   );
-}
+});
+
+export default RoofAdditions;

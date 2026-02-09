@@ -46,7 +46,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
-import RoofAdditions from "@/components/RoofAdditions";
+import RoofAdditions, { type RoofAdditionsHandle } from "@/components/RoofAdditions";
 import { type PenetrationEstimate } from "@/lib/penetrations-data";
 import { usePricingDB } from "@/hooks/usePricingDB";
 import { TPOLaborEquipmentSection } from "@/components/TPOLaborEquipmentSection";
@@ -216,6 +216,10 @@ export default function GAFTPOEstimator() {
   // Penetrations state
   const [penetrationEstimate, setPenetrationEstimate] = useState<PenetrationEstimate | null>(null);
   const penetrationCost = penetrationEstimate?.totalMaterialCost ?? 0;
+  const roofAdditionsRef = useRef<RoofAdditionsHandle>(null);
+  const [roofAdditionsInitialState, setRoofAdditionsInitialState] = useState<
+    { lineItems: Record<string, number>; sheetMetal: import("@/lib/sheet-metal-flashing-data").SheetMetalFlashingState } | undefined
+  >(undefined);
 
   // Labor & equipment totals
   const laborEquipmentTotals: TPOLaborEquipmentTotals | null = useMemo(() => {
@@ -356,6 +360,22 @@ export default function GAFTPOEstimator() {
     if (state.laborEquipment) {
       setLaborEquipment(state.laborEquipment);
     }
+    // Restore penetrations & sheet metal flashing
+    if (state.penetrationsState) {
+      if (roofAdditionsRef.current) {
+        roofAdditionsRef.current.setState(state.penetrationsState);
+      } else {
+        setRoofAdditionsInitialState(state.penetrationsState);
+      }
+    }
+    // Restore wall measurements (v2)
+    if (state.measurements.wallLinearFt) {
+      setMeasurements((prev) => ({
+        ...prev,
+        wallLinearFt: parseFloat(state.measurements.wallLinearFt!) || 0,
+        wallHeight: parseFloat(state.measurements.wallHeight ?? "0") || 0,
+      }));
+    }
     setLoadedEstimateId(savedEstimate.id);
     setLoadedEstimateName(savedEstimate.name);
     toast.success(`Loaded estimate: "${savedEstimate.name}"`);
@@ -368,11 +388,14 @@ export default function GAFTPOEstimator() {
       measurements: {
         totalRoofArea: String(measurements.roofArea),
         baseFlashing: String(measurements.baseFlashingLF),
+        wallLinearFt: String(measurements.wallLinearFt),
+        wallHeight: String(measurements.wallHeight),
       },
       customPrices,
       laborEquipment,
+      penetrationsState: roofAdditionsRef.current?.getState(),
     });
-  }, [measurements, customPrices, laborEquipment]);
+  }, [measurements, customPrices, laborEquipment, penetrationEstimate]);
 
   const handleViewBreakdown = useCallback(() => {
     const breakdownData = serializeTPOBreakdown(
@@ -1110,8 +1133,10 @@ export default function GAFTPOEstimator() {
             {/* Roof Penetrations & Additions */}
             <div data-print-hide>
               <RoofAdditions
+                ref={roofAdditionsRef}
                 onEstimateChange={setPenetrationEstimate}
                 accentColor="red"
+                initialState={roofAdditionsInitialState}
               />
             </div>
             {/* Total Cost Header */}

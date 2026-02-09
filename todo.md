@@ -131,3 +131,11 @@
 ## Transparent Logo Background
 - [x] Remove black background from BidFix AI logo, make transparent
 - [x] Upload and update all references in the app (Footer, Catalog hero, Catalog footer)
+
+## Fix Save Functionality (Bug)
+- [x] Investigate what data is being lost — penetrations, sheet metal flashing, wall measurements not captured
+- [x] Fix serialization to capture all data (penetrations, sheet metal flashing via RoofAdditions ref)
+- [x] Fix deserialization to restore all data (initialState prop + forwardRef on RoofAdditions)
+- [x] Wire save/load in all 3 estimators (Karnak, Carlisle TPO, GAF TPO)
+- [x] Write roundtrip tests for save/load — 14 new tests, 111 total passing
+- [x] Test in browser — app running, no errors

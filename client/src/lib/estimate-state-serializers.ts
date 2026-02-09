@@ -3,10 +3,22 @@
  *
  * Functions to serialize/deserialize the full estimator state for save/load.
  * Each estimator has its own shape, so we store a discriminated union keyed by `system`.
+ *
+ * Includes: measurements, custom prices, labor/equipment, penetrations, and sheet metal flashing.
  */
 
 import type { LaborEquipmentState } from "@/lib/labor-equipment-data";
 import type { TPOLaborEquipmentState } from "@/lib/tpo-labor-equipment-data";
+import type { SheetMetalFlashingState } from "@/lib/sheet-metal-flashing-data";
+
+// ─── Shared Penetration/Additions State ─────────────────────────────────────
+
+export interface SavedPenetrationsState {
+  /** penetrationId -> quantity */
+  lineItems: Record<string, number>;
+  /** Sheet metal flashing state */
+  sheetMetal: SheetMetalFlashingState;
+}
 
 // ─── Karnak ──────────────────────────────────────────────────────────────────
 
@@ -17,6 +29,8 @@ export interface KarnakSaveState {
   horizontalSeamsLF: string;
   customPrices: Record<string, number>;
   laborEquipment: LaborEquipmentState;
+  /** Penetrations & sheet metal flashing (added v2) */
+  penetrationsState?: SavedPenetrationsState;
 }
 
 export function serializeKarnakState(state: {
@@ -25,6 +39,7 @@ export function serializeKarnakState(state: {
   horizontalSeamsLF: string;
   customPrices: Record<string, number>;
   laborEquipment: LaborEquipmentState;
+  penetrationsState?: SavedPenetrationsState;
 }): string {
   const payload: KarnakSaveState = {
     system: "karnak-metal-kynar",
@@ -43,30 +58,40 @@ export function deserializeKarnakState(json: string): KarnakSaveState | null {
   }
 }
 
-// ─── Carlisle TPO ────────────────────────────────────────────────────────────
+// ─── Carlisle TPO / GAF TPO ────────────────────────────────────────────────
 
 export interface TPOSaveState {
   system: "carlisle-tpo" | "gaf-tpo";
   measurements: {
     totalRoofArea: string;
     baseFlashing: string;
+    /** Wall linear ft (added v2) */
+    wallLinearFt?: string;
+    /** Wall height (added v2) */
+    wallHeight?: string;
   };
   customPrices: Record<string, number>;
   laborEquipment: TPOLaborEquipmentState;
-  /** Penetration config if any */
+  /** Penetrations & sheet metal flashing (added v2) */
+  penetrationsState?: SavedPenetrationsState;
+  /** @deprecated — old format, kept for backward compat */
   penetrations?: Record<string, { count: number; avgSize: string }>;
-  /** Roof additions if any */
+  /** @deprecated — old format */
   roofAdditions?: Record<string, boolean | number | string>;
 }
 
 export function serializeTPOState(
   system: "carlisle-tpo" | "gaf-tpo",
   state: {
-    measurements: { totalRoofArea: string; baseFlashing: string };
+    measurements: {
+      totalRoofArea: string;
+      baseFlashing: string;
+      wallLinearFt?: string;
+      wallHeight?: string;
+    };
     customPrices: Record<string, number>;
     laborEquipment: TPOLaborEquipmentState;
-    penetrations?: Record<string, { count: number; avgSize: string }>;
-    roofAdditions?: Record<string, boolean | number | string>;
+    penetrationsState?: SavedPenetrationsState;
   },
 ): string {
   const payload: TPOSaveState = {
