@@ -375,6 +375,10 @@ export default function TPOEstimator() {
         wallHeight: parseFloat(state.measurements.wallHeight ?? "0") || 0,
       }));
     }
+    // Restore roof assembly configuration (v3)
+    if (state.assemblyConfig) {
+      setAssembly(state.assemblyConfig);
+    }
     setLoadedEstimateId(savedEstimate.id);
     setLoadedEstimateName(savedEstimate.name);
     toast.success(`Loaded estimate: "${savedEstimate.name}"`);
@@ -392,9 +396,10 @@ export default function TPOEstimator() {
       },
       customPrices,
       laborEquipment,
+      assemblyConfig: assembly,
       penetrationsState: roofAdditionsRef.current?.getState(),
     });
-  }, [measurements, customPrices, laborEquipment, penetrationEstimate]);
+  }, [measurements, customPrices, laborEquipment, assembly, penetrationEstimate]);
 
   const handleViewBreakdown = useCallback(() => {
     const breakdownData = serializeTPOBreakdown(

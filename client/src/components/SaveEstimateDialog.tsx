@@ -4,7 +4,7 @@
  * Shows a name input, optional notes, and a save button.
  * If an existing estimate ID is provided, offers "Save As New" or "Overwrite".
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +37,7 @@ interface SaveEstimateDialogProps {
   /** If editing an existing saved estimate, pass its ID and name */
   existingId?: number | null;
   existingName?: string;
+  existingNotes?: string;
   /** Called after a successful save with the new/updated estimate ID */
   onSaved?: (id: number, name: string) => void;
 }
@@ -51,12 +52,21 @@ export function SaveEstimateDialog({
   roofArea,
   existingId,
   existingName,
+  existingNotes,
   onSaved,
 }: SaveEstimateDialogProps) {
-  const [name, setName] = useState(existingName || "");
+  const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
   const [saved, setSaved] = useState(false);
 
+  // Sync name and notes from props whenever the dialog opens or the loaded estimate changes
+  useEffect(() => {
+    if (open) {
+      setName(existingName || "");
+      setNotes(existingNotes || "");
+      setSaved(false);
+    }
+  }, [open, existingName, existingNotes]);
 
   const saveMutation = trpc.estimates.save.useMutation();
   const updateMutation = trpc.estimates.update.useMutation();

@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, name, data LIKE '%penetrationsState%' as has_pens, data LIKE '%sheetMetal%' as has_sm, LENGTH(data) as data_len, RIGHT(data, 100) as data_end FROM saved_estimates WHERE id = 60001;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2M93N6eA4z8JVUn.02c0fb067b9a --database Q9FjtgmyfZcDZpNJvvZPkD --execute SELECT id, name, data LIKE '%penetrationsState%' as has_pens, data LIKE '%sheetMetal%' as has_sm, LENGTH(data) as data_len, RIGHT(data, 100) as data_end FROM saved_estimates WHERE id = 60001;",
+  "rows": [
+    {
+      "id": "60001",
+      "name": "115610 Preston Forest Village - Bldg 2 Area E",
+      "has_pens": "1",
+      "has_sm": "1",
+      "data_len": "5258",
+      "data_end": "e\":{\"lineItems\":{},\"sheetMetal\":{\"metalTypeId\":\"galvanized-steel\",\"gaugeId\":\"24ga\",\"lineItems\":{}}}}"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\thas_pens\thas_sm\tdata_len\tdata_end\n60001\t115610 Preston Forest Village - Bldg 2 Area E\t1\t1\t5258\te\":{\"lineItems\":{},\"sheetMetal\":{\"metalTypeId\":\"galvanized-steel\",\"gaugeId\":\"24ga\",\"lineItems\":{}}}}\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

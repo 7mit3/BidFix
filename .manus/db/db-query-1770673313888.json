@@ -1,0 +1,19 @@
+{
+  "query": "SELECT id, name, system, SUBSTRING(data, 1, 200) as data_preview, grandTotal, roofArea, updatedAt FROM saved_estimates ORDER BY updatedAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2M93N6eA4z8JVUn.02c0fb067b9a --database Q9FjtgmyfZcDZpNJvvZPkD --execute SELECT id, name, system, SUBSTRING(data, 1, 200) as data_preview, grandTotal, roofArea, updatedAt FROM saved_estimates ORDER BY updatedAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "60001",
+      "name": "115610 Preston Forest Village - Bldg 2 Area E",
+      "system": "gaf-tpo",
+      "data_preview": "{\"system\":\"gaf-tpo\",\"measurements\":{\"totalRoofArea\":\"20300\",\"baseFlashing\":\"1000\",\"wallLinearFt\":\"400\",\"wallHeight\":\"4\"},\"customPrices\":{\"acc-coverstrip\":379,\"acc-pipe-boot\":38,\"acc-corners\":14,\"acc-c",
+      "grandTotal": "207968.00",
+      "roofArea": "20300.00",
+      "updatedAt": "2026-02-09 21:30:41"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tsystem\tdata_preview\tgrandTotal\troofArea\tupdatedAt\n60001\t115610 Preston Forest Village - Bldg 2 Area E\tgaf-tpo\t{\"system\":\"gaf-tpo\",\"measurements\":{\"totalRoofArea\":\"20300\",\"baseFlashing\":\"1000\",\"wallLinearFt\":\"400\",\"wallHeight\":\"4\"},\"customPrices\":{\"acc-coverstrip\":379,\"acc-pipe-boot\":38,\"acc-corners\":14,\"acc-c\t207968.00\t20300.00\t2026-02-09 21:30:41\n",
+  "stderr": "",
+  "execution_time_ms": 481
+}

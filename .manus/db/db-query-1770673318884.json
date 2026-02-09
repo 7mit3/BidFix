@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, name, system, LENGTH(data) as data_length, LEFT(data, 500) as data_start FROM saved_estimates ORDER BY updatedAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2M93N6eA4z8JVUn.02c0fb067b9a --database Q9FjtgmyfZcDZpNJvvZPkD --execute SELECT id, name, system, LENGTH(data) as data_length, LEFT(data, 500) as data_start FROM saved_estimates ORDER BY updatedAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "60001",
+      "name": "115610 Preston Forest Village - Bldg 2 Area E",
+      "system": "gaf-tpo",
+      "data_length": "5258",
+      "data_start": "{\"system\":\"gaf-tpo\",\"measurements\":{\"totalRoofArea\":\"20300\",\"baseFlashing\":\"1000\",\"wallLinearFt\":\"400\",\"wallHeight\":\"4\"},\"customPrices\":{\"acc-coverstrip\":379,\"acc-pipe-boot\":38,\"acc-corners\":14,\"acc-caulk\":13,\"acc-termbar\":15,\"adhesive-bonding\":179,\"adhesive-primer\":65,\"adhesive-insulation\":1140,\"cover-densdeck-half\":40,\"cover-densdeck-quarter\":28,\"cover-perlite\":22,\"cover-securock\":36,\"fastener-plates-barbed\":198,\"fastener-plates-perimeter\":165,\"fastener-plates-3in\":232,\"fastener-screws-1.625in"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tsystem\tdata_length\tdata_start\n60001\t115610 Preston Forest Village - Bldg 2 Area E\tgaf-tpo\t5258\t{\"system\":\"gaf-tpo\",\"measurements\":{\"totalRoofArea\":\"20300\",\"baseFlashing\":\"1000\",\"wallLinearFt\":\"400\",\"wallHeight\":\"4\"},\"customPrices\":{\"acc-coverstrip\":379,\"acc-pipe-boot\":38,\"acc-corners\":14,\"acc-caulk\":13,\"acc-termbar\":15,\"adhesive-bonding\":179,\"adhesive-primer\":65,\"adhesive-insulation\":1140,\"cover-densdeck-half\":40,\"cover-densdeck-quarter\":28,\"cover-perlite\":22,\"cover-securock\":36,\"fastener-plates-barbed\":198,\"fastener-plates-perimeter\":165,\"fastener-plates-3in\":232,\"fastener-screws-1.625in\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

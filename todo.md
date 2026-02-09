@@ -139,3 +139,22 @@
 - [x] Wire save/load in all 3 estimators (Karnak, Carlisle TPO, GAF TPO)
 - [x] Write roundtrip tests for save/load — 14 new tests, 111 total passing
 - [x] Test in browser — app running, no errors
+
+## Fix Save/Overwrite Bugs (Bug Report)
+- [x] Bug 1: Project name pre-fills correctly (was already working — useEffect syncs existingName on open)
+- [x] Bug 2: Root cause was missing assembly config in serialization (see below)
+- [x] Investigated SaveEstimateDialog — props and loadedEstimate flow is correct
+- [x] Investigated getEstimateData — closure captures latest state correctly
+- [x] Tested fix in browser — full save/load cycle verified
+
+## Fix Assembly Config Not Saved (Root Cause of Bug 2)
+- [x] Add assembly config to TPOSaveState interface in estimate-state-serializers.ts
+- [x] Update serializeTPOState to include assembly config
+- [x] Update deserializeTPOState to return assembly config
+- [x] Update GAF TPO getEstimateData to pass assembly config
+- [x] Update GAF TPO load effect to restore assembly config
+- [x] Update Carlisle TPO getEstimateData to pass assembly config
+- [x] Update Carlisle TPO load effect to restore assembly config
+- [x] Remove debug console.log statements from getEstimateData
+- [x] Update vitest tests for assembly config roundtrip (4 new tests, 115 total passing)
+- [x] Test in browser — full save/load cycle with assembly changes verified

@@ -4,12 +4,14 @@
  * Functions to serialize/deserialize the full estimator state for save/load.
  * Each estimator has its own shape, so we store a discriminated union keyed by `system`.
  *
- * Includes: measurements, custom prices, labor/equipment, penetrations, and sheet metal flashing.
+ * Includes: measurements, custom prices, labor/equipment, penetrations, sheet metal flashing,
+ * and roof assembly configuration (deck, insulation, cover board, membrane, attachment method).
  */
 
 import type { LaborEquipmentState } from "@/lib/labor-equipment-data";
 import type { TPOLaborEquipmentState } from "@/lib/tpo-labor-equipment-data";
 import type { SheetMetalFlashingState } from "@/lib/sheet-metal-flashing-data";
+import type { AssemblyConfig } from "@/lib/tpo-data";
 
 // ─── Shared Penetration/Additions State ─────────────────────────────────────
 
@@ -72,6 +74,8 @@ export interface TPOSaveState {
   };
   customPrices: Record<string, number>;
   laborEquipment: TPOLaborEquipmentState;
+  /** Roof assembly configuration (added v3) */
+  assemblyConfig?: AssemblyConfig;
   /** Penetrations & sheet metal flashing (added v2) */
   penetrationsState?: SavedPenetrationsState;
   /** @deprecated — old format, kept for backward compat */
@@ -91,6 +95,7 @@ export function serializeTPOState(
     };
     customPrices: Record<string, number>;
     laborEquipment: TPOLaborEquipmentState;
+    assemblyConfig?: AssemblyConfig;
     penetrationsState?: SavedPenetrationsState;
   },
 ): string {

@@ -12,6 +12,7 @@ import {
   type SavedPenetrationsState,
 } from "./estimate-state-serializers";
 import { getDefaultSheetMetalState } from "./sheet-metal-flashing-data";
+import type { AssemblyConfig } from "./tpo-data";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -197,6 +198,126 @@ describe("TPO state serialization", () => {
   it("should return null for wrong system type", () => {
     const json = JSON.stringify({ system: "karnak-metal-kynar" });
     expect(deserializeTPOState(json)).toBeNull();
+  });
+});
+
+// ─── Assembly Config Roundtrip ─────────────────────────────────────────────
+
+const sampleAssemblyConfig: AssemblyConfig = {
+  deckType: "steel-22ga",
+  vaporBarrier: "carlisle-vb",
+  insulationEnabled: true,
+  insulationLayers: [
+    { thickness: "3.0", enabled: true },
+    { thickness: "1.5", enabled: true },
+    { thickness: "none", enabled: false },
+    { thickness: "none", enabled: false },
+  ],
+  coverBoard: "densdeck-prime-half",
+  membraneThickness: "80mil",
+  attachmentMethod: "mechanically-attached",
+  fastenerType: "sfs-dekfast",
+  fastenerLength: "5in",
+  membraneFastenerLength: "3in",
+  plateType: "3in-round",
+  membranePlateType: "barbed",
+};
+
+describe("TPO assembly config serialization", () => {
+  it("should roundtrip assembly config for Carlisle TPO", () => {
+    const json = serializeTPOState("carlisle-tpo", {
+      measurements: { totalRoofArea: "20000", baseFlashing: "800" },
+      customPrices: {},
+      laborEquipment: { laborItems: [], equipmentItems: [] },
+      assemblyConfig: sampleAssemblyConfig,
+    });
+
+    const restored = deserializeTPOState(json);
+    expect(restored).not.toBeNull();
+    expect(restored!.assemblyConfig).toBeDefined();
+    expect(restored!.assemblyConfig!.deckType).toBe("steel-22ga");
+    expect(restored!.assemblyConfig!.vaporBarrier).toBe("carlisle-vb");
+    expect(restored!.assemblyConfig!.insulationEnabled).toBe(true);
+    expect(restored!.assemblyConfig!.insulationLayers[0].thickness).toBe("3.0");
+    expect(restored!.assemblyConfig!.insulationLayers[0].enabled).toBe(true);
+    expect(restored!.assemblyConfig!.insulationLayers[1].thickness).toBe("1.5");
+    expect(restored!.assemblyConfig!.insulationLayers[1].enabled).toBe(true);
+    expect(restored!.assemblyConfig!.insulationLayers[2].enabled).toBe(false);
+    expect(restored!.assemblyConfig!.coverBoard).toBe("densdeck-prime-half");
+    expect(restored!.assemblyConfig!.membraneThickness).toBe("80mil");
+    expect(restored!.assemblyConfig!.attachmentMethod).toBe("mechanically-attached");
+    expect(restored!.assemblyConfig!.fastenerType).toBe("sfs-dekfast");
+    expect(restored!.assemblyConfig!.fastenerLength).toBe("5in");
+    expect(restored!.assemblyConfig!.membraneFastenerLength).toBe("3in");
+    expect(restored!.assemblyConfig!.plateType).toBe("3in-round");
+    expect(restored!.assemblyConfig!.membranePlateType).toBe("barbed");
+  });
+
+  it("should roundtrip assembly config for GAF TPO", () => {
+    const gafAssembly: AssemblyConfig = {
+      ...sampleAssemblyConfig,
+      attachmentMethod: "fully-adhered",
+      fastenerType: "gaf-drilltec-14",
+      fastenerLength: "auto",
+      membraneFastenerLength: "auto",
+    };
+    const json = serializeTPOState("gaf-tpo", {
+      measurements: { totalRoofArea: "15000", baseFlashing: "600" },
+      customPrices: { "gaf-membrane": 800 },
+      laborEquipment: { laborItems: [], equipmentItems: [] },
+      assemblyConfig: gafAssembly,
+    });
+
+    const restored = deserializeTPOState(json);
+    expect(restored).not.toBeNull();
+    expect(restored!.system).toBe("gaf-tpo");
+    expect(restored!.assemblyConfig).toBeDefined();
+    expect(restored!.assemblyConfig!.attachmentMethod).toBe("fully-adhered");
+    expect(restored!.assemblyConfig!.fastenerType).toBe("gaf-drilltec-14");
+    expect(restored!.assemblyConfig!.fastenerLength).toBe("auto");
+  });
+
+  it("should handle missing assemblyConfig gracefully (backward compat v2 data)", () => {
+    const json = serializeTPOState("carlisle-tpo", {
+      measurements: { totalRoofArea: "10000", baseFlashing: "500" },
+      customPrices: {},
+      laborEquipment: { laborItems: [], equipmentItems: [] },
+    });
+
+    const restored = deserializeTPOState(json);
+    expect(restored).not.toBeNull();
+    expect(restored!.assemblyConfig).toBeUndefined();
+  });
+
+  it("should roundtrip assembly config together with penetrations and all other data", () => {
+    const json = serializeTPOState("gaf-tpo", {
+      measurements: {
+        totalRoofArea: "30000",
+        baseFlashing: "1000",
+        wallLinearFt: "400",
+        wallHeight: "4",
+      },
+      customPrices: { "tpo-membrane": 850 },
+      laborEquipment: { laborItems: [], equipmentItems: [] },
+      assemblyConfig: sampleAssemblyConfig,
+      penetrationsState: samplePenetrationsState,
+    });
+
+    const restored = deserializeTPOState(json);
+    expect(restored).not.toBeNull();
+    // Assembly
+    expect(restored!.assemblyConfig).toBeDefined();
+    expect(restored!.assemblyConfig!.deckType).toBe("steel-22ga");
+    expect(restored!.assemblyConfig!.insulationLayers).toHaveLength(4);
+    // Penetrations
+    expect(restored!.penetrationsState).toBeDefined();
+    expect(restored!.penetrationsState!.lineItems["pipe-flashing-small"]).toBe(12);
+    expect(restored!.penetrationsState!.sheetMetal.lineItems).toHaveLength(2);
+    // Measurements
+    expect(restored!.measurements.wallLinearFt).toBe("400");
+    expect(restored!.measurements.wallHeight).toBe("4");
+    // Prices
+    expect(restored!.customPrices["tpo-membrane"]).toBe(850);
   });
 });
 
