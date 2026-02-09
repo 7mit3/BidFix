@@ -32,7 +32,16 @@ export {
   CORNER_ZONE_RATIO,
 } from "./tpo-data";
 
-import { getInsulationSummary, FIELD_ZONE_RATIO, PERIMETER_ZONE_RATIO, CORNER_ZONE_RATIO } from "./tpo-data";
+import {
+  getInsulationSummary,
+  FIELD_ZONE_RATIO,
+  PERIMETER_ZONE_RATIO,
+  CORNER_ZONE_RATIO,
+  INSULATION_SCREW_TYPES,
+  MEMBRANE_PLATE_TYPES,
+  getResolvedFastenerLength,
+  getResolvedMembraneFastenerLength,
+} from "./tpo-data";
 
 // ---- GAF-SPECIFIC ASSEMBLY OPTIONS ----
 
@@ -468,6 +477,36 @@ export const GAF_TPO_PRODUCTS: Record<string, TPOProduct> = {
     defaultPrice: 72,
     description: "Coarse-thread screws for mechanically attaching TPO membrane in seam rows",
   },
+  "fastener-screws-membrane-3in": {
+    id: "fastener-screws-membrane-3in",
+    name: '#15 x 3" Membrane Attachment Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 82,
+    description: "Coarse-thread screws for mechanically attaching TPO membrane — 3\" length",
+  },
+  "fastener-screws-membrane-4in": {
+    id: "fastener-screws-membrane-4in",
+    name: '#15 x 4" Membrane Attachment Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 95,
+    description: "Coarse-thread screws for mechanically attaching TPO membrane — 4\" length",
+  },
+  "fastener-screws-membrane-5in": {
+    id: "fastener-screws-membrane-5in",
+    name: '#15 x 5" Membrane Attachment Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 110,
+    description: "Coarse-thread screws for mechanically attaching TPO membrane — 5\" length",
+  },
 
   // Plates
   "fastener-plates-3in": {
@@ -580,15 +619,12 @@ const COVER_BOARD_THICKNESS: Record<string, number> = {
 
 const DECK_PENETRATION = 1.0;
 
-function selectScrewForAssembly(totalInsulationInches: number, coverBoardInches: number): string {
-  const totalThickness = totalInsulationInches + coverBoardInches + DECK_PENETRATION;
-  if (totalThickness <= 2) return "fastener-screws-2in";
-  if (totalThickness <= 3) return "fastener-screws-3in";
-  if (totalThickness <= 4) return "fastener-screws-4in";
-  if (totalThickness <= 5) return "fastener-screws-5in";
-  if (totalThickness <= 6) return "fastener-screws-6in";
-  if (totalThickness <= 7) return "fastener-screws-7in";
-  return "fastener-screws-8in";
+// Screw selection now uses shared functions from tpo-data.ts
+function screwProductId(lengthKey: string): string {
+  return `fastener-screws-${lengthKey}`;
+}
+function membraneScrewProductId(lengthKey: string): string {
+  return `fastener-screws-membrane-${lengthKey}`;
 }
 
 export function calculateGAFTPOEstimate(
@@ -673,13 +709,16 @@ export function calculateGAFTPOEstimate(
       const cornerFasteners = Math.ceil(cornerBoards * INSULATION_FASTENERS_PER_BOARD_CORNER);
       const totalInsFasteners = fieldFasteners + perimeterFasteners + cornerFasteners;
 
-      const screwId = selectScrewForAssembly(totalInsThickness, coverBoardThickness);
+      // Select screw length based on assembly config or auto-select
+      const resolvedInsLength = getResolvedFastenerLength(assembly);
+      const screwId = screwProductId(resolvedInsLength);
       const screwProduct = GAF_TPO_PRODUCTS[screwId];
       const screwBoxes = totalInsFasteners / screwProduct.coveragePerUnit;
+      const screwTypeName = INSULATION_SCREW_TYPES.find(t => t.value === assembly.fastenerType)?.label ?? "HD Roofing Screws";
       addItem(
         screwId,
         screwBoxes,
-        `${totalInsFasteners.toLocaleString()} screws for ${totalInsThickness.toFixed(1)}" insulation + ${coverBoardThickness}" cover board (Field: ${fieldFasteners.toLocaleString()} / Perim: ${perimeterFasteners.toLocaleString()} / Corner: ${cornerFasteners.toLocaleString()})`
+        `${totalInsFasteners.toLocaleString()} ${screwTypeName} for ${totalInsThickness.toFixed(1)}" insulation + ${coverBoardThickness}" cover board (Field: ${fieldFasteners.toLocaleString()} / Perim: ${perimeterFasteners.toLocaleString()} / Corner: ${cornerFasteners.toLocaleString()})`
       );
 
       const plateBoxes = totalInsFasteners / GAF_TPO_PRODUCTS["fastener-plates-3in"].coveragePerUnit;
@@ -747,18 +786,26 @@ export function calculateGAFTPOEstimate(
     const cornerMemFasteners = Math.ceil(cornerSeamLF * MEMBRANE_FASTENERS_PER_LF_CORNER);
     const totalMemFasteners = fieldMemFasteners + perimMemFasteners + cornerMemFasteners;
 
-    const memScrewBoxes = totalMemFasteners / GAF_TPO_PRODUCTS["fastener-screws-membrane-2in"].coveragePerUnit;
+    // Membrane screws - use assembly selection or auto
+    const resolvedMemLength = getResolvedMembraneFastenerLength(assembly);
+    const memScrewId = membraneScrewProductId(resolvedMemLength);
+    const memScrewProduct = GAF_TPO_PRODUCTS[memScrewId] ?? GAF_TPO_PRODUCTS["fastener-screws-membrane-2in"];
+    const memScrewBoxes = totalMemFasteners / memScrewProduct.coveragePerUnit;
     addItem(
-      "fastener-screws-membrane-2in",
+      memScrewProduct.id,
       memScrewBoxes,
       `${totalMemFasteners.toLocaleString()} membrane screws in ${seamRows} seam rows (Field: ${fieldMemFasteners.toLocaleString()} / Perim: ${perimMemFasteners.toLocaleString()} / Corner: ${cornerMemFasteners.toLocaleString()})`
     );
 
-    const barbedBoxes = totalMemFasteners / GAF_TPO_PRODUCTS["fastener-plates-barbed"].coveragePerUnit;
+    // Membrane plates - use assembly selection
+    const memPlateOption = MEMBRANE_PLATE_TYPES.find(p => p.value === assembly.membranePlateType);
+    const memPlateId = memPlateOption?.productId ?? "fastener-plates-barbed";
+    const memPlateProduct = GAF_TPO_PRODUCTS[memPlateId];
+    const barbedBoxes = totalMemFasteners / memPlateProduct.coveragePerUnit;
     addItem(
-      "fastener-plates-barbed",
+      memPlateId,
       barbedBoxes,
-      `${totalMemFasteners.toLocaleString()} barbed seam plates (1:1 with membrane screws)`
+      `${totalMemFasteners.toLocaleString()} ${memPlateProduct.name} (1:1 with membrane screws)`
     );
   }
 

@@ -18,6 +18,12 @@ export interface AssemblyConfig {
   coverBoard: string;
   membraneThickness: string;
   attachmentMethod: string;
+  // Fastener selections (visible when mechanically attached)
+  fastenerType: string;        // insulation screw type
+  fastenerLength: string;      // insulation screw length (e.g. "3in", "4in", "auto")
+  membraneFastenerLength: string; // membrane attachment screw length
+  plateType: string;           // insulation plate type
+  membranePlateType: string;   // membrane plate type
 }
 
 export interface TPOMeasurements {
@@ -131,6 +137,43 @@ export const MEMBRANE_THICKNESSES = [
 export const ATTACHMENT_METHODS = [
   { value: "fully-adhered", label: "Fully Adhered" },
   { value: "mechanically-attached", label: "Mechanically Attached" },
+];
+
+// ---- FASTENER OPTIONS (for Roof Assembly dropdowns) ----
+
+export const INSULATION_SCREW_TYPES = [
+  { value: "sfs-dekfast", label: "SFS Dekfast HD Roofing Screws" },
+  { value: "trufast-hp", label: "Trufast HP-X Roofing Screws" },
+  { value: "omg-hs", label: "OMG RhinoBond / HS Screws" },
+];
+
+export const INSULATION_SCREW_LENGTHS = [
+  { value: "auto", label: "Auto-Select (based on assembly)" },
+  { value: "2in", label: '2" — up to 1" insulation', minThickness: 0, maxThickness: 1.0 },
+  { value: "3in", label: '3" — 1"–2" insulation', minThickness: 1.0, maxThickness: 2.0 },
+  { value: "4in", label: '4" — 2"–3" insulation', minThickness: 2.0, maxThickness: 3.0 },
+  { value: "5in", label: '5" — 3"–4" insulation', minThickness: 3.0, maxThickness: 4.0 },
+  { value: "6in", label: '6" — 4"–5" insulation', minThickness: 4.0, maxThickness: 5.0 },
+  { value: "7in", label: '7" — 5"–6" insulation', minThickness: 5.0, maxThickness: 6.0 },
+  { value: "8in", label: '8" — 6"+ insulation', minThickness: 6.0, maxThickness: 99 },
+];
+
+export const MEMBRANE_SCREW_LENGTHS = [
+  { value: "auto", label: "Auto-Select (based on assembly)" },
+  { value: "2in", label: '2" Membrane Screws' },
+  { value: "3in", label: '3" Membrane Screws' },
+  { value: "4in", label: '4" Membrane Screws' },
+  { value: "5in", label: '5" Membrane Screws' },
+];
+
+export const INSULATION_PLATE_TYPES = [
+  { value: "3in-round", label: '3" Round Insulation Stress Plates', productId: "fastener-plates-3in" },
+  { value: "3in-hd-perim", label: '3" Heavy-Duty Perimeter Plates', productId: "fastener-plates-perimeter" },
+];
+
+export const MEMBRANE_PLATE_TYPES = [
+  { value: "barbed", label: '2" Barbed Seam Plates', productId: "fastener-plates-barbed" },
+  { value: "3in-round", label: '3" Round Stress Plates (seam)', productId: "fastener-plates-3in" },
 ];
 
 // ---- PRODUCT CATALOG ----
@@ -540,6 +583,36 @@ export const TPO_PRODUCTS: Record<string, TPOProduct> = {
     defaultPrice: 72,
     description: "Coarse-thread screws for mechanically attaching TPO membrane in seam rows",
   },
+  "fastener-screws-membrane-3in": {
+    id: "fastener-screws-membrane-3in",
+    name: '#15 x 3" Membrane Attachment Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 82,
+    description: "Coarse-thread screws for mechanically attaching TPO membrane — 3\" length",
+  },
+  "fastener-screws-membrane-4in": {
+    id: "fastener-screws-membrane-4in",
+    name: '#15 x 4" Membrane Attachment Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 95,
+    description: "Coarse-thread screws for mechanically attaching TPO membrane — 4\" length",
+  },
+  "fastener-screws-membrane-5in": {
+    id: "fastener-screws-membrane-5in",
+    name: '#15 x 5" Membrane Attachment Screws',
+    category: "Fasteners & Plates",
+    unit: "Box (1,000)",
+    coveragePerUnit: 1000,
+    coverageUnit: "pieces",
+    defaultPrice: 110,
+    description: "Coarse-thread screws for mechanically attaching TPO membrane — 5\" length",
+  },
 
   // Plates - Insulation
   "fastener-plates-3in": {
@@ -676,15 +749,58 @@ const COVER_BOARD_THICKNESS: Record<string, number> = {
 const DECK_PENETRATION = 1.0;
 
 /** Select the correct screw product ID based on total assembly thickness */
-function selectScrewForAssembly(totalInsulationInches: number, coverBoardInches: number): string {
+function autoSelectScrewLength(totalInsulationInches: number, coverBoardInches: number): string {
   const totalThickness = totalInsulationInches + coverBoardInches + DECK_PENETRATION;
-  if (totalThickness <= 2) return "fastener-screws-2in";
-  if (totalThickness <= 3) return "fastener-screws-3in";
-  if (totalThickness <= 4) return "fastener-screws-4in";
-  if (totalThickness <= 5) return "fastener-screws-5in";
-  if (totalThickness <= 6) return "fastener-screws-6in";
-  if (totalThickness <= 7) return "fastener-screws-7in";
-  return "fastener-screws-8in";
+  if (totalThickness <= 2) return "2in";
+  if (totalThickness <= 3) return "3in";
+  if (totalThickness <= 4) return "4in";
+  if (totalThickness <= 5) return "5in";
+  if (totalThickness <= 6) return "6in";
+  if (totalThickness <= 7) return "7in";
+  return "8in";
+}
+
+/** Auto-select membrane screw length based on assembly */
+function autoSelectMembraneScrewLength(totalInsulationInches: number, coverBoardInches: number): string {
+  const totalThickness = totalInsulationInches + coverBoardInches + DECK_PENETRATION;
+  if (totalThickness <= 2) return "2in";
+  if (totalThickness <= 3) return "3in";
+  if (totalThickness <= 4) return "4in";
+  return "5in";
+}
+
+/** Resolve screw product ID from length key */
+function screwProductId(lengthKey: string): string {
+  return `fastener-screws-${lengthKey}`;
+}
+
+/** Resolve membrane screw product ID from length key */
+function membraneScrewProductId(lengthKey: string): string {
+  return `fastener-screws-membrane-${lengthKey}`;
+}
+
+/** Get the resolved fastener length (handles 'auto') */
+export function getResolvedFastenerLength(assembly: AssemblyConfig): string {
+  if (assembly.fastenerLength === "auto") {
+    const { totalThickness } = assembly.insulationEnabled
+      ? getInsulationSummary(assembly.insulationLayers)
+      : { totalThickness: 0 };
+    const cbThickness = COVER_BOARD_THICKNESS[assembly.coverBoard] ?? 0;
+    return autoSelectScrewLength(totalThickness, cbThickness);
+  }
+  return assembly.fastenerLength;
+}
+
+/** Get the resolved membrane fastener length (handles 'auto') */
+export function getResolvedMembraneFastenerLength(assembly: AssemblyConfig): string {
+  if (assembly.membraneFastenerLength === "auto") {
+    const { totalThickness } = assembly.insulationEnabled
+      ? getInsulationSummary(assembly.insulationLayers)
+      : { totalThickness: 0 };
+    const cbThickness = COVER_BOARD_THICKNESS[assembly.coverBoard] ?? 0;
+    return autoSelectMembraneScrewLength(totalThickness, cbThickness);
+  }
+  return assembly.membraneFastenerLength;
 }
 
 export function calculateTPOEstimate(
@@ -773,14 +889,16 @@ export function calculateTPOEstimate(
       const cornerFasteners = Math.ceil(cornerBoards * INSULATION_FASTENERS_PER_BOARD_CORNER);
       const totalInsFasteners = fieldFasteners + perimeterFasteners + cornerFasteners;
 
-      // Select screw length based on total assembly thickness
-      const screwId = selectScrewForAssembly(totalInsThickness, coverBoardThickness);
+      // Select screw length based on assembly config or auto-select
+      const resolvedInsLength = getResolvedFastenerLength(assembly);
+      const screwId = screwProductId(resolvedInsLength);
       const screwProduct = TPO_PRODUCTS[screwId];
       const screwBoxes = totalInsFasteners / screwProduct.coveragePerUnit;
+      const screwTypeName = INSULATION_SCREW_TYPES.find(t => t.value === assembly.fastenerType)?.label ?? "HD Roofing Screws";
       addItem(
         screwId,
         screwBoxes,
-        `${totalInsFasteners.toLocaleString()} screws for ${totalInsThickness.toFixed(1)}" insulation + ${coverBoardThickness}" cover board (Field: ${fieldFasteners.toLocaleString()} / Perim: ${perimeterFasteners.toLocaleString()} / Corner: ${cornerFasteners.toLocaleString()})`
+        `${totalInsFasteners.toLocaleString()} ${screwTypeName} for ${totalInsThickness.toFixed(1)}" insulation + ${coverBoardThickness}" cover board (Field: ${fieldFasteners.toLocaleString()} / Perim: ${perimeterFasteners.toLocaleString()} / Corner: ${cornerFasteners.toLocaleString()})`
       );
 
       // Insulation stress plates (1:1 with screws)
@@ -855,18 +973,27 @@ export function calculateTPOEstimate(
     const cornerMemFasteners = Math.ceil(cornerSeamLF * MEMBRANE_FASTENERS_PER_LF_CORNER);
     const totalMemFasteners = fieldMemFasteners + perimMemFasteners + cornerMemFasteners;
 
-    const memScrewBoxes = totalMemFasteners / TPO_PRODUCTS["fastener-screws-membrane-2in"].coveragePerUnit;
+    // Membrane screws - use assembly selection or auto
+    const resolvedMemLength = getResolvedMembraneFastenerLength(assembly);
+    const memScrewId = membraneScrewProductId(resolvedMemLength);
+    // Fallback to the 2in product if the specific length doesn't exist
+    const memScrewProduct = TPO_PRODUCTS[memScrewId] ?? TPO_PRODUCTS["fastener-screws-membrane-2in"];
+    const memScrewBoxes = totalMemFasteners / memScrewProduct.coveragePerUnit;
     addItem(
-      "fastener-screws-membrane-2in",
+      memScrewProduct.id,
       memScrewBoxes,
       `${totalMemFasteners.toLocaleString()} membrane screws in ${seamRows} seam rows (Field: ${fieldMemFasteners.toLocaleString()} / Perim: ${perimMemFasteners.toLocaleString()} / Corner: ${cornerMemFasteners.toLocaleString()})`
     );
 
-    const barbedBoxes = totalMemFasteners / TPO_PRODUCTS["fastener-plates-barbed"].coveragePerUnit;
+    // Membrane plates - use assembly selection
+    const memPlateOption = MEMBRANE_PLATE_TYPES.find(p => p.value === assembly.membranePlateType);
+    const memPlateId = memPlateOption?.productId ?? "fastener-plates-barbed";
+    const memPlateProduct = TPO_PRODUCTS[memPlateId];
+    const barbedBoxes = totalMemFasteners / memPlateProduct.coveragePerUnit;
     addItem(
-      "fastener-plates-barbed",
+      memPlateId,
       barbedBoxes,
-      `${totalMemFasteners.toLocaleString()} barbed seam plates (1:1 with membrane screws)`
+      `${totalMemFasteners.toLocaleString()} ${memPlateProduct.name} (1:1 with membrane screws)`
     );
   }
 

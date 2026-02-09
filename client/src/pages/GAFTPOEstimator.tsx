@@ -52,6 +52,13 @@ import {
   FIELD_ZONE_RATIO,
   PERIMETER_ZONE_RATIO,
   CORNER_ZONE_RATIO,
+  INSULATION_SCREW_TYPES,
+  INSULATION_SCREW_LENGTHS,
+  MEMBRANE_SCREW_LENGTHS,
+  INSULATION_PLATE_TYPES,
+  MEMBRANE_PLATE_TYPES,
+  getResolvedFastenerLength,
+  getResolvedMembraneFastenerLength,
 } from "@/lib/tpo-data";
 import {
   GAF_VAPOR_BARRIERS,
@@ -81,6 +88,11 @@ export default function GAFTPOEstimator() {
     coverBoard: "densdeck-prime-half",
     membraneThickness: "60mil",
     attachmentMethod: "fully-adhered",
+    fastenerType: "sfs-dekfast",
+    fastenerLength: "auto",
+    membraneFastenerLength: "auto",
+    plateType: "3in-round",
+    membranePlateType: "barbed",
   });
 
   // Measurements state
@@ -533,6 +545,144 @@ export default function GAFTPOEstimator() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Fastener & Plate Selection — only visible when Mechanically Attached */}
+                <AnimatePresence>
+                  {assembly.attachmentMethod === "mechanically-attached" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="mt-4 pt-4 border-t border-dashed border-amber-300 space-y-4">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-amber-700 flex items-center gap-1.5">
+                          <Wrench className="w-3.5 h-3.5" />
+                          Membrane Securement
+                        </p>
+
+                        {/* Insulation Screw Type */}
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">Insulation Screw Type</Label>
+                          <Select
+                            value={assembly.fastenerType}
+                            onValueChange={(v) => updateAssembly("fastenerType", v)}
+                          >
+                            <SelectTrigger className="h-9 text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {INSULATION_SCREW_TYPES.map((st) => (
+                                <SelectItem key={st.value} value={st.value}>
+                                  {st.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Insulation Screw Length */}
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">
+                            Insulation Screw Length
+                            {assembly.fastenerLength === "auto" && (
+                              <span className="ml-2 text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                                → {getResolvedFastenerLength(assembly).replace("in", '"')}
+                              </span>
+                            )}
+                          </Label>
+                          <Select
+                            value={assembly.fastenerLength}
+                            onValueChange={(v) => updateAssembly("fastenerLength", v)}
+                          >
+                            <SelectTrigger className="h-9 text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {INSULATION_SCREW_LENGTHS.map((sl) => (
+                                <SelectItem key={sl.value} value={sl.value}>
+                                  {sl.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Insulation Plate Type */}
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">Insulation Plate Type</Label>
+                          <Select
+                            value={assembly.plateType}
+                            onValueChange={(v) => updateAssembly("plateType", v)}
+                          >
+                            <SelectTrigger className="h-9 text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {INSULATION_PLATE_TYPES.map((pt) => (
+                                <SelectItem key={pt.value} value={pt.value}>
+                                  {pt.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="border-t border-dashed border-slate-200 pt-3 mt-3">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-red-700 mb-3">Membrane Fasteners</p>
+                        </div>
+
+                        {/* Membrane Screw Length */}
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">
+                            Membrane Screw Length
+                            {assembly.membraneFastenerLength === "auto" && (
+                              <span className="ml-2 text-[10px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded">
+                                → {getResolvedMembraneFastenerLength(assembly).replace("in", '"')}
+                              </span>
+                            )}
+                          </Label>
+                          <Select
+                            value={assembly.membraneFastenerLength}
+                            onValueChange={(v) => updateAssembly("membraneFastenerLength", v)}
+                          >
+                            <SelectTrigger className="h-9 text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {MEMBRANE_SCREW_LENGTHS.map((sl) => (
+                                <SelectItem key={sl.value} value={sl.value}>
+                                  {sl.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Membrane Plate Type */}
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">Membrane Plate Type</Label>
+                          <Select
+                            value={assembly.membranePlateType}
+                            onValueChange={(v) => updateAssembly("membranePlateType", v)}
+                          >
+                            <SelectTrigger className="h-9 text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {MEMBRANE_PLATE_TYPES.map((pt) => (
+                                <SelectItem key={pt.value} value={pt.value}>
+                                  {pt.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </CardContent>
             </Card>
 
