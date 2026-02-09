@@ -41,6 +41,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Switch } from "@/components/ui/switch";
 import {
   type AssemblyConfig,
   type TPOMeasurements,
@@ -68,6 +69,7 @@ export default function TPOEstimator() {
   const [assembly, setAssembly] = useState<AssemblyConfig>({
     deckType: "steel-22ga",
     vaporBarrier: "none",
+    insulationEnabled: true,
     insulationLayers: [
       { thickness: "2.0", enabled: true },
       { thickness: "none", enabled: false },
@@ -102,12 +104,19 @@ export default function TPOEstimator() {
 
   // Insulation summary
   const insulationSummary = useMemo(
-    () => getInsulationSummary(assembly.insulationLayers),
-    [assembly.insulationLayers]
+    () => assembly.insulationEnabled
+      ? getInsulationSummary(assembly.insulationLayers)
+      : { totalThickness: 0, totalRValue: 0, activeLayers: [] },
+    [assembly.insulationLayers, assembly.insulationEnabled]
   );
 
   // Count how many layers are enabled
   const enabledLayerCount = assembly.insulationLayers.filter((l) => l.enabled).length;
+
+  // Toggle insulation on/off
+  const toggleInsulation = useCallback(() => {
+    setAssembly((prev) => ({ ...prev, insulationEnabled: !prev.insulationEnabled }));
+  }, []);
 
   // Handlers
   const updateAssembly = useCallback(
@@ -317,57 +326,42 @@ export default function TPOEstimator() {
                   </Select>
                 </div>
 
-                {/* Insulation Layers */}
+                {/* Insulation Layers (Optional) */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="flex items-center gap-2 text-sm font-medium">
                       <Thermometer className="w-4 h-4 text-slate-500" />
                       Insulation (Polyiso)
                     </Label>
-                    {insulationSummary.totalThickness > 0 && (
-                      <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                        {insulationSummary.totalThickness.toFixed(1)}" total · R-{insulationSummary.totalRValue.toFixed(1)}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {assembly.insulationEnabled && insulationSummary.totalThickness > 0 && (
+                        <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                          {insulationSummary.totalThickness.toFixed(1)}" total · R-{insulationSummary.totalRValue.toFixed(1)}
+                        </span>
+                      )}
+                      <Switch
+                        checked={assembly.insulationEnabled}
+                        onCheckedChange={toggleInsulation}
+                        aria-label="Toggle insulation"
+                      />
+                    </div>
                   </div>
 
-                  {/* Layer 1 - always visible */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground w-14 shrink-0">Layer 1</span>
-                      <Select
-                        value={assembly.insulationLayers[0].thickness}
-                        onValueChange={(v) => updateInsulationLayer(0, v)}
+                  <AnimatePresence>
+                    {assembly.insulationEnabled ? (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="space-y-2"
                       >
-                        <SelectTrigger className="flex-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {INSULATION_THICKNESSES.map((ins) => (
-                            <SelectItem key={ins.value} value={ins.value}>
-                              {ins.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Additional layers */}
-                    {assembly.insulationLayers.slice(1).map((layer, idx) => {
-                      const realIdx = idx + 1;
-                      if (!layer.enabled) return null;
-                      return (
-                        <motion.div
-                          key={realIdx}
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className="flex items-center gap-2"
-                        >
-                          <span className="text-xs text-muted-foreground w-14 shrink-0">Layer {realIdx + 1}</span>
+                        {/* Layer 1 - always visible when insulation is enabled */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground w-14 shrink-0">Layer 1</span>
                           <Select
-                            value={layer.thickness}
-                            onValueChange={(v) => updateInsulationLayer(realIdx, v)}
+                            value={assembly.insulationLayers[0].thickness}
+                            onValueChange={(v) => updateInsulationLayer(0, v)}
                           >
                             <SelectTrigger className="flex-1">
                               <SelectValue />
@@ -380,31 +374,72 @@ export default function TPOEstimator() {
                               ))}
                             </SelectContent>
                           </Select>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
-                            onClick={() => removeInsulationLayer(realIdx)}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
+                        </div>
 
-                  {/* Add layer button */}
-                  {enabledLayerCount < 4 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={addInsulationLayer}
-                      className="w-full gap-2 text-xs border-dashed"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      Add Insulation Layer ({enabledLayerCount}/4)
-                    </Button>
-                  )}
+                        {/* Additional layers */}
+                        {assembly.insulationLayers.slice(1).map((layer, idx) => {
+                          const realIdx = idx + 1;
+                          if (!layer.enabled) return null;
+                          return (
+                            <motion.div
+                              key={realIdx}
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="flex items-center gap-2"
+                            >
+                              <span className="text-xs text-muted-foreground w-14 shrink-0">Layer {realIdx + 1}</span>
+                              <Select
+                                value={layer.thickness}
+                                onValueChange={(v) => updateInsulationLayer(realIdx, v)}
+                              >
+                                <SelectTrigger className="flex-1">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {INSULATION_THICKNESSES.map((ins) => (
+                                    <SelectItem key={ins.value} value={ins.value}>
+                                      {ins.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                                onClick={() => removeInsulationLayer(realIdx)}
+                              >
+                                <X className="w-4 h-4" />
+                              </Button>
+                            </motion.div>
+                          );
+                        })}
+
+                        {/* Add layer button */}
+                        {enabledLayerCount < 4 && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={addInsulationLayer}
+                            className="w-full gap-2 text-xs border-dashed"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            Add Insulation Layer ({enabledLayerCount}/4)
+                          </Button>
+                        )}
+                      </motion.div>
+                    ) : (
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="text-xs text-muted-foreground italic py-1"
+                      >
+                        No insulation — membrane over deck/cover board only
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 {/* Cover Board */}
@@ -728,7 +763,10 @@ export default function TPOEstimator() {
                             ?.label || "—"}
                         </span>
                         <span>
-                          Insulation: {insulationSummary.totalThickness.toFixed(1)}" Polyiso ({insulationSummary.activeLayers.length} layer{insulationSummary.activeLayers.length !== 1 ? "s" : ""}) · R-{insulationSummary.totalRValue.toFixed(1)}
+                          Insulation:{" "}
+                          {assembly.insulationEnabled && insulationSummary.activeLayers.length > 0
+                            ? `${insulationSummary.totalThickness.toFixed(1)}" Polyiso (${insulationSummary.activeLayers.length} layer${insulationSummary.activeLayers.length !== 1 ? "s" : ""}) · R-${insulationSummary.totalRValue.toFixed(1)}`
+                            : "None"}
                         </span>
                         <span>
                           Membrane:{" "}

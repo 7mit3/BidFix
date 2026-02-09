@@ -13,6 +13,7 @@ export interface InsulationLayer {
 export interface AssemblyConfig {
   deckType: string;
   vaporBarrier: string;
+  insulationEnabled: boolean; // toggle insulation on/off
   insulationLayers: InsulationLayer[]; // up to 4 layers
   coverBoard: string;
   membraneThickness: string;
@@ -739,7 +740,9 @@ export function calculateTPOEstimate(
   }
 
   // ---- 2. INSULATION (multi-layer) ----
-  const { totalThickness: totalInsThickness, activeLayers } = getInsulationSummary(assembly.insulationLayers);
+  const { totalThickness: totalInsThickness, activeLayers } = assembly.insulationEnabled
+    ? getInsulationSummary(assembly.insulationLayers)
+    : { totalThickness: 0, activeLayers: [] as { thickness: string; rValue: number; label: string }[] };
   for (let i = 0; i < activeLayers.length; i++) {
     const layer = activeLayers[i];
     const insId = `insulation-${layer.thickness}`;
