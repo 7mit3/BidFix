@@ -3,7 +3,8 @@
 // Layout: Two-column — left: assembly config + measurements, right: results
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { Link, useLocation } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
+import { trpc } from "@/lib/trpc";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -25,6 +26,8 @@ import {
   X,
   HardHat,
   FileSpreadsheet,
+  Save,
+  FolderOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -82,12 +85,22 @@ import {
 } from "@/lib/gaf-tpo-data";
 import { storeBreakdownData } from "@/lib/estimate-breakdown";
 import { serializeTPOBreakdown } from "@/lib/breakdown-serializers";
+import { SaveEstimateDialog } from "@/components/SaveEstimateDialog";
+import { serializeTPOState, deserializeTPOState } from "@/lib/estimate-state-serializers";
+import { toast } from "sonner";
 
 const fmt = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
 export default function GAFTPOEstimator() {
   const [, navigate] = useLocation();
+  const searchString = useSearch();
+
+  // Save/Load state
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [loadedEstimateId, setLoadedEstimateId] = useState<number | null>(null);
+  const [loadedEstimateName, setLoadedEstimateName] = useState<string>("");
+
   // Assembly config state
   const [assembly, setAssembly] = useState<AssemblyConfig>({
     deckType: "steel-22ga",
@@ -313,6 +326,54 @@ export default function GAFTPOEstimator() {
 
   const handlePrint = useCallback(() => window.print(), []);
 
+  // Load saved estimate from URL param
+  const loadEstimateId = new URLSearchParams(searchString).get("loadEstimate");
+  const { data: savedEstimate } = trpc.estimates.get.useQuery(
+    { id: Number(loadEstimateId) },
+    { enabled: !!loadEstimateId },
+  );
+
+  useEffect(() => {
+    if (!savedEstimate) return;
+    const state = deserializeTPOState(savedEstimate.data);
+    if (!state || state.system !== "gaf-tpo") {
+      toast.error("Could not load this estimate — incompatible format.");
+      return;
+    }
+    // Restore measurements
+    setMeasurements({
+      roofArea: parseFloat(state.measurements.totalRoofArea) || 0,
+      wallLinearFt: 0,
+      wallHeight: 0,
+      baseFlashingLF: parseFloat(state.measurements.baseFlashing) || 0,
+    });
+    // Restore custom prices
+    Object.entries(state.customPrices).forEach(([id, price]) => {
+      userEditedPrices.current.add(id);
+      setCustomPrices((prev) => ({ ...prev, [id]: price }));
+    });
+    // Restore labor/equipment
+    if (state.laborEquipment) {
+      setLaborEquipment(state.laborEquipment);
+    }
+    setLoadedEstimateId(savedEstimate.id);
+    setLoadedEstimateName(savedEstimate.name);
+    toast.success(`Loaded estimate: "${savedEstimate.name}"`);
+    window.history.replaceState({}, "", "/estimator/gaf-tpo");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedEstimate]);
+
+  const getEstimateData = useCallback(() => {
+    return serializeTPOState("gaf-tpo", {
+      measurements: {
+        totalRoofArea: String(measurements.roofArea),
+        baseFlashing: String(measurements.baseFlashingLF),
+      },
+      customPrices,
+      laborEquipment,
+    });
+  }, [measurements, customPrices, laborEquipment]);
+
   const handleViewBreakdown = useCallback(() => {
     const breakdownData = serializeTPOBreakdown(
       estimate,
@@ -400,6 +461,29 @@ export default function GAFTPOEstimator() {
           </p>
         </div>
       </div>
+
+      {/* Loaded estimate banner */}
+      {loadedEstimateName && (
+        <div className="bg-amber-50 border-b border-amber-200 py-2">
+          <div className="container flex items-center justify-between text-sm">
+            <span className="text-amber-800">
+              <FolderOpen className="inline h-4 w-4 mr-1" />
+              Loaded: <strong>{loadedEstimateName}</strong>
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-amber-700 hover:text-amber-900"
+              onClick={() => {
+                setLoadedEstimateId(null);
+                setLoadedEstimateName("");
+              }}
+            >
+              Dismiss
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="container py-8">
@@ -1326,8 +1410,17 @@ export default function GAFTPOEstimator() {
                 </Card>
               </motion.div>
 
-              {/* View Full Breakdown Button */}
-              <div className="flex justify-center mt-4">
+              {/* Save & View Full Breakdown Buttons */}
+              <div className="flex flex-wrap justify-center gap-3 mt-4">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => setSaveDialogOpen(true)}
+                  className="gap-2"
+                >
+                  <Save className="w-5 h-5" />
+                  {loadedEstimateId ? "Save / Update" : "Save Estimate"}
+                </Button>
                 <Button
                   size="lg"
                   onClick={handleViewBreakdown}
@@ -1356,6 +1449,22 @@ export default function GAFTPOEstimator() {
           </div>
         </div>
       </div>
+
+      <SaveEstimateDialog
+        open={saveDialogOpen}
+        onOpenChange={setSaveDialogOpen}
+        system="gaf-tpo"
+        systemLabel="GAF EverGuard TPO"
+        getEstimateData={getEstimateData}
+        grandTotal={grandTotal}
+        roofArea={measurements.roofArea}
+        existingId={loadedEstimateId}
+        existingName={loadedEstimateName}
+        onSaved={(id, name) => {
+          setLoadedEstimateId(id);
+          setLoadedEstimateName(name);
+        }}
+      />
 
       {/* Footer */}
       <footer className="border-t border-slate-200 mt-12 py-6 bg-slate-50">

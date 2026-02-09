@@ -10,6 +10,7 @@ import TPOEstimator from "./pages/TPOEstimator";
 import GAFTPOEstimator from "./pages/GAFTPOEstimator";
 import PricingDatabase from "./pages/PricingDatabase";
 import EstimateBreakdown from "./pages/EstimateBreakdown";
+import SavedEstimates from "./pages/SavedEstimates";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -21,6 +22,7 @@ function Router() {
       <Route path={"/estimator/gaf-tpo"} component={GAFTPOEstimator} />
       <Route path={"/pricing"} component={PricingDatabase} />
       <Route path={"/breakdown"} component={EstimateBreakdown} />
+      <Route path={"/saved"} component={SavedEstimates} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

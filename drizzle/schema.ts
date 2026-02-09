@@ -102,3 +102,33 @@ export const quoteRequests = mysqlTable("quote_requests", {
 
 export type QuoteRequest = typeof quoteRequests.$inferSelect;
 export type InsertQuoteRequest = typeof quoteRequests.$inferInsert;
+
+/**
+ * Saved estimates.
+ * Persists full estimator state so users can name, save, and revisit past project estimates.
+ * The `data` column stores the complete estimator state as JSON (inputs, prices, labor, equipment, etc.).
+ */
+export const savedEstimates = mysqlTable("saved_estimates", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User-chosen project name */
+  name: varchar("name", { length: 256 }).notNull(),
+  /** Which estimator system: 'karnak-metal-kynar', 'carlisle-tpo', 'gaf-tpo' */
+  system: varchar("system", { length: 64 }).notNull(),
+  /** Human-readable system label for display */
+  systemLabel: varchar("systemLabel", { length: 256 }).notNull(),
+  /** Optional notes about this estimate */
+  notes: text("notes"),
+  /** Full estimator state serialized as JSON */
+  data: text("data").notNull(),
+  /** Snapshot of the grand total at time of save */
+  grandTotal: decimal("grandTotal", { precision: 12, scale: 2 }),
+  /** Snapshot of roof area / square footage */
+  roofArea: decimal("roofArea", { precision: 12, scale: 2 }),
+  /** User who saved this estimate */
+  createdBy: varchar("createdBy", { length: 64 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SavedEstimate = typeof savedEstimates.$inferSelect;
+export type InsertSavedEstimate = typeof savedEstimates.$inferInsert;

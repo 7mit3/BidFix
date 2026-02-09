@@ -57,3 +57,16 @@
 - [x] Add tax and profit to the grand total summary card (shows Subtotal before Tax & Profit, Total Tax, Total Profit)
 - [x] Include tax and profit in Excel export
 - [x] All 57 tests passing
+
+## Save/Load Estimates
+- [x] Design database schema for saved estimates (name, system type, estimator state JSON, timestamps)
+- [x] Create drizzle schema and run migrations (saved_estimates table)
+- [x] Build backend tRPC procedures: save, list, load, delete, rename, update
+- [x] Create SaveEstimateDialog component (name, notes, system info, Save/Update/Save As New)
+- [x] Create SavedEstimates page listing all saved projects with search/filter/rename/delete
+- [x] Add save/load to Karnak estimator with loaded estimate banner
+- [x] Add save/load to Carlisle TPO estimator with loaded estimate banner
+- [x] Add save/load to GAF TPO estimator with loaded estimate banner
+- [x] Add /saved route in App.tsx and Saved Estimates link on Catalog page
+- [x] Test save/load workflow end-to-end in browser — verified on Carlisle TPO
+- [x] Write vitest tests for estimate serializers (12 tests, 69 total)

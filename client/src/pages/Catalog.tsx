@@ -23,6 +23,7 @@ import {
   ChevronRight,
   Search,
   Database,
+  FolderOpen,
 } from "lucide-react";
 import {
   SYSTEM_CATEGORIES,
@@ -301,6 +302,12 @@ export default function Catalog() {
             )}
           </div>
         </div>
+        <Link href="/saved">
+          <button className="inline-flex items-center gap-2 px-5 py-3 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors shadow-lg whitespace-nowrap">
+            <FolderOpen className="w-4 h-4" />
+            Saved Estimates
+          </button>
+        </Link>
         <Link href="/pricing">
           <button className="inline-flex items-center gap-2 px-5 py-3 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors shadow-lg whitespace-nowrap">
             <Database className="w-4 h-4" />
