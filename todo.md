@@ -18,3 +18,13 @@
 - [x] Import distributor pricing: Upload CSV with updated prices to bulk-update the pricing database
 - [x] Enhance Pricing Database page with quote request and import workflows (Products tab + Quote Requests tab)
 - [x] Write vitest tests for pricing integration (16 tests passing)
+
+## Labor & Equipment Sections
+- [x] Review Karnak labor/equipment implementation (useEstimator hook, LaborEquipmentSection component)
+- [x] Add labor & equipment data model and defaults for TPO estimators (shared tpo-labor-equipment-data.ts)
+- [x] Add labor & equipment UI section to Carlisle TPO estimator page
+- [x] Add labor & equipment totals to Carlisle TPO cost summary and order list
+- [x] Add labor & equipment UI section to GAF TPO estimator page
+- [x] Add labor & equipment totals to GAF TPO cost summary and order list
+- [x] TypeScript compilation verified — no errors
+- [x] Write vitest tests for TPO labor/equipment (13 tests passing, 29 total)

@@ -23,6 +23,7 @@ import {
   RotateCcw,
   Plus,
   X,
+  HardHat,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +45,14 @@ import { Switch } from "@/components/ui/switch";
 import RoofAdditions from "@/components/RoofAdditions";
 import { type PenetrationEstimate } from "@/lib/penetrations-data";
 import { usePricingDB } from "@/hooks/usePricingDB";
+import { TPOLaborEquipmentSection } from "@/components/TPOLaborEquipmentSection";
+import {
+  DEFAULT_TPO_LABOR_ITEMS,
+  DEFAULT_TPO_EQUIPMENT_ITEMS,
+  calculateTPOLaborEquipmentTotals,
+  type TPOLaborEquipmentState,
+  type TPOLaborEquipmentTotals,
+} from "@/lib/tpo-labor-equipment-data";
 import {
   type AssemblyConfig,
   type TPOMeasurements,
@@ -134,10 +143,73 @@ export default function GAFTPOEstimator() {
     [assembly, measurements, customPrices]
   );
 
+  // Labor & Equipment state
+  const [laborEquipment, setLaborEquipment] = useState<TPOLaborEquipmentState>(() => ({
+    laborItems: DEFAULT_TPO_LABOR_ITEMS.map((item) => ({
+      ...item,
+      rate: item.defaultRate,
+      quantity: item.defaultQuantity,
+    })),
+    equipmentItems: DEFAULT_TPO_EQUIPMENT_ITEMS.map((item) => ({
+      ...item,
+      rate: item.defaultRate,
+      quantity: item.defaultQuantity,
+    })),
+  }));
+
+  const updateLaborItem = useCallback(
+    (id: string, field: "rate" | "quantity" | "enabled", value: number | boolean) => {
+      setLaborEquipment((prev) => ({
+        ...prev,
+        laborItems: prev.laborItems.map((item) =>
+          item.id === id ? { ...item, [field]: value } : item
+        ),
+      }));
+    },
+    []
+  );
+
+  const updateEquipmentItem = useCallback(
+    (id: string, field: "rate" | "quantity" | "enabled", value: number | boolean) => {
+      setLaborEquipment((prev) => ({
+        ...prev,
+        equipmentItems: prev.equipmentItems.map((item) =>
+          item.id === id ? { ...item, [field]: value } : item
+        ),
+      }));
+    },
+    []
+  );
+
+  const resetLaborEquipment = useCallback(() => {
+    setLaborEquipment({
+      laborItems: DEFAULT_TPO_LABOR_ITEMS.map((item) => ({
+        ...item,
+        rate: item.defaultRate,
+        quantity: item.defaultQuantity,
+      })),
+      equipmentItems: DEFAULT_TPO_EQUIPMENT_ITEMS.map((item) => ({
+        ...item,
+        rate: item.defaultRate,
+        quantity: item.defaultQuantity,
+      })),
+    });
+  }, []);
+
   // Penetrations state
   const [penetrationEstimate, setPenetrationEstimate] = useState<PenetrationEstimate | null>(null);
   const penetrationCost = penetrationEstimate?.totalMaterialCost ?? 0;
-  const grandTotal = estimate.totalMaterialCost + penetrationCost;
+
+  // Labor & equipment totals
+  const laborEquipmentTotals: TPOLaborEquipmentTotals | null = useMemo(() => {
+    if (measurements.roofArea <= 0) return null;
+    const flashingLF = measurements.baseFlashingLF + measurements.wallLinearFt;
+    return calculateTPOLaborEquipmentTotals(laborEquipment, measurements.roofArea, flashingLF);
+  }, [laborEquipment, measurements.roofArea, measurements.baseFlashingLF, measurements.wallLinearFt]);
+
+  const laborCost = laborEquipmentTotals?.laborTotal ?? 0;
+  const equipmentCost = laborEquipmentTotals?.equipmentTotal ?? 0;
+  const grandTotal = estimate.totalMaterialCost + penetrationCost + laborCost + equipmentCost;
 
   // Derived wall sq ft
   const wallSqFt = measurements.wallLinearFt * measurements.wallHeight;
@@ -921,6 +993,15 @@ export default function GAFTPOEstimator() {
                 </CollapsibleContent>
               </Card>
             </Collapsible>
+
+            {/* Labor & Equipment */}
+            <TPOLaborEquipmentSection
+              laborEquipment={laborEquipment}
+              updateLaborItem={updateLaborItem}
+              updateEquipmentItem={updateEquipmentItem}
+              resetLaborEquipment={resetLaborEquipment}
+              accentColor="emerald"
+            />
           </div>
 
           {/* Right Column: Results */}
@@ -944,27 +1025,41 @@ export default function GAFTPOEstimator() {
                   <Card className="bg-gradient-to-br from-gray-900 via-gray-800 to-red-950 text-white border-0 shadow-lg">
                     <CardContent className="py-6">
                       <p className="text-red-300 text-xs font-semibold tracking-wider uppercase mb-1">
-                        Total Material Estimate
+                        Total Project Estimate
                       </p>
                       <p className="text-4xl font-bold font-display tracking-tight">
                         {fmt(grandTotal)}
                       </p>
-                      <div className="flex flex-wrap gap-x-6 gap-y-1 mt-3 text-sm">
+                      <div className="flex flex-wrap gap-x-6 gap-y-2 mt-3 text-sm">
+                        <span className="text-slate-300">
+                          <Package className="w-3.5 h-3.5 inline mr-1" />
+                          Materials: {fmt(estimate.totalMaterialCost)}
+                        </span>
+                        {laborCost > 0 && (
+                          <span className="text-slate-300">
+                            <HardHat className="w-3.5 h-3.5 inline mr-1" />
+                            Labor: {fmt(laborCost)}
+                          </span>
+                        )}
+                        {equipmentCost > 0 && (
+                          <span className="text-slate-300">
+                            <Wrench className="w-3.5 h-3.5 inline mr-1" />
+                            Equipment: {fmt(equipmentCost)}
+                          </span>
+                        )}
+                        {penetrationCost > 0 && (
+                          <span className="text-red-300">
+                            Penetrations: {fmt(penetrationCost)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-sm">
                         <span className="text-red-200">
                           <DollarSign className="w-3.5 h-3.5 inline mr-1" />
                           {measurements.roofArea > 0
                             ? `${(grandTotal / measurements.roofArea).toFixed(2)} / sq ft`
                             : "—"}
                         </span>
-                        <span className="text-slate-300">
-                          <Package className="w-3.5 h-3.5 inline mr-1" />
-                          {estimate.lineItems.length} line items
-                        </span>
-                        {penetrationCost > 0 && (
-                          <span className="text-red-300">
-                            Penetrations: {fmt(penetrationCost)}
-                          </span>
-                        )}
                         <span className="text-slate-300">
                           <Ruler className="w-3.5 h-3.5 inline mr-1" />
                           {measurements.roofArea.toLocaleString()} sq ft roof
@@ -1169,19 +1264,31 @@ export default function GAFTPOEstimator() {
                 {/* Grand Total Footer */}
                 <Card className="border-red-200 bg-red-50/50">
                   <CardContent className="py-4">
-                    {penetrationCost > 0 && (
-                      <div className="flex items-center justify-between text-sm text-slate-600 mb-2">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm text-slate-600">
                         <span>Roofing Materials</span>
                         <span className="tabular-nums">{fmt(estimate.totalMaterialCost)}</span>
                       </div>
-                    )}
-                    {penetrationCost > 0 && (
-                      <div className="flex items-center justify-between text-sm text-slate-600 mb-3 pb-3 border-b border-red-200">
-                        <span>Penetrations & Additions</span>
-                        <span className="tabular-nums">{fmt(penetrationCost)}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between">
+                      {penetrationCost > 0 && (
+                        <div className="flex items-center justify-between text-sm text-slate-600">
+                          <span>Penetrations & Additions</span>
+                          <span className="tabular-nums">{fmt(penetrationCost)}</span>
+                        </div>
+                      )}
+                      {laborCost > 0 && (
+                        <div className="flex items-center justify-between text-sm text-slate-600">
+                          <span>Labor</span>
+                          <span className="tabular-nums">{fmt(laborCost)}</span>
+                        </div>
+                      )}
+                      {equipmentCost > 0 && (
+                        <div className="flex items-center justify-between text-sm text-slate-600">
+                          <span>Equipment</span>
+                          <span className="tabular-nums">{fmt(equipmentCost)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-red-200">
                       <span className="text-lg font-semibold text-slate-700">
                         Grand Total
                       </span>
@@ -1194,7 +1301,7 @@ export default function GAFTPOEstimator() {
                         {(
                           grandTotal / measurements.roofArea
                         ).toFixed(2)}{" "}
-                        per sq ft (all materials)
+                        per sq ft (all-in)
                       </p>
                     )}
                   </CardContent>
