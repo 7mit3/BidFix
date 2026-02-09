@@ -41,6 +41,8 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Switch } from "@/components/ui/switch";
+import RoofAdditions from "@/components/RoofAdditions";
+import { type PenetrationEstimate } from "@/lib/penetrations-data";
 import {
   type AssemblyConfig,
   type TPOMeasurements,
@@ -98,6 +100,11 @@ export default function GAFTPOEstimator() {
     () => calculateGAFTPOEstimate(assembly, measurements, customPrices),
     [assembly, measurements, customPrices]
   );
+
+  // Penetrations state
+  const [penetrationEstimate, setPenetrationEstimate] = useState<PenetrationEstimate | null>(null);
+  const penetrationCost = penetrationEstimate?.totalMaterialCost ?? 0;
+  const grandTotal = estimate.totalMaterialCost + penetrationCost;
 
   // Derived wall sq ft
   const wallSqFt = measurements.wallLinearFt * measurements.wallHeight;
@@ -739,6 +746,13 @@ export default function GAFTPOEstimator() {
 
           {/* Right Column: Results */}
           <div className="lg:col-span-7 space-y-6">
+            {/* Roof Penetrations & Additions */}
+            <div data-print-hide>
+              <RoofAdditions
+                onEstimateChange={setPenetrationEstimate}
+                accentColor="red"
+              />
+            </div>
             {/* Total Cost Header */}
             <AnimatePresence mode="wait">
               {hasResults && (
@@ -754,19 +768,24 @@ export default function GAFTPOEstimator() {
                         Total Material Estimate
                       </p>
                       <p className="text-4xl font-bold font-display tracking-tight">
-                        {fmt(estimate.totalMaterialCost)}
+                        {fmt(grandTotal)}
                       </p>
                       <div className="flex flex-wrap gap-x-6 gap-y-1 mt-3 text-sm">
-                        <span className="text-slate-300">
+                        <span className="text-red-200">
                           <DollarSign className="w-3.5 h-3.5 inline mr-1" />
                           {measurements.roofArea > 0
-                            ? `${(estimate.totalMaterialCost / measurements.roofArea).toFixed(2)} / sq ft`
+                            ? `${(grandTotal / measurements.roofArea).toFixed(2)} / sq ft`
                             : "—"}
                         </span>
                         <span className="text-slate-300">
                           <Package className="w-3.5 h-3.5 inline mr-1" />
                           {estimate.lineItems.length} line items
                         </span>
+                        {penetrationCost > 0 && (
+                          <span className="text-red-300">
+                            Penetrations: {fmt(penetrationCost)}
+                          </span>
+                        )}
                         <span className="text-slate-300">
                           <Ruler className="w-3.5 h-3.5 inline mr-1" />
                           {measurements.roofArea.toLocaleString()} sq ft roof
@@ -971,20 +990,32 @@ export default function GAFTPOEstimator() {
                 {/* Grand Total Footer */}
                 <Card className="border-red-200 bg-red-50/50">
                   <CardContent className="py-4">
+                    {penetrationCost > 0 && (
+                      <div className="flex items-center justify-between text-sm text-slate-600 mb-2">
+                        <span>Roofing Materials</span>
+                        <span className="tabular-nums">{fmt(estimate.totalMaterialCost)}</span>
+                      </div>
+                    )}
+                    {penetrationCost > 0 && (
+                      <div className="flex items-center justify-between text-sm text-slate-600 mb-3 pb-3 border-b border-red-200">
+                        <span>Penetrations & Additions</span>
+                        <span className="tabular-nums">{fmt(penetrationCost)}</span>
+                      </div>
+                    )}
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-semibold text-slate-700">
                         Grand Total
                       </span>
                       <span className="text-2xl font-bold text-slate-900 tabular-nums">
-                        {fmt(estimate.totalMaterialCost)}
+                        {fmt(grandTotal)}
                       </span>
                     </div>
                     {measurements.roofArea > 0 && (
                       <p className="text-sm text-red-600 mt-1">
                         {(
-                          estimate.totalMaterialCost / measurements.roofArea
+                          grandTotal / measurements.roofArea
                         ).toFixed(2)}{" "}
-                        per sq ft (materials only)
+                        per sq ft (all materials)
                       </p>
                     )}
                   </CardContent>
