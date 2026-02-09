@@ -56,6 +56,21 @@ export interface PenetrationEstimate {
   materials: PenetrationMaterialResult[];
   totalMaterialCost: number;
   totalLaborMinutes: number;
+  /** Sheet metal flashing items (if any) */
+  sheetMetalItems?: SheetMetalFlashingLineItem[];
+  sheetMetalCost?: number;
+  sheetMetalLaborMinutes?: number;
+  sheetMetalType?: string;
+  sheetMetalGauge?: string;
+}
+
+/** Lightweight line item for sheet metal flashing within the penetration estimate */
+export interface SheetMetalFlashingLineItem {
+  flashingId: string;
+  name: string;
+  quantity: number; // linear feet
+  unitPrice: number;
+  totalCost: number;
 }
 
 // ── Penetration Type Definitions ───────────────────────────

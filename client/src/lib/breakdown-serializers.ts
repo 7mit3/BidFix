@@ -25,6 +25,7 @@ import type { PenetrationEstimate } from "./penetrations-data";
 export function serializeKarnakBreakdown(
   estimate: EstimateResult,
   laborEquipment: LaborEquipmentState,
+  penetrationEstimate?: PenetrationEstimate | null,
 ): EstimateBreakdownData {
   const sqft = estimate.inputs.squareFootage;
   const totals = calculateLaborEquipmentTotals(laborEquipment, sqft);
@@ -41,6 +42,35 @@ export function serializeKarnakBreakdown(
     totalCost: item.totalCost,
     enabled: item.quantityToOrder > 0,
   }));
+
+  const penetrations: BreakdownPenetrationItem[] = [
+    // Standard penetration materials
+    ...(penetrationEstimate?.materials ?? []).map(
+      (mat, idx) => ({
+        id: `pen-${idx}`,
+        name: mat.materialName,
+        description: `From: ${mat.fromPenetration}`,
+        unit: mat.unit,
+        quantity: mat.quantity,
+        unitPrice: mat.unitPrice,
+        totalCost: mat.totalPrice,
+        enabled: true,
+      })
+    ),
+    // Sheet metal flashing items
+    ...(penetrationEstimate?.sheetMetalItems ?? []).map(
+      (item, idx) => ({
+        id: `sm-${idx}`,
+        name: `${item.name}${penetrationEstimate?.sheetMetalType ? ` (${penetrationEstimate.sheetMetalType} ${penetrationEstimate.sheetMetalGauge})` : ""}`,
+        description: "Sheet Metal Flashing",
+        unit: "LF",
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalCost: item.totalCost,
+        enabled: true,
+      })
+    ),
+  ];
 
   const labor: BreakdownLaborItem[] = laborEquipment.laborItems.map((item) => {
     const breakdown = totals.laborBreakdown.find((b) => b.label === item.label);
@@ -80,7 +110,7 @@ export function serializeKarnakBreakdown(
       "Horizontal Seams": `${estimate.inputs.horizontalSeamsLF.toLocaleString()} lin. ft.`,
     },
     materials,
-    penetrations: [],
+    penetrations,
     labor,
     equipment,
   };
@@ -116,18 +146,34 @@ export function serializeTPOBreakdown(
     enabled: item.unitsToOrder > 0,
   }));
 
-  const penetrations: BreakdownPenetrationItem[] = (penetrationEstimate?.materials ?? []).map(
-    (mat, idx) => ({
-      id: `pen-${idx}`,
-      name: mat.materialName,
-      description: `From: ${mat.fromPenetration}`,
-      unit: mat.unit,
-      quantity: mat.quantity,
-      unitPrice: mat.unitPrice,
-      totalCost: mat.totalPrice,
-      enabled: true,
-    })
-  );
+  const penetrations: BreakdownPenetrationItem[] = [
+    // Standard penetration materials
+    ...(penetrationEstimate?.materials ?? []).map(
+      (mat, idx) => ({
+        id: `pen-${idx}`,
+        name: mat.materialName,
+        description: `From: ${mat.fromPenetration}`,
+        unit: mat.unit,
+        quantity: mat.quantity,
+        unitPrice: mat.unitPrice,
+        totalCost: mat.totalPrice,
+        enabled: true,
+      })
+    ),
+    // Sheet metal flashing items
+    ...(penetrationEstimate?.sheetMetalItems ?? []).map(
+      (item, idx) => ({
+        id: `sm-${idx}`,
+        name: `${item.name}${penetrationEstimate?.sheetMetalType ? ` (${penetrationEstimate.sheetMetalType} ${penetrationEstimate.sheetMetalGauge})` : ""}`,
+        description: "Sheet Metal Flashing",
+        unit: "LF",
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalCost: item.totalCost,
+        enabled: true,
+      })
+    ),
+  ];
 
   const labor: BreakdownLaborItem[] = laborEquipment.laborItems.map((item) => {
     const breakdown = totals.laborBreakdown.find((b) => b.label === item.label);

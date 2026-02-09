@@ -8,7 +8,7 @@
  * - Progressive disclosure: Input → Summary → Detail
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { useLocation, useSearch } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useEstimator } from "@/hooks/useEstimator";
@@ -20,6 +20,8 @@ import { PricingEditor } from "@/components/PricingEditor";
 import { LaborEquipmentSection } from "@/components/LaborEquipmentSection";
 import { SystemInfo } from "@/components/SystemInfo";
 import { Footer } from "@/components/Footer";
+import RoofAdditions from "@/components/RoofAdditions";
+import { type PenetrationEstimate } from "@/lib/penetrations-data";
 import { SaveEstimateDialog } from "@/components/SaveEstimateDialog";
 import { Button } from "@/components/ui/button";
 import { FileSpreadsheet, Save, FolderOpen } from "lucide-react";
@@ -35,6 +37,8 @@ export default function Home() {
   const [, navigate] = useLocation();
   const searchString = useSearch();
   const estimator = useEstimator();
+  const [penetrationEstimate, setPenetrationEstimate] = useState<PenetrationEstimate | null>(null);
+  const penetrationCost = penetrationEstimate?.totalMaterialCost ?? 0;
 
   // Save dialog state
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
@@ -95,10 +99,11 @@ export default function Home() {
     const breakdownData = serializeKarnakBreakdown(
       estimator.estimate,
       estimator.laborEquipment,
+      penetrationEstimate,
     );
     storeBreakdownData(breakdownData);
     navigate("/breakdown");
-  }, [estimator.estimate, estimator.laborEquipment, navigate]);
+  }, [estimator.estimate, estimator.laborEquipment, penetrationEstimate, navigate]);
 
   const getEstimateData = useCallback(() => {
     return serializeKarnakState({
@@ -167,6 +172,10 @@ export default function Home() {
               customPrices={estimator.customPrices}
               updatePrice={estimator.updatePrice}
               resetPrices={estimator.resetPrices}
+            />
+            <RoofAdditions
+              onEstimateChange={setPenetrationEstimate}
+              accentColor="red"
             />
           </div>
 

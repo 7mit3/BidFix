@@ -81,3 +81,16 @@
 - [x] Custom items should have editable name, quantity, price, and auto-calculated total
 - [x] Test in browser — verified all quantities editable and Add Item works in all sections
 - [x] Update vitest tests — 69 tests passing
+
+## Sheet Metal Flashing (Penetrations & Additions)
+- [x] Create sheet metal flashing data model (metal types, gauges/thicknesses, flashing items)
+- [x] Metal type selection: Steel, Aluminum, Stainless Steel, Copper, Galvalume
+- [x] Gauge/thickness selection per metal type (Steel: 28ga-16ga, Aluminum: .032"-.063", Stainless: 26ga-20ga, Copper: 16oz-24oz, Galvalume: 26ga-22ga)
+- [x] Common flashing items: Drip Edge, Gravel Stop, Coping Cap, Counter Flashing, Edge Metal, Reglet, Through-Wall, Parapet Cap, Valley, Step, Custom
+- [x] Add Sheet Metal Flashing UI section within RoofAdditions component
+- [x] Integrate into all three estimators (Karnak, Carlisle TPO, GAF TPO)
+- [x] Add flashing items to Estimate Breakdown page (via breakdown serializers)
+- [x] Add flashing products to pricing database (all-products.ts)
+- [x] Update estimate serialization/deserialization for save/load
+- [x] Write vitest tests for sheet metal flashing — 27 tests passing (96 total)
+- [x] Test in browser across all estimators — verified Karnak, Carlisle TPO, GAF TPO
