@@ -70,3 +70,14 @@
 - [x] Add /saved route in App.tsx and Saved Estimates link on Catalog page
 - [x] Test save/load workflow end-to-end in browser — verified on Carlisle TPO
 - [x] Write vitest tests for estimate serializers (12 tests, 69 total)
+
+## Editable Quantities & Custom Items on Breakdown Page
+- [x] Make all labor item quantities editable (currently some show "—" when disabled)
+- [x] Make all item quantities editable across all sections (Materials, Penetrations, Labor, Equipment)
+- [x] Add "Add Item" button to Materials section for custom line items
+- [x] Add "Add Item" button to Penetrations section for custom line items
+- [x] Add "Add Item" button to Labor section for custom line items
+- [x] Add "Add Item" button to Equipment section for custom line items
+- [x] Custom items should have editable name, quantity, price, and auto-calculated total
+- [x] Test in browser — verified all quantities editable and Add Item works in all sections
+- [x] Update vitest tests — 69 tests passing
