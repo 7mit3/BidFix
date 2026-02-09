@@ -5,7 +5,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { DollarSign, Package, HardHat, Wrench } from "lucide-react";
+import { DollarSign, Package, HardHat, Wrench, Ruler } from "lucide-react";
 import { type EstimateResult, formatCurrency } from "@/lib/karnak-data";
 import type { LaborEquipmentTotals } from "@/lib/labor-equipment-data";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,6 +43,8 @@ export function CostSummary({
   const materialCost = estimate.totalMaterialCost;
   const laborCost = laborEquipmentTotals?.laborTotal ?? 0;
   const equipmentCost = laborEquipmentTotals?.equipmentTotal ?? 0;
+  const sqft = estimate.inputs.squareFootage;
+  const pricePerSqFt = sqft > 0 ? projectTotal / sqft : 0;
 
   // Group material costs by application step
   const stepCosts = estimate.lineItems.reduce(
@@ -124,6 +126,26 @@ export function CostSummary({
                 </span>
               </div>
             </div>
+
+            {/* Price per square foot */}
+            {sqft > 0 && (
+              <div className="mt-4 pt-4 border-t border-white/15 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
+                  <Ruler className="w-4 h-4 text-warm-300" />
+                </div>
+                <div>
+                  <p className="text-warm-400 text-xs uppercase tracking-wide">
+                    Price per Square Foot
+                  </p>
+                  <p className="text-white font-heading text-xl font-bold font-mono-nums">
+                    {formatCurrency(pricePerSqFt)}
+                    <span className="text-warm-400 text-sm font-normal ml-1">
+                      / sq. ft.
+                    </span>
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Category proportion bar */}
