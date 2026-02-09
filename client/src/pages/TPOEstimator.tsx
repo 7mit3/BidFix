@@ -3,7 +3,7 @@
 // Layout: Two-column — left: assembly config + measurements, right: results
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -25,6 +25,7 @@ import {
   Minus,
   X,
   HardHat,
+  FileSpreadsheet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,11 +80,14 @@ import {
   getResolvedFastenerLength,
   getResolvedMembraneFastenerLength,
 } from "@/lib/tpo-data";
+import { storeBreakdownData } from "@/lib/estimate-breakdown";
+import { serializeTPOBreakdown } from "@/lib/breakdown-serializers";
 
 const fmt = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
 export default function TPOEstimator() {
+  const [, navigate] = useLocation();
   // Assembly config state
   const [assembly, setAssembly] = useState<AssemblyConfig>({
     deckType: "steel-22ga",
@@ -307,6 +311,19 @@ export default function TPOEstimator() {
   }, [estimate]);
 
   const handlePrint = useCallback(() => window.print(), []);
+
+  const handleViewBreakdown = useCallback(() => {
+    const breakdownData = serializeTPOBreakdown(
+      estimate,
+      laborEquipment,
+      penetrationEstimate,
+      "Carlisle Sure-Weld TPO System",
+      "carlisle-tpo",
+      "blue",
+    );
+    storeBreakdownData(breakdownData);
+    navigate("/breakdown");
+  }, [estimate, laborEquipment, penetrationEstimate, navigate]);
 
   // Group line items by category for display
   const groupedItems = useMemo(() => {
@@ -1118,6 +1135,7 @@ export default function TPOEstimator() {
 
             {/* Material Order List */}
             {hasResults ? (
+              <>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -1274,6 +1292,19 @@ export default function TPOEstimator() {
                   </CardContent>
                 </Card>
               </motion.div>
+
+              {/* View Full Breakdown Button */}
+              <div className="flex justify-center mt-4">
+                <Button
+                  size="lg"
+                  onClick={handleViewBreakdown}
+                  className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+                >
+                  <FileSpreadsheet className="w-5 h-5" />
+                  View Full Breakdown
+                </Button>
+              </div>
+              </>
             ) : (
               <Card className="border-dashed border-2 border-slate-200">
                 <CardContent className="py-16 text-center">

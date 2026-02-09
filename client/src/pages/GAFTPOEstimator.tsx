@@ -3,7 +3,7 @@
 // Layout: Two-column — left: assembly config + measurements, right: results
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
@@ -24,6 +24,7 @@ import {
   Plus,
   X,
   HardHat,
+  FileSpreadsheet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,11 +80,14 @@ import {
   calculateGAFTPOEstimate,
   exportGAFTPOEstimateCSV,
 } from "@/lib/gaf-tpo-data";
+import { storeBreakdownData } from "@/lib/estimate-breakdown";
+import { serializeTPOBreakdown } from "@/lib/breakdown-serializers";
 
 const fmt = (n: number) =>
   n.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
 export default function GAFTPOEstimator() {
+  const [, navigate] = useLocation();
   // Assembly config state
   const [assembly, setAssembly] = useState<AssemblyConfig>({
     deckType: "steel-22ga",
@@ -308,6 +312,19 @@ export default function GAFTPOEstimator() {
   }, [estimate]);
 
   const handlePrint = useCallback(() => window.print(), []);
+
+  const handleViewBreakdown = useCallback(() => {
+    const breakdownData = serializeTPOBreakdown(
+      estimate,
+      laborEquipment,
+      penetrationEstimate,
+      "GAF EverGuard TPO System",
+      "gaf-tpo",
+      "emerald",
+    );
+    storeBreakdownData(breakdownData);
+    navigate("/breakdown");
+  }, [estimate, laborEquipment, penetrationEstimate, navigate]);
 
   // Group line items by category
   const groupedItems = useMemo(() => {
@@ -1136,6 +1153,7 @@ export default function GAFTPOEstimator() {
 
             {/* Material Order List */}
             {hasResults ? (
+              <>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -1307,6 +1325,19 @@ export default function GAFTPOEstimator() {
                   </CardContent>
                 </Card>
               </motion.div>
+
+              {/* View Full Breakdown Button */}
+              <div className="flex justify-center mt-4">
+                <Button
+                  size="lg"
+                  onClick={handleViewBreakdown}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                >
+                  <FileSpreadsheet className="w-5 h-5" />
+                  View Full Breakdown
+                </Button>
+              </div>
+              </>
             ) : (
               <Card className="border-dashed border-2 border-slate-200">
                 <CardContent className="py-16 text-center">

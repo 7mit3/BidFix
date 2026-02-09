@@ -8,6 +8,8 @@
  * - Progressive disclosure: Input → Summary → Detail
  */
 
+import { useCallback } from "react";
+import { useLocation } from "wouter";
 import { useEstimator } from "@/hooks/useEstimator";
 import { HeroSection } from "@/components/HeroSection";
 import { InputSection } from "@/components/InputSection";
@@ -17,9 +19,24 @@ import { PricingEditor } from "@/components/PricingEditor";
 import { LaborEquipmentSection } from "@/components/LaborEquipmentSection";
 import { SystemInfo } from "@/components/SystemInfo";
 import { Footer } from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import { FileSpreadsheet } from "lucide-react";
+import { storeBreakdownData } from "@/lib/estimate-breakdown";
+import { serializeKarnakBreakdown } from "@/lib/breakdown-serializers";
 
 export default function Home() {
+  const [, navigate] = useLocation();
   const estimator = useEstimator();
+
+  const handleViewBreakdown = useCallback(() => {
+    if (!estimator.estimate) return;
+    const breakdownData = serializeKarnakBreakdown(
+      estimator.estimate,
+      estimator.laborEquipment,
+    );
+    storeBreakdownData(breakdownData);
+    navigate("/breakdown");
+  }, [estimator.estimate, estimator.laborEquipment, navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -64,6 +81,18 @@ export default function Home() {
               laborEquipmentTotals={estimator.laborEquipmentTotals}
               projectTotal={estimator.projectTotal}
             />
+            {estimator.estimate && (
+              <div className="flex justify-center">
+                <Button
+                  size="lg"
+                  onClick={handleViewBreakdown}
+                  className="bg-karnak-red hover:bg-karnak-red/90 text-white gap-2"
+                >
+                  <FileSpreadsheet className="w-5 h-5" />
+                  View Full Breakdown
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 

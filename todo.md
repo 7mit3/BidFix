@@ -31,3 +31,15 @@
 
 ## Bug Fixes
 - [x] Fix nested button error on /estimator/carlisle-tpo — button cannot contain a nested button (was in RoofAdditions.tsx: reset button nested inside header button)
+
+## Estimate Breakdown Page
+- [x] Review current estimator data structures (materials, labor, equipment, penetrations)
+- [x] Create EstimateBreakdown page with consolidated view of all cost items
+- [x] Implement toggle on/off for each line item (materials, labor, equipment, penetrations)
+- [x] Implement editable quantities and prices for each line item
+- [x] Show section subtotals and grand total that update reactively
+- [x] Add "View Full Breakdown" button to each estimator (Karnak, Carlisle TPO, GAF TPO)
+- [x] Pass estimator state to breakdown page via sessionStorage
+- [x] Add Export CSV and Print capability from the breakdown page
+- [x] Test the full workflow from Carlisle TPO estimator — verified in browser
+- [x] Write vitest tests for breakdown utilities (28 tests, 57 total)
