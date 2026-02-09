@@ -98,3 +98,9 @@
 ## Prefinished Steel Metal Type
 - [x] Add "Prefinished Steel" to METAL_TYPES in sheet-metal-flashing-data.ts
 - [x] Update tests and verify — 97 tests passing
+
+## Price Per Square Foot on Breakdown Page
+- [x] Show $/sq.ft. next to Grand Total in the top sticky summary bar
+- [x] Show $/sq.ft. below Grand Total in the bottom summary card
+- [x] Calculate as Grand Total ÷ Total Roof Area (from user input)
+- [x] Test in browser and verify — confirmed $7.54/sq.ft. for 80,000 sq.ft. TPO estimate

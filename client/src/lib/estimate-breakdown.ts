@@ -61,6 +61,7 @@ export interface EstimateBreakdownData {
   systemSlug: string; // e.g. "karnak-metal-kynar", "carlisle-tpo"
   accentColor: string; // tailwind color name: "red", "blue", "emerald"
   measurements: Record<string, string>; // human-readable key-value pairs for header
+  roofArea: number; // total roof area in sq. ft. for $/sqft calculation
   materials: BreakdownMaterialItem[];
   penetrations: BreakdownPenetrationItem[];
   labor: BreakdownLaborItem[];

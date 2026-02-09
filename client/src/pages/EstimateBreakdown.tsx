@@ -581,11 +581,18 @@ export default function EstimateBreakdown() {
               <span className="ml-2 font-semibold tabular-nums">{fmt(eqTP.sectionTotal)}</span>
             </div>
           </div>
-          <div className="text-right">
-            <span className="text-sm text-muted-foreground mr-2">Grand Total</span>
-            <span className={`text-xl font-bold ${accent.text} tabular-nums`}>
-              {fmt(grandTotal)}
-            </span>
+          <div className="text-right flex items-baseline gap-3">
+            <div>
+              <span className="text-sm text-muted-foreground mr-2">Grand Total</span>
+              <span className={`text-xl font-bold ${accent.text} tabular-nums`}>
+                {fmt(grandTotal)}
+              </span>
+            </div>
+            {data.roofArea > 0 && (
+              <div className="text-sm text-muted-foreground tabular-nums">
+                {fmt(grandTotal / data.roofArea)}/sq.ft.
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -788,6 +795,14 @@ export default function EstimateBreakdown() {
                   {fmt(grandTotal)}
                 </span>
               </div>
+              {data.roofArea > 0 && (
+                <div className="flex justify-between items-center pt-1">
+                  <span className="text-sm text-muted-foreground">Price Per Square Foot</span>
+                  <span className={`text-lg font-semibold ${accent.text} tabular-nums`}>
+                    {fmt(grandTotal / data.roofArea)}/sq.ft.
+                  </span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
