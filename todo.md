@@ -94,3 +94,7 @@
 - [x] Update estimate serialization/deserialization for save/load
 - [x] Write vitest tests for sheet metal flashing — 27 tests passing (96 total)
 - [x] Test in browser across all estimators — verified Karnak, Carlisle TPO, GAF TPO
+
+## Prefinished Steel Metal Type
+- [x] Add "Prefinished Steel" to METAL_TYPES in sheet-metal-flashing-data.ts
+- [x] Update tests and verify — 97 tests passing

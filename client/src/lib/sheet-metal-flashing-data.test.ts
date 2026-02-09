@@ -12,13 +12,14 @@ import {
 
 describe("Sheet Metal Flashing Data", () => {
   describe("METAL_TYPES", () => {
-    it("has 5 metal types", () => {
-      expect(METAL_TYPES).toHaveLength(5);
+    it("has 6 metal types", () => {
+      expect(METAL_TYPES).toHaveLength(6);
     });
 
-    it("includes galvanized steel, aluminum, stainless steel, copper, galvalume", () => {
+    it("includes galvanized steel, prefinished steel, aluminum, stainless steel, copper, galvalume", () => {
       const ids = METAL_TYPES.map((m) => m.id);
       expect(ids).toContain("galvanized-steel");
+      expect(ids).toContain("prefinished-steel");
       expect(ids).toContain("aluminum");
       expect(ids).toContain("stainless-steel");
       expect(ids).toContain("copper");
@@ -30,6 +31,14 @@ describe("Sheet Metal Flashing Data", () => {
       expect(steel.gauges).toHaveLength(7);
       expect(steel.gauges[0].label).toBe("28 Gauge");
       expect(steel.gauges[steel.gauges.length - 1].label).toBe("16 Gauge");
+    });
+
+    it("prefinished steel has gauges from 28ga to 16ga", () => {
+      const pf = METAL_TYPES.find((m) => m.id === "prefinished-steel")!;
+      expect(pf.gauges).toHaveLength(7);
+      expect(pf.gauges[0].label).toBe("28 Gauge");
+      expect(pf.gauges[pf.gauges.length - 1].label).toBe("16 Gauge");
+      expect(pf.basePricePerLF).toBeGreaterThan(0);
     });
 
     it("aluminum has thickness options", () => {

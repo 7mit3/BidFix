@@ -7,6 +7,7 @@
  *
  * Metal Types:
  *   - Galvanized Steel (28ga – 16ga)
+ *   - Prefinished Steel (28ga – 16ga)
  *   - Aluminum (.032" – .063")
  *   - Stainless Steel (26ga – 20ga)
  *   - Copper (16 oz – 24 oz)
@@ -93,6 +94,21 @@ export const METAL_TYPES: MetalType[] = [
       { id: "20ga", label: "20 Gauge", value: "20", priceMultiplier: 1.55 },
       { id: "18ga", label: "18 Gauge", value: "18", priceMultiplier: 2.00 },
       { id: "16ga", label: "16 Gauge", value: "16", priceMultiplier: 2.60 },
+    ],
+  },
+  {
+    id: "prefinished-steel",
+    name: "Prefinished Steel",
+    basePricePerLF: 4.25,
+    defaultGaugeId: "24ga-pf",
+    gauges: [
+      { id: "28ga-pf", label: "28 Gauge", value: "28", priceMultiplier: 0.70 },
+      { id: "26ga-pf", label: "26 Gauge", value: "26", priceMultiplier: 0.80 },
+      { id: "24ga-pf", label: "24 Gauge", value: "24", priceMultiplier: 1.00 },
+      { id: "22ga-pf", label: "22 Gauge", value: "22", priceMultiplier: 1.25 },
+      { id: "20ga-pf", label: "20 Gauge", value: "20", priceMultiplier: 1.55 },
+      { id: "18ga-pf", label: "18 Gauge", value: "18", priceMultiplier: 2.00 },
+      { id: "16ga-pf", label: "16 Gauge", value: "16", priceMultiplier: 2.60 },
     ],
   },
   {
