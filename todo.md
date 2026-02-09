@@ -120,3 +120,6 @@
 - [x] Remove all karnak-red, warm-, stone- color references
 - [x] All 97 tests passing, zero TypeScript errors
 - [x] Verified in browser across Catalog, Estimators, Pricing Database
+
+## Powered by RooFix AI Badge
+- [x] Add "Powered by RooFix AI" badge to Footer component with link to roofix.ai
