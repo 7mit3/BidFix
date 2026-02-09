@@ -43,3 +43,9 @@
 - [x] Add Export CSV and Print capability from the breakdown page
 - [x] Test the full workflow from Carlisle TPO estimator — verified in browser
 - [x] Write vitest tests for breakdown utilities (28 tests, 57 total)
+
+## Excel Export
+- [x] Install xlsx (SheetJS) library for Excel export
+- [x] Update EstimateBreakdown page Export CSV button to Export Excel (.xlsx)
+- [x] Update both header and footer export buttons
+- [x] Multi-sheet workbook: Summary, Materials, Penetrations, Labor, Equipment

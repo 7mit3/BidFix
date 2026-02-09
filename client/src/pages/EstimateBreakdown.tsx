@@ -20,7 +20,7 @@ import {
   HardHat,
   Settings,
   Printer,
-  Download,
+  FileSpreadsheet,
   Eye,
   EyeOff,
   ChevronDown,
@@ -206,82 +206,127 @@ export default function EstimateBreakdown() {
     setSections((prev) => ({ ...prev, [section]: !prev[section] }));
   }, []);
 
-  // ── CSV Export ───────────────────────────────────────────
+  // ── Excel Export ─────────────────────────────────────────
 
-  const exportCSV = useCallback(() => {
+  const exportExcel = useCallback(() => {
     if (!data) return;
-    const rows: string[][] = [
-      ["Category", "Item", "Description", "Unit", "Qty", "Unit Price", "Total", "Included"],
-    ];
+    import("xlsx").then((XLSX) => {
+      const wb = XLSX.utils.book_new();
 
-    materials.forEach((m) => {
-      rows.push([
-        "Material",
-        m.name,
-        m.description,
-        m.unit,
-        String(m.quantity),
-        m.unitPrice.toFixed(2),
-        m.totalCost.toFixed(2),
-        m.enabled ? "Yes" : "No",
-      ]);
+      // ── Materials sheet ───────────────────────────────────
+      const matRows = materials.map((m) => ({
+        Category: m.category,
+        Item: m.name,
+        Description: m.description,
+        Unit: m.unit,
+        Quantity: m.quantity,
+        "Unit Price": m.unitPrice,
+        Total: m.totalCost,
+        Included: m.enabled ? "Yes" : "No",
+      }));
+      matRows.push(
+        {} as any,
+        { Category: "", Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": "Materials Total", Total: materialTotal, Included: "" } as any
+      );
+      const matWs = XLSX.utils.json_to_sheet(matRows);
+      // Set column widths
+      matWs["!cols"] = [
+        { wch: 16 }, { wch: 40 }, { wch: 30 }, { wch: 18 },
+        { wch: 10 }, { wch: 12 }, { wch: 14 }, { wch: 10 },
+      ];
+      XLSX.utils.book_append_sheet(wb, matWs, "Materials");
+
+      // ── Penetrations sheet (if any) ───────────────────────
+      if (penetrations.length > 0) {
+        const penRows = penetrations.map((p) => ({
+          Item: p.name,
+          Description: p.description,
+          Unit: p.unit,
+          Quantity: p.quantity,
+          "Unit Price": p.unitPrice,
+          Total: p.totalCost,
+          Included: p.enabled ? "Yes" : "No",
+        }));
+        penRows.push(
+          {} as any,
+          { Item: "", Description: "", Unit: "", Quantity: "", "Unit Price": "Penetrations Total", Total: penetrationTotal, Included: "" } as any
+        );
+        const penWs = XLSX.utils.json_to_sheet(penRows);
+        penWs["!cols"] = [
+          { wch: 30 }, { wch: 30 }, { wch: 12 },
+          { wch: 10 }, { wch: 12 }, { wch: 14 }, { wch: 10 },
+        ];
+        XLSX.utils.book_append_sheet(wb, penWs, "Penetrations");
+      }
+
+      // ── Labor sheet ───────────────────────────────────────
+      if (labor.length > 0) {
+        const labRows = labor.map((l) => ({
+          Item: l.label,
+          Description: l.description,
+          "Rate Type": getRateLabel(l.rateType),
+          Rate: l.rate,
+          Quantity: l.rateType === "per_sqft" || l.rateType === "per_lf" ? "—" : l.quantity,
+          Total: l.computedCost,
+          Included: l.enabled ? "Yes" : "No",
+        }));
+        labRows.push(
+          {} as any,
+          { Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: "Labor Total", Total: laborTotal, Included: "" } as any
+        );
+        const labWs = XLSX.utils.json_to_sheet(labRows);
+        labWs["!cols"] = [
+          { wch: 30 }, { wch: 30 }, { wch: 14 },
+          { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 10 },
+        ];
+        XLSX.utils.book_append_sheet(wb, labWs, "Labor");
+      }
+
+      // ── Equipment sheet ───────────────────────────────────
+      if (equipment.length > 0) {
+        const eqRows = equipment.map((e) => ({
+          Item: e.label,
+          Description: e.description,
+          "Rate Type": getRateLabel(e.rateType),
+          Rate: e.rate,
+          Quantity: e.rateType === "flat" ? "—" : e.quantity,
+          Total: e.computedCost,
+          Included: e.enabled ? "Yes" : "No",
+        }));
+        eqRows.push(
+          {} as any,
+          { Item: "", Description: "", "Rate Type": "", Rate: "", Quantity: "Equipment Total", Total: equipmentTotal, Included: "" } as any
+        );
+        const eqWs = XLSX.utils.json_to_sheet(eqRows);
+        eqWs["!cols"] = [
+          { wch: 30 }, { wch: 30 }, { wch: 14 },
+          { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 10 },
+        ];
+        XLSX.utils.book_append_sheet(wb, eqWs, "Equipment");
+      }
+
+      // ── Summary sheet ─────────────────────────────────────
+      const summaryRows = [
+        { Section: "Materials", Items: materials.filter((m) => m.enabled).length, Total: materialTotal },
+        ...(penetrations.length > 0 ? [{ Section: "Penetrations", Items: penetrations.filter((p) => p.enabled).length, Total: penetrationTotal }] : []),
+        ...(labor.length > 0 ? [{ Section: "Labor", Items: labor.filter((l) => l.enabled).length, Total: laborTotal }] : []),
+        ...(equipment.length > 0 ? [{ Section: "Equipment", Items: equipment.filter((e) => e.enabled).length, Total: equipmentTotal }] : []),
+        {} as any,
+        { Section: "GRAND TOTAL", Items: "", Total: grandTotal } as any,
+      ];
+      const summaryWs = XLSX.utils.json_to_sheet(summaryRows);
+      summaryWs["!cols"] = [{ wch: 20 }, { wch: 10 }, { wch: 16 }];
+      XLSX.utils.book_append_sheet(wb, summaryWs, "Summary");
+      // Move Summary to the first position
+      const idx = wb.SheetNames.indexOf("Summary");
+      if (idx > 0) {
+        wb.SheetNames.splice(idx, 1);
+        wb.SheetNames.unshift("Summary");
+      }
+
+      // ── Download ──────────────────────────────────────────
+      XLSX.writeFile(wb, `${data.systemSlug}-estimate-${Date.now()}.xlsx`);
     });
-
-    penetrations.forEach((p) => {
-      rows.push([
-        "Penetration",
-        p.name,
-        p.description,
-        p.unit,
-        String(p.quantity),
-        p.unitPrice.toFixed(2),
-        p.totalCost.toFixed(2),
-        p.enabled ? "Yes" : "No",
-      ]);
-    });
-
-    labor.forEach((l) => {
-      rows.push([
-        "Labor",
-        l.label,
-        l.description,
-        getRateLabel(l.rateType),
-        l.rateType === "per_sqft" || l.rateType === "per_lf" ? "—" : String(l.quantity),
-        l.rate.toFixed(2),
-        l.computedCost.toFixed(2),
-        l.enabled ? "Yes" : "No",
-      ]);
-    });
-
-    equipment.forEach((e) => {
-      rows.push([
-        "Equipment",
-        e.label,
-        e.description,
-        getRateLabel(e.rateType),
-        e.rateType === "flat" ? "—" : String(e.quantity),
-        e.rate.toFixed(2),
-        e.computedCost.toFixed(2),
-        e.enabled ? "Yes" : "No",
-      ]);
-    });
-
-    // Summary rows
-    rows.push([]);
-    rows.push(["", "", "", "", "", "Materials Total", materialTotal.toFixed(2), ""]);
-    rows.push(["", "", "", "", "", "Penetrations Total", penetrationTotal.toFixed(2), ""]);
-    rows.push(["", "", "", "", "", "Labor Total", laborTotal.toFixed(2), ""]);
-    rows.push(["", "", "", "", "", "Equipment Total", equipmentTotal.toFixed(2), ""]);
-    rows.push(["", "", "", "", "", "GRAND TOTAL", grandTotal.toFixed(2), ""]);
-
-    const csvContent = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${data.systemSlug}-breakdown-${Date.now()}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
   }, [data, materials, penetrations, labor, equipment, materialTotal, penetrationTotal, laborTotal, equipmentTotal, grandTotal]);
 
   // ── Print ────────────────────────────────────────────────
@@ -363,11 +408,11 @@ export default function EstimateBreakdown() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={exportCSV}
+                onClick={exportExcel}
                 className="text-white/80 hover:text-white hover:bg-white/10 text-xs"
               >
-                <Download className="w-4 h-4 mr-1" />
-                Export CSV
+                <FileSpreadsheet className="w-4 h-4 mr-1" />
+                Export Excel
               </Button>
               <Button
                 variant="ghost"
@@ -590,9 +635,9 @@ export default function EstimateBreakdown() {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Estimator
           </Button>
-          <Button onClick={exportCSV}>
-            <Download className="w-4 h-4 mr-2" />
-            Export CSV
+          <Button onClick={exportExcel}>
+            <FileSpreadsheet className="w-4 h-4 mr-2" />
+            Export Excel
           </Button>
         </div>
       </div>
