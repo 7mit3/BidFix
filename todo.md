@@ -1,6 +1,9 @@
 # Project TODO
 
 ## Reminders
+- Vercel ignores express.static() - static assets must go in public/** directory
+- Express app must be default exported from src/index.ts for Vercel detection
+- Current issue: Vercel was serving raw esbuild bundle as page content (no frontend)
 - DB pricing sync: useState initializer only runs once, so we use useEffect to sync DB prices when they arrive
 - The system prefix for pricing DB is: karnak, carlisle-tpo, gaf-tpo (stripped when passed to estimators)
 - userEditedPrices ref tracks which prices the user has manually changed so DB sync doesn't overwrite them
@@ -183,3 +186,10 @@
 - [x] Created reconstruct-breakdown.ts utility to reconstruct breakdown from saved state
 - [x] Load estimate data, generate breakdown data, store in sessionStorage, navigate to /breakdown
 - [x] Tested in browser — direct breakdown navigation works correctly with all data restored
+
+## Vercel Deployment Fix
+- [ ] Create src/index.ts with Express app default export for Vercel serverless function
+- [ ] Create vercel.json with proper build config, rewrites, and SPA fallback
+- [ ] Update build script to output Vite frontend to public/ for Vercel CDN
+- [ ] Push changes to GitHub to trigger new Vercel deployment
+- [ ] Verify deployment works correctly on bid-fix.vercel.app
